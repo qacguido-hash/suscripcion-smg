@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Panel de Suscripción — Swiss Medical Seguros</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --navy:#0a1628;--blue:#1a3a6b;--mid:#2563a8;--accent:#3b82c4;
+  --green:#1a7a4a;--green-l:#edf7f1;--red:#c0392b;--red-l:#fdf0ef;
+  --amber:#b45309;--amber-l:#fef9ec;--gray:#f4f6f9;--border:#dde3ec;
+  --text:#0f1c2e;--muted:#6b7a90;
+  --font:'DM Sans',sans-serif;--mono:'DM Mono',monospace;
+}
+body{font-family:var(--font);color:var(--text);background:var(--gray);height:100vh;overflow:hidden;}
+.app{display:flex;height:100vh;}
+.sidebar{width:215px;min-width:215px;background:var(--navy);display:flex;flex-direction:column;height:100vh;}
+.sidebar-logo{padding:22px 18px 16px;border-bottom:1px solid rgba(255,255,255,0.08);}
+.logo-tag{font-size:9px;font-weight:600;letter-spacing:2px;color:rgba(255,255,255,0.35);text-transform:uppercase;}
+.logo-name{font-size:14px;font-weight:600;color:#fff;margin-top:3px;}
+.logo-sub{font-size:11px;color:rgba(255,255,255,0.4);margin-top:2px;}
+.nav-section{padding:14px 10px 6px;}
+.nav-label{font-size:9px;font-weight:600;letter-spacing:1.5px;color:rgba(255,255,255,0.28);text-transform:uppercase;padding:0 8px;margin-bottom:5px;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;cursor:pointer;transition:background 0.15s;font-size:13px;color:rgba(255,255,255,0.5);user-select:none;}
+.nav-item:hover{background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.85);}
+.nav-item.active{background:rgba(59,130,196,0.25);color:#fff;font-weight:500;}
+.nav-icon{width:15px;height:15px;flex-shrink:0;}
+.sidebar-bottom{margin-top:auto;padding:14px 18px;border-top:1px solid rgba(255,255,255,0.08);}
+.sidebar-team{font-size:11px;color:rgba(255,255,255,0.3);}
+.main{flex:1;display:flex;flex-direction:column;height:100vh;overflow:hidden;}
+.topbar{background:#fff;border-bottom:1px solid var(--border);padding:0 26px;height:56px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.topbar-left .ttl{font-size:15px;font-weight:600;}
+.topbar-left .sub{font-size:12px;color:var(--muted);margin-top:1px;}
+.topbar-right{display:flex;gap:8px;}
+.btn{padding:7px 16px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;border:none;font-family:var(--font);transition:all 0.15s;}
+.btn-primary{background:var(--blue);color:#fff;}
+.btn-primary:hover{background:var(--mid);}
+.btn-outline{background:transparent;color:var(--blue);border:1px solid var(--border);}
+.btn-outline:hover{background:var(--gray);}
+.btn-sm{padding:5px 13px;font-size:12px;}
+.btn-green{background:var(--green);color:#fff;}
+.btn-green:hover{background:#145f39;}
+.content{flex:1;overflow-y:auto;padding:22px 26px;}
+.tabs{display:flex;border-bottom:1.5px solid var(--border);margin-bottom:22px;}
+.tab{padding:9px 18px;font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;border-bottom:2.5px solid transparent;margin-bottom:-1.5px;transition:all 0.15s;white-space:nowrap;user-select:none;}
+.tab:hover{color:var(--blue);}
+.tab.active{color:var(--blue);border-bottom-color:var(--blue);}
+.view{display:none;}
+.view.active{display:block;}
+.card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:18px 20px;margin-bottom:14px;}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.card-title{font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px;}
+.badge{font-size:10px;font-weight:600;padding:2px 9px;border-radius:20px;}
+.badge-ok{background:var(--green-l);color:var(--green);}
+.badge-warn{background:var(--amber-l);color:var(--amber);}
+.badge-bad{background:var(--red-l);color:var(--red);}
+.badge-blue{background:#e8f1fb;color:var(--blue);}
+.fg{display:flex;flex-direction:column;gap:5px;margin-bottom:12px;}
+label{font-size:11px;font-weight:600;color:var(--muted);letter-spacing:0.3px;text-transform:uppercase;}
+input[type=text],input[type=number],select,textarea{border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:13px;color:var(--text);font-family:var(--font);background:#fff;transition:border 0.15s;outline:none;width:100%;}
+input:focus,select:focus,textarea:focus{border-color:var(--accent);}
+textarea{resize:vertical;min-height:68px;line-height:1.5;}
+.cuit-input{font-family:var(--mono);font-size:15px;letter-spacing:1px;}
+.ib{padding:10px 14px;border-radius:8px;font-size:12px;display:flex;align-items:flex-start;gap:8px;margin-bottom:12px;border:1px solid;line-height:1.5;}
+.ib-info{background:#e8f1fb;border-color:#c5d9f0;color:var(--mid);}
+.ib-warn{background:var(--amber-l);border-color:#f3d69b;color:var(--amber);}
+.ib-ok{background:var(--green-l);border-color:#b2dfca;color:var(--green);}
+.ib-err{background:var(--red-l);border-color:#f5c0b8;color:var(--red);}
+.rs-box{background:var(--gray);border-radius:8px;padding:9px 14px;border:1px solid var(--border);min-height:38px;display:flex;align-items:center;gap:8px;}
+.rs-ph{font-size:13px;color:var(--muted);font-style:italic;}
+.rs-val{font-size:14px;font-weight:600;color:var(--blue);}
+.spin{width:13px;height:13px;border:2px solid #c5d9f0;border-top-color:var(--mid);border-radius:50%;animation:spin 0.7s linear infinite;display:inline-block;flex-shrink:0;vertical-align:middle;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.loading{text-align:center;padding:28px;color:var(--muted);font-size:13px;}
+.bcra-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px;}
+.bcra-item{padding:12px;border-radius:9px;border:1px solid var(--border);}
+.bcra-lbl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.4px;color:var(--muted);}
+.bcra-val{font-size:18px;font-weight:600;margin-top:4px;}
+.bcra-sub{font-size:11px;color:var(--muted);margin-top:1px;}
+.vg{color:var(--green);}
+.vr{color:var(--red);}
+.va{color:var(--amber);}
+.vb{color:var(--mid);}
+.ent-table{width:100%;border-collapse:collapse;font-size:12px;margin-top:12px;}
+.ent-table th{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.4px;color:var(--muted);padding:7px 10px;text-align:left;border-bottom:1px solid var(--border);}
+.ent-table td{padding:8px 10px;border-bottom:1px solid var(--border);}
+.ent-table tr:last-child td{border-bottom:none;}
+.pdf-drop{border:2px dashed var(--border);border-radius:10px;padding:26px 20px;text-align:center;cursor:pointer;transition:all 0.2s;background:#fafbfd;position:relative;}
+.pdf-drop:hover,.pdf-drop.drag{border-color:var(--accent);background:#f0f6fd;}
+.pdf-drop input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.pdf-icon{width:36px;height:36px;margin:0 auto 10px;background:#e8f1fb;border-radius:8px;display:flex;align-items:center;justify-content:center;}
+.pdf-drop-label{font-size:13px;font-weight:500;color:var(--blue);}
+.pdf-drop-sub{font-size:11px;color:var(--muted);margin-top:3px;}
+.pdf-loaded{display:flex;align-items:center;gap:12px;padding:11px 14px;background:var(--green-l);border-radius:8px;border:1px solid #b2dfca;margin-top:10px;}
+.pdf-loaded-name{font-size:13px;font-weight:500;color:var(--green);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.pdf-loaded-size{font-size:11px;color:var(--green);opacity:0.7;flex-shrink:0;}
+.pdf-remove{font-size:11px;color:var(--red);cursor:pointer;padding:3px 8px;border-radius:5px;border:1px solid #f5c0b8;background:var(--red-l);flex-shrink:0;}
+.ratio-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px;}
+.ratio-item{padding:13px;border-radius:9px;border:1px solid var(--border);text-align:center;}
+.ratio-val{font-size:22px;font-weight:600;}
+.ratio-name{font-size:11px;color:var(--muted);margin-top:2px;}
+.ratio-ref{font-size:10px;color:var(--muted);margin-top:3px;opacity:0.7;}
+.ratio-bar{height:3px;border-radius:2px;margin-top:8px;background:var(--border);overflow:hidden;}
+.ratio-fill{height:100%;border-radius:2px;}
+.fg-green{background:var(--green);}
+.fg-amber{background:#f59e0b;}
+.fg-red{background:var(--red);}
+.cupo-box{background:var(--navy);border-radius:12px;padding:20px 24px;display:flex;align-items:center;justify-content:space-between;margin-top:16px;}
+.cupo-lbl{font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.4);}
+.cupo-amount{font-size:28px;font-weight:600;color:#fff;font-family:var(--mono);margin-top:4px;}
+.cupo-cond{font-size:11px;color:rgba(255,255,255,0.45);margin-top:5px;}
+.cupo-badge{padding:7px 16px;border-radius:20px;font-size:12px;font-weight:700;}
+.checklist{display:flex;flex-direction:column;gap:8px;}
+.check-item{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-radius:8px;border:1px solid var(--border);font-size:13px;}
+.check-left{display:flex;align-items:center;gap:10px;}
+.check-dot{width:8px;height:8px;border-radius:50%;background:var(--border);}
+.check-dot.done{background:var(--green);}
+.check-dot.warn{background:#f59e0b;}
+.check-link{font-size:11px;font-weight:600;color:var(--mid);padding:5px 12px;border-radius:6px;border:1px solid #d0e0f3;background:#f0f6fd;text-decoration:none;white-space:nowrap;display:inline-block;}
+.check-link:hover{background:#daeaf8;}
+.score-row{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:9px;border:1px solid var(--border);margin-bottom:8px;}
+.score-name{font-size:13px;font-weight:500;flex:1;}
+.score-bar-wrap{flex:2;height:5px;background:var(--border);border-radius:3px;overflow:hidden;}
+.score-bar-fill{height:100%;border-radius:3px;transition:width 0.5s ease;}
+.score-pts{font-family:var(--mono);font-size:13px;font-weight:600;min-width:58px;text-align:right;}
+.sep{height:1px;background:var(--border);margin:14px 0;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+.manual-form{margin-top:16px;padding:16px;background:var(--gray);border-radius:10px;border:1px solid var(--border);}
+.manual-form-title{font-size:12px;font-weight:600;color:var(--text);margin-bottom:12px;display:flex;align-items:center;gap:6px;}
+.extracted-val{font-size:10px;color:var(--green);margin-top:2px;font-family:var(--mono);}
+.client-row{display:flex;align-items:center;gap:14px;padding:12px 14px;border-radius:10px;border:1px solid var(--border);background:#fff;cursor:pointer;transition:border-color 0.15s;margin-bottom:8px;}
+.client-row:hover{border-color:var(--accent);}
+.client-initials{width:36px;height:36px;border-radius:8px;background:#e8f1fb;color:var(--blue);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex-shrink:0;}
+.client-name{font-size:13px;font-weight:600;}
+.client-cuit{font-size:11px;color:var(--muted);font-family:var(--mono);}
+.score-chip{font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;}
+.nosis-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px;}
+.nosis-metric{padding:11px 12px;background:#fff;border-radius:8px;border:1px solid var(--border);text-align:center;}
+.nosis-metric-lbl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.4px;color:var(--muted);}
+.nosis-metric-val{font-size:18px;font-weight:600;margin-top:3px;}
+.tab-nav{display:flex;justify-content:flex-end;margin-top:14px;padding-top:14px;border-top:1px solid var(--border);}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-tag">Swiss Medical Seguros</div>
+      <div class="logo-name">Panel de Suscripción</div>
+      <div class="logo-sub">Caución · Análisis de Riesgo</div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Análisis</div>
+      <div class="nav-item active" id="nav-nuevo" onclick="showView('nuevo')">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="5" height="5" rx="1" fill="currentColor" opacity=".7"/><rect x="9" y="2" width="5" height="5" rx="1" fill="currentColor"/><rect x="2" y="9" width="5" height="5" rx="1" fill="currentColor" opacity=".5"/><rect x="9" y="9" width="5" height="5" rx="1" fill="currentColor" opacity=".3"/></svg>
+        Nuevo análisis
+      </div>
+      <div class="nav-item" id="nav-base" onclick="showView('base')">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="5" r="3" stroke="currentColor" stroke-width="1.5"/><path d="M2 13c0-3.314 2.686-5 6-5s6 1.686 6 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        Base de clientes
+      </div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Sistema</div>
+      <div class="nav-item">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M8 2L10 6H14L11 9L12 13L8 11L4 13L5 9L2 6H6L8 2Z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
+        Reportes
+      </div>
+    </div>
+    <div class="sidebar-bottom">
+      <div class="sidebar-team">Equipo de Suscripción · SMG</div>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-left">
+        <div class="ttl" id="topbar-title">Nuevo análisis de riesgo</div>
+        <div class="sub" id="topbar-sub">Completá los módulos para generar el legajo</div>
+      </div>
+      <div class="topbar-right" id="topbar-actions">
+        <button class="btn btn-outline btn-sm" onclick="window.print()">Imprimir legajo</button>
+        <button class="btn btn-primary btn-sm" onclick="window.print()">Generar legajo</button>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="view active" id="view-nuevo">
+        <div class="tabs" id="tabs-bar">
+          <div class="tab active" data-tab="tab-cliente">1 · Cliente</div>
+          <div class="tab" data-tab="tab-crediticio">2 · Crediticio</div>
+          <div class="tab" data-tab="tab-presencia">3 · Presencia digital</div>
+          <div class="tab" data-tab="tab-balance">4 · Balance y cupo</div>
+          <div class="tab" data-tab="tab-score">5 · Scorecard</div>
+        </div>
+
+        <!-- TAB 1: CLIENTE -->
+        <div class="view active" id="tab-cliente">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">
+                <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M8 8a3 3 0 100-6 3 3 0 000 6zM2 14c0-3.31 2.69-5 6-5s6 1.69 6 5" stroke="#1a3a6b" stroke-width="1.5" stroke-linecap="round"/></svg>
+                Identificación del solicitante
+              </div>
+              <span class="badge badge-blue">Paso 1 de 5</span>
+            </div>
+            <div style="display:flex;gap:14px;align-items:flex-end;flex-wrap:wrap;">
+              <div class="fg" style="margin-bottom:0;flex:0 0 210px;">
+                <label>CUIT / CUIL *</label>
+                <input class="cuit-input" type="text" id="cuit-input" placeholder="20-12345678-9" maxlength="13"/>
+              </div>
+              <div style="flex:1;display:flex;flex-direction:column;gap:5px;">
+                <label>Razón social / Nombre completo</label>
+                <div class="rs-box" id="rs-box">
+                  <span class="rs-ph" id="rs-ph">Se completará al ingresar el CUIT</span>
+                  <span class="spin" id="rs-spin" style="display:none;"></span>
+                  <span class="rs-val" id="rs-val" style="display:none;"></span>
+                </div>
+              </div>
+            </div>
+            <div id="rs-status" style="margin-top:10px;display:none;"></div>
+            <div class="tab-nav">
+              <button class="btn btn-primary btn-sm" onclick="goTab('tab-crediticio')">Siguiente: Crediticio →</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 2: CREDITICIO -->
+        <div class="view" id="tab-crediticio">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">
+                <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><rect x="1" y="3" width="14" height="10" rx="2" stroke="#1a3a6b" stroke-width="1.5"/><path d="M1 7h14" stroke="#1a3a6b" stroke-width="1.5"/></svg>
+                Central de Deudores — BCRA
+              </div>
+              <span class="badge badge-blue" id="bcra-badge">En espera</span>
+            </div>
+            <div id="bcra-content">
+              <div class="ib ib-info">
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none" style="flex-shrink:0;margin-top:1px"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.3"/><path d="M8 7v5M8 5v1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                Ingresá el CUIT en el Paso 1 y avanzá a este tab para consultar automáticamente.
+              </div>
+            </div>
+          </div>
+
+          <!-- NOSIS OPCIONAL -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">
+                <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M3 13V7M6 13V4M9 13V9M12 13V2" stroke="#1a3a6b" stroke-width="1.5" stroke-linecap="round"/></svg>
+                Informe Nosis / Bureau crediticio
+              </div>
+              <span class="badge badge-blue">Opcional</span>
+            </div>
+            <div class="ib ib-info">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" style="flex-shrink:0;margin-top:1px"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.3"/><path d="M8 7v5M8 5v1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+              Podés adjuntar el PDF del informe Nosis para obtener un score crediticio adicional. Si el PDF tiene texto digital, los datos se extraen automáticamente.
+            </div>
+            <div class="pdf-drop" id="drop-nosis"
+              ondragover="event.preventDefault();this.classList.add('drag')"
+              ondragleave="this.classList.remove('drag')"
+              ondrop="onNosisDrop(event)">
+              <input type="file" accept=".pdf" onchange="onNosisFile(this)"/>
+              <div class="pdf-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z" stroke="#1a3a6b" stroke-width="1.5" stroke-linejoin="round"/><path d="M14 2v6h6" stroke="#1a3a6b" stroke-width="1.5"/><path d="M9 13h6M9 17h4" stroke="#1a3a6b" stroke-width="1.5" stroke-linecap="round"/></svg>
+              </div>
+              <div class="pdf-drop-label">Arrastrá el PDF de Nosis acá</div>
+              <div class="pdf-drop-sub">o hacé clic para seleccionar · Opcional</div>
+            </div>
+            <div id="nosis-file-info"></div>
+            <div id="nosis-status"></div>
+            <div id="nosis-result"></div>
+            <div class="tab-nav">
+              <button class="btn btn-primary btn-sm" onclick="goTab('tab-presencia')">Siguiente: Presencia digital →</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 3: PRESENCIA -->
+        <div class="view" id="tab-presencia">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">
+                <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="#1a3a6b" stroke-width="1.5"/><path d="M8 1.5C8 1.5 5.5 4 5.5 8s2.5 6.5 2.5 6.5M8 1.5C8 1.5 10.5 4 10.5 8S8 14.5 8 14.5M1.5 8h13" stroke="#1a3a6b" stroke-width="1.3"/></svg>
+                Investigación de presencia digital
+              </div>
+              <span class="badge badge-blue">Checklist guiado</span>
+            </div>
+            <div class="checklist">
+              <div class="check-item"><div class="check-left"><div class="check-dot done"></div><span>Google — nombre + CUIT + términos negativos</span></div><a class="check-link" id="link-google" href="#" target="_blank">Buscar en Google</a></div>
+              <div class="check-item"><div class="check-left"><div class="check-dot warn"></div><span>Poder Judicial — juicios y demandas (PJN)</span></div><a class="check-link" href="https://scw.pjn.gov.ar/scw/home.seam" target="_blank">Abrir PJN</a></div>
+              <div class="check-item"><div class="check-left"><div class="check-dot"></div><span>Sitio web propio — validar actividad real</span></div><a class="check-link" id="link-web" href="#" target="_blank">Buscar en Google</a></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title">Hallazgos del suscriptor</div></div>
+            <div class="g2">
+              <div class="fg"><label>Presencia web</label><select id="presencia-web"><option value="3">Buena — sitio activo y coherente</option><option value="2">Moderada</option><option value="1">Escasa</option><option value="0">Negativa o problemática</option></select></div>
+              <div class="fg"><label>Juicios encontrados (PJN)</label><select id="juicios-pjn"><option value="3">Ninguno</option><option value="2">1 a 3 — menor cuantía</option><option value="0">Varios o alta cuantía</option></select></div>
+              <div class="fg"><label>Antigüedad verificada</label><input type="text" id="antiguedad-v" placeholder="Ej: 12 años en actividad"/></div>
+              <div class="fg"><label>Imagen general</label><select id="imagen"><option value="3">Positiva y consistente</option><option value="2">Neutral</option><option value="1">Escasa o sin datos</option><option value="0">Contenido problemático</option></select></div>
+              <div class="fg" style="grid-column:1/-1;"><label>Observaciones</label><textarea id="obs-presencia" placeholder="Describí lo que encontraste..."></textarea></div>
+            </div>
+            <div class="tab-nav">
+              <button class="btn btn-primary btn-sm" onclick="goTab('tab-balance')">Siguiente: Balance y cupo →</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 4: BALANCE -->
+        <div class="view" id="tab-balance">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">
+                <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M2 14V6l6-4 6 4v8H2z" stroke="#1a3a6b" stroke-width="1.5" stroke-linejoin="round"/><rect x="5.5" y="9" width="5" height="5" rx="0.5" stroke="#1a3a6b" stroke-width="1.3"/></svg>
+                Balance contable
+              </div>
+              <span class="badge badge-warn" id="balance-badge">PDF o carga manual</span>
+            </div>
+            <div class="ib ib-info">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" style="flex-shrink:0;margin-top:1px"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.3"/><path d="M8 7v5M8 5v1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+              Subí el PDF del balance con texto digital. Si es escaneado o no se puede leer, completá los datos manualmente abajo. Los ratios y el cupo se calculan automáticamente.
+            </div>
+            <div class="pdf-drop" id="drop-balance" ondragover="event.preventDefault();this.classList.add('drag')" ondragleave="this.classList.remove('drag')" ondrop="onBalanceDrop(event)">
+              <input type="file" accept=".pdf" onchange="onBalanceFile(this)"/>
+              <div class="pdf-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z" stroke="#1a3a6b" stroke-width="1.5" stroke-linejoin="round"/><path d="M14 2v6h6" stroke="#1a3a6b" stroke-width="1.5"/><path d="M9 13h6M9 17h4" stroke="#1a3a6b" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+              <div class="pdf-drop-label">Arrastrá el PDF del balance acá</div>
+              <div class="pdf-drop-sub">o hacé clic para seleccionar · Balance certificado por contador</div>
+            </div>
+            <div id="balance-file-info"></div>
+            <div id="balance-pdf-status"></div>
+            <div class="manual-form">
+              <div class="manual-form-title">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" opacity=".5"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 000-1.41l-2.34-2.34a1 1 0 00-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+                Datos del balance — <span id="form-source">completá manualmente o subí el PDF</span>
+              </div>
+              <div class="g2">
+                <div class="fg"><label>Activo corriente ($)</label><input type="number" id="b-ac" placeholder="0" oninput="calcularRatios()"/><div class="extracted-val" id="ext-ac"></div></div>
+                <div class="fg"><label>Pasivo corriente ($)</label><input type="number" id="b-pc" placeholder="0" oninput="calcularRatios()"/><div class="extracted-val" id="ext-pc"></div></div>
+                <div class="fg"><label>Activo total ($)</label><input type="number" id="b-at" placeholder="0" oninput="calcularRatios()"/><div class="extracted-val" id="ext-at"></div></div>
+                <div class="fg"><label>Pasivo total ($)</label><input type="number" id="b-pt" placeholder="0" oninput="calcularRatios()"/><div class="extracted-val" id="ext-pt"></div></div>
+                <div class="fg"><label>Patrimonio neto ($)</label><input type="number" id="b-pn" placeholder="0" oninput="calcularRatios()"/><div class="extracted-val" id="ext-pn"></div></div>
+                <div class="fg"><label>Ventas / ingresos ($)</label><input type="number" id="b-ventas" placeholder="0" oninput="calcularRatios()"/><div class="extracted-val" id="ext-ventas"></div></div>
+                <div class="fg"><label>Resultado del ejercicio ($)</label><input type="number" id="b-resultado" placeholder="0" oninput="calcularRatios()"/><div class="extracted-val" id="ext-resultado"></div></div>
+                <div class="fg"><label>Ejercicio cerrado</label><input type="text" id="b-ejercicio" placeholder="Ej: 31/12/2024"/></div>
+              </div>
+              <button class="btn btn-green btn-sm" onclick="calcularRatios(true)">Calcular ratios y cupo →</button>
+            </div>
+          </div>
+          <div id="balance-result" style="display:none;" class="card">
+            <div class="card-header">
+              <div class="card-title">Ratios financieros y cupo sugerido</div>
+              <span class="badge badge-blue" id="ej-lbl"></span>
+            </div>
+            <div id="ratios-grid" class="ratio-grid"></div>
+            <div id="cupo-box-html"></div>
+            <div class="tab-nav">
+              <button class="btn btn-primary btn-sm" onclick="goTab('tab-score')">Siguiente: Scorecard →</button>
+            </div>
+          </div>
+          <div class="tab-nav" id="balance-nav-manual">
+            <button class="btn btn-outline btn-sm" onclick="goTab('tab-score')">Ir al Scorecard sin balance →</button>
+          </div>
+        </div>
+
+        <!-- TAB 5: SCORECARD -->
+        <div class="view" id="tab-score">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">
+                <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M8 2L10 6H14L11 9L12 13L8 11L4 13L5 9L2 6H6L8 2Z" stroke="#1a3a6b" stroke-width="1.3" stroke-linejoin="round"/></svg>
+                Scorecard unificado de riesgo
+              </div>
+              <button class="btn btn-outline btn-sm" onclick="calcularScore()">Calcular score final</button>
+            </div>
+            <div>
+              <div class="score-row"><div class="score-name">Situación crediticia (BCRA)</div><div class="score-bar-wrap"><div class="score-bar-fill fg-green" id="bar-cred" style="width:0%"></div></div><div class="score-pts" id="pts-cred" style="color:var(--muted);">— / 100</div></div>
+              <div class="score-row"><div class="score-name">Score Nosis</div><div class="score-bar-wrap"><div class="score-bar-fill fg-green" id="bar-nosis" style="width:0%"></div></div><div class="score-pts" id="pts-nosis" style="color:var(--muted);">— / 100</div></div>
+              <div class="score-row"><div class="score-name">Presencia digital e imagen</div><div class="score-bar-wrap"><div class="score-bar-fill fg-green" id="bar-pres" style="width:0%"></div></div><div class="score-pts" id="pts-pres" style="color:var(--muted);">— / 100</div></div>
+              <div class="score-row"><div class="score-name">Solidez financiera (balance)</div><div class="score-bar-wrap"><div class="score-bar-fill fg-amber" id="bar-fin" style="width:0%"></div></div><div class="score-pts" id="pts-fin" style="color:var(--muted);">— / 100</div></div>
+              <div class="score-row"><div class="score-name">Capacidad vs. cupo solicitado</div><div class="score-bar-wrap"><div class="score-bar-fill fg-green" id="bar-cap" style="width:0%"></div></div><div class="score-pts" id="pts-cap" style="color:var(--muted);">— / 100</div></div>
+            </div>
+            <div class="sep"></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+              <div style="font-size:13px;color:var(--muted);">Score total ponderado</div>
+              <div id="score-total" style="font-size:28px;font-weight:700;font-family:var(--mono);color:var(--muted);">— / 100</div>
+            </div>
+            <div id="semaforo-box" style="display:flex;align-items:center;gap:16px;padding:16px 20px;border-radius:12px;border:2px solid var(--border);background:var(--gray);">
+              <div style="width:44px;height:44px;border-radius:50%;background:var(--border);flex-shrink:0;"></div>
+              <div style="font-size:13px;color:var(--muted);">Presioná "Calcular score final" para ver la recomendación.</div>
+            </div>
+            <div class="sep"></div>
+            <div class="fg"><label>Suscriptor responsable</label><input type="text" id="suscriptor-nombre" placeholder="Nombre completo del suscriptor que aprueba"/></div>
+            <div style="margin-top:14px;display:flex;gap:10px;justify-content:flex-end;">
+              <button class="btn btn-primary btn-sm" onclick="window.print()">Aprobar y generar legajo</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIEW BASE -->
+      <div class="view" id="view-base">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Base de clientes analizados</div>
+            <button class="btn btn-primary btn-sm" onclick="showView('nuevo')">+ Nuevo análisis</button>
+          </div>
+          <div style="display:flex;gap:10px;margin-bottom:18px;">
+            <input type="text" placeholder="Buscar por razón social, CUIT o fecha..." style="max-width:340px;"/>
+            <select style="width:180px;"><option>Todos los estados</option><option>Aprobados</option><option>Con condiciones</option><option>Rechazados</option></select>
+          </div>
+          <div class="client-row"><div class="client-initials">CD</div><div><div class="client-name">Constructora Del Sur S.A.</div><div class="client-cuit">30-71234567-8 · 02/04/2025</div></div><div style="margin-left:auto;"><span class="score-chip badge-ok">77 pts · Aprobado</span></div></div>
+          <div class="client-row"><div class="client-initials">AG</div><div><div class="client-name">Alvarez González &amp; Asoc.</div><div class="client-cuit">30-65432198-1 · 28/03/2025</div></div><div style="margin-left:auto;"><span class="score-chip badge-warn">54 pts · Con condiciones</span></div></div>
+          <div class="client-row"><div class="client-initials">TR</div><div><div class="client-name">Transportes Rápido SRL</div><div class="client-cuit">30-58974123-5 · 15/03/2025</div></div><div style="margin-left:auto;"><span class="score-chip badge-bad">31 pts · Rechazado</span></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+const _s={cuit:'',nombre:'',bcraData:null,ratiosData:null,nosisScore:null};
+
+function showView(n){
+  document.querySelectorAll('.view[id^="view-"]').forEach(v=>v.classList.remove('active'));
+  document.getElementById('view-'+n).classList.add('active');
+  ['nuevo','base'].forEach(x=>document.getElementById('nav-'+x).classList.toggle('active',x===n));
+  document.getElementById('topbar-actions').style.display=n==='nuevo'?'flex':'none';
+  document.getElementById('topbar-title').textContent=n==='nuevo'?'Nuevo análisis de riesgo':'Base de clientes';
+  document.getElementById('topbar-sub').textContent=n==='nuevo'?'Completá los módulos para generar el legajo':'Historial de análisis del equipo';
+}
+function goTab(id){
+  document.querySelectorAll('#view-nuevo .view').forEach(v=>v.classList.remove('active'));
+  document.querySelectorAll('#tabs-bar .tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('#tabs-bar .tab').forEach(t=>{if(t.dataset.tab===id)t.classList.add('active');});
+  if(id==='tab-crediticio') consultarBCRA();
+  if(id==='tab-presencia') actualizarLinks();
+  window.scrollTo(0,0);
+}
+document.querySelectorAll('#tabs-bar .tab').forEach(t=>t.addEventListener('click',()=>goTab(t.dataset.tab)));
+
+// CUIT
+let _ct=null;
+document.getElementById('cuit-input').addEventListener('input',function(){
+  let d=this.value.replace(/\D/g,'').slice(0,11);
+  let f=d;
+  if(d.length>2)f=d.slice(0,2)+'-'+d.slice(2);
+  if(d.length>10)f=d.slice(0,2)+'-'+d.slice(2,10)+'-'+d.slice(10);
+  this.value=f;_s.cuit=d;
+  if(d.length===11){clearTimeout(_ct);_ct=setTimeout(()=>buscarRS(d),700);}
+  else resetRS();
+});
+function resetRS(){
+  _s.nombre='';
+  $('rs-ph').textContent='Se completará al ingresar el CUIT';
+  show('rs-ph');hide('rs-spin');hide('rs-val');hide('rs-status');
+}
+function buscarRS(cuit){
+  hide('rs-ph');hide('rs-val');show('rs-spin');hide('rs-status');
+  fetch('/functions/bcra?cuit='+cuit+'&tipo=deudas')
+    .then(r=>r.json())
+    .then(data=>{
+      hide('rs-spin');
+      const nombre=data&&data.results&&data.results.denominacion||null;
+      if(nombre){
+        _s.nombre=nombre;
+        $('rs-val').textContent=nombre;
+        show('rs-val');hide('rs-ph');hide('rs-status');
+      } else {
+        $('rs-ph').textContent='No se encontró — podés ingresar el nombre manualmente';
+        show('rs-ph');hide('rs-status');
+      }
+    })
+    .catch(()=>{hide('rs-spin');show('rs-ph');});
+}
+
+// BCRA
+let _bcraC='';
+const SIT={1:{l:'Normal',vc:'vg',bc:'badge-ok'},2:{l:'Con seguimiento',vc:'va',bc:'badge-warn'},3:{l:'Con problemas',vc:'va',bc:'badge-warn'},4:{l:'Alto riesgo',vc:'vr',bc:'badge-bad'},5:{l:'Irrecuperable',vc:'vr',bc:'badge-bad'},6:{l:'Irrecup. técnico',vc:'vr',bc:'badge-bad'}};
+
+async function consultarBCRA(){
+  const cuit=_s.cuit;
+  if(!cuit||cuit.length!==11){
+    $('bcra-content').innerHTML='<div class="ib ib-warn">'+iW()+'<span>Ingresá el CUIT en el Paso 1 antes de avanzar.</span></div>';
+    badge('bcra-badge','Sin CUIT','badge-warn');return;
+  }
+  if(_bcraC===cuit)return;
+  _bcraC=cuit;
+  const fmt=cuit.slice(0,2)+'-'+cuit.slice(2,10)+'-'+cuit.slice(10);
+  badge('bcra-badge','Consultando...','badge-blue');
+  $('bcra-content').innerHTML='<div class="loading"><span class="spin" style="width:20px;height:20px;border-width:2.5px;display:block;margin:0 auto 12px;"></span>Consultando Central de Deudores del BCRA para CUIT '+fmt+'...</div>';
+  try{
+    const [resD,resC]=await Promise.all([
+      fetch('/functions/bcra?cuit='+cuit+'&tipo=deudas'),
+      fetch('/functions/bcra?cuit='+cuit+'&tipo=cheques')
+    ]);
+    const dataD=await resD.json();
+    const dataC=await resC.json().catch(()=>null);
+    renderBCRA(dataD,dataC,fmt);
+  }catch(e){
+    badge('bcra-badge','Error','badge-bad');
+    $('bcra-content').innerHTML='<div class="ib ib-err">'+iX()+'<span>Error al consultar el BCRA. Intentá de nuevo o ingresá los datos manualmente.</span></div><div class="g3" style="margin-top:12px;"><div class="fg"><label>Situación (1=Normal)</label><input type="number" id="bcra-sit-m" min="1" max="6" placeholder="1" value="1" oninput="saveBCRAm()"/></div><div class="fg"><label>Deuda total ($)</label><input type="number" id="bcra-deuda-m" placeholder="0" oninput="saveBCRAm()"/></div><div class="fg"><label>Cheques rechazados</label><input type="number" id="bcra-cheques-m" placeholder="0" oninput="saveBCRAm()"/></div></div>';
+  }
+}
+function saveBCRAm(){
+  const s=parseInt($('bcra-sit-m')&&$('bcra-sit-m').value)||1;
+  const d=parseFloat($('bcra-deuda-m')&&$('bcra-deuda-m').value)||0;
+  const c=parseInt($('bcra-cheques-m')&&$('bcra-cheques-m').value)||0;
+  _s.bcraData={situacion:s,deuda_total:d,cheques_rechazados:c,sin_deuda:d===0};
+}
+function renderBCRA(data,chData,fmt){
+  const res=data&&data.results||data;
+  const periodos=res&&res.periodos||[];
+  const primerPeriodo=periodos[0]||{};
+  const deudas=primerPeriodo.entidades||[];
+  const periodo=primerPeriodo.periodo||'—';
+  const denom=res&&res.denominacion||null;
+  if(denom&&!_s.nombre){_s.nombre=denom;$('rs-val').textContent=denom;show('rs-val');hide('rs-ph');}
+  let sitMax=1,total=0;
+  deudas.forEach(d=>{if((d.situacion||1)>sitMax)sitMax=d.situacion;total+=(d.monto||0)*1000;});
+  const chCnt=chData&&chData.results&&chData.results.cheques&&chData.results.cheques.length||0;
+  const sinDeuda=deudas.length===0&&!(data&&data.error);
+  _s.bcraData={situacion:sitMax,deuda_total:total,cheques_rechazados:chCnt,sin_deuda:sinDeuda};
+  const si=SIT[sitMax]||SIT[1];
+  badge('bcra-badge','Sit. '+sitMax+' · '+si.l,si.bc);
+  let ents='';
+  if(deudas.length>0){
+    ents='<div style="margin-top:14px;"><div style="font-size:10px;font-weight:600;text-transform:uppercase;color:var(--muted);margin-bottom:8px;">Detalle por entidad</div><table class="ent-table"><thead><tr><th>Entidad</th><th>Situación</th><th>Monto</th></tr></thead><tbody>';
+    deudas.slice(0,10).forEach(d=>{
+      const s=SIT[d.situacion]||SIT[1];
+      ents+='<tr><td>'+(d.entidad||'—')+'</td><td><span class="badge '+s.bc+'">'+d.situacion+'·'+s.l+'</span></td><td style="font-family:var(--mono)">$'+(d.monto*1000).toLocaleString('es-AR')+'</td></tr>';
+    });
+    ents+='</tbody></table></div>';
+  }
+  $('bcra-content').innerHTML=
+    (sinDeuda?'<div class="ib ib-ok" style="margin-bottom:12px;">'+iC()+'<span>Sin deudas informadas para CUIT '+fmt+'.</span></div>':'')+
+    '<div class="bcra-grid">'+
+    '<div class="bcra-item"><div class="bcra-lbl">Situación crediticia</div><div class="bcra-val '+si.vc+'">'+sitMax+' — '+si.l+'</div><div class="bcra-sub">Período '+periodo+'</div></div>'+
+    '<div class="bcra-item"><div class="bcra-lbl">Deuda total</div><div class="bcra-val vb">'+(total>0?'$'+total.toLocaleString('es-AR'):'$0')+'</div><div class="bcra-sub">'+deudas.length+' entidad/es</div></div>'+
+    '<div class="bcra-item"><div class="bcra-lbl">Cheques rechazados</div><div class="bcra-val '+(chCnt>0?'vr':'vg')+'">'+chCnt+'</div><div class="bcra-sub">Últimos 12 meses</div></div>'+
+    '</div>'+ents;
+}
+
+// PRESENCIA
+function actualizarLinks(){
+  const n=encodeURIComponent(_s.nombre||'');
+  const c=_s.cuit||'';
+  const q=n+(c?'+'+c:'');
+  $('link-google').href='https://www.google.com/search?q='+q+'+deuda+estafa+problema+denuncia';
+  $('link-web').href='https://www.google.com/search?q='+n+'+sitio+web+oficial';
+}
+
+// NOSIS PDF
+function onNosisDrop(e){e.preventDefault();document.getElementById('drop-nosis').classList.remove('drag');const f=e.dataTransfer.files[0];if(f)procesarNosis(f);}
+function onNosisFile(i){if(i.files[0])procesarNosis(i.files[0]);}
+
+async function procesarNosis(file){
+  const sz=(file.size/1024).toFixed(0)+' KB';
+  $('nosis-file-info').innerHTML='<div class="pdf-loaded"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z" stroke="#1a7a4a" stroke-width="1.5"/><path d="M14 2v6h6" stroke="#1a7a4a" stroke-width="1.5"/></svg><span class="pdf-loaded-name">'+file.name+'</span><span class="pdf-loaded-size">'+sz+'</span><span class="pdf-remove" onclick="quitarNosis()">Quitar</span></div>';
+  $('nosis-status').innerHTML='<div class="ib ib-info" style="margin-top:10px;">'+iI()+'<span class="spin" style="margin:0 4px;"></span> Leyendo el PDF...</div>';
+  $('nosis-result').innerHTML='';
+  try{
+    const buf=await file.arrayBuffer();
+    const pdf=await pdfjsLib.getDocument({data:buf}).promise;
+    let txt='';
+    for(let i=1;i<=Math.min(pdf.numPages,15);i++){
+      const pg=await pdf.getPage(i);
+      const ct=await pg.getTextContent();
+      txt+=ct.items.map(x=>x.str).join(' ')+'\n';
+    }
+    if(txt.trim().length<50)throw new Error('escaneado');
+    const datos=extraerNosis(txt);
+    _s.nosisScore=datos.scoreCalc;
+    renderNosisResult(datos);
+    $('nosis-status').innerHTML='<div class="ib ib-ok" style="margin-top:10px;">'+iC()+'<span>PDF de Nosis procesado. Score extraído: '+datos.scoreCalc+'/100.</span></div>';
+  }catch(err){
+    $('nosis-status').innerHTML='<div class="ib ib-warn" style="margin-top:10px;">'+iW()+'<span>No se pudo leer el PDF automáticamente. El score Nosis no se incluirá en el scorecard.</span></div>';
+    _s.nosisScore=null;
+  }
+}
+function quitarNosis(){
+  $('nosis-file-info').innerHTML='';$('nosis-status').innerHTML='';$('nosis-result').innerHTML='';
+  _s.nosisScore=null;
+}
+function extraerNosis(txt){
+  const t=txt.toLowerCase();
+  let score=null;
+  let m=t.match(/score[^0-9]*(\d{3})/)||t.match(/puntaje[^0-9]*(\d{3})/)||t.match(/calificacion[^0-9]*(\d{3})/);
+  if(m)score=parseInt(m[1]);
+  let juicios=0;
+  if(t.includes('juicio')||t.includes('demanda'))juicios=1;
+  if((t.match(/juicio/g)||[]).length>2)juicios=2;
+  const inhibicion=t.includes('inhibi');
+  let cheques=0;
+  const mc=t.match(/cheque[^0-9]*(\d+)/);
+  if(mc)cheques=parseInt(mc[1]);
+  let deuda='Sin deuda informada';
+  const md=txt.match(/deuda[^0-9$]*\$?\s*([\d.,]+)/i);
+  if(md)deuda='$'+md[1];
+  let riesgo='Moderado';
+  if(score){if(score>=700)riesgo='Bajo';else if(score>=500)riesgo='Moderado';else riesgo='Alto';}
+  let scoreCalc=score?(score>=700?90:score>=600?70:score>=500?55:score>=400?35:20):50;
+  if(juicios===1)scoreCalc-=10;
+  if(juicios>=2)scoreCalc-=25;
+  if(inhibicion)scoreCalc-=20;
+  if(cheques>0)scoreCalc-=15;
+  scoreCalc=Math.max(0,Math.min(100,scoreCalc));
+  return{score,scoreCalc,juicios,inhibicion,cheques,deuda,riesgo};
+}
+function renderNosisResult(d){
+  const vc=d.riesgo==='Bajo'?'vg':d.riesgo==='Moderado'?'va':'vr';
+  $('nosis-result').innerHTML=
+    '<div style="margin-top:14px;padding:14px 16px;background:var(--gray);border-radius:10px;border:1px solid var(--border);">'+
+    '<div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.4px;color:var(--muted);margin-bottom:10px;">Análisis extraído del PDF de Nosis</div>'+
+    '<div class="nosis-grid">'+
+    '<div class="nosis-metric"><div class="nosis-metric-lbl">Score Nosis</div><div class="nosis-metric-val vb">'+(d.score||'N/D')+'</div></div>'+
+    '<div class="nosis-metric"><div class="nosis-metric-lbl">Nivel de riesgo</div><div class="nosis-metric-val '+vc+'">'+d.riesgo+'</div></div>'+
+    '<div class="nosis-metric"><div class="nosis-metric-lbl">Score interno</div><div class="nosis-metric-val '+(d.scoreCalc>=70?'vg':d.scoreCalc>=50?'va':'vr')+'">'+d.scoreCalc+'/100</div></div>'+
+    '<div class="nosis-metric"><div class="nosis-metric-lbl">Juicios</div><div class="nosis-metric-val '+(d.juicios>0?'vr':'vg')+'">'+d.juicios+'</div></div>'+
+    '<div class="nosis-metric"><div class="nosis-metric-lbl">Inhibición</div><div class="nosis-metric-val '+(d.inhibicion?'vr':'vg')+'">'+(d.inhibicion?'SÍ':'No')+'</div></div>'+
+    '<div class="nosis-metric"><div class="nosis-metric-lbl">Cheques rech.</div><div class="nosis-metric-val '+(d.cheques>0?'vr':'vg')+'">'+d.cheques+'</div></div>'+
+    '</div></div>';
+}
+
+// BALANCE PDF
+function onBalanceDrop(e){e.preventDefault();document.getElementById('drop-balance').classList.remove('drag');const f=e.dataTransfer.files[0];if(f)procesarPDF(f);}
+function onBalanceFile(i){if(i.files[0])procesarPDF(i.files[0]);}
+
+async function procesarPDF(file){
+  const sz=(file.size/1024).toFixed(0)+' KB';
+  $('balance-file-info').innerHTML='<div class="pdf-loaded"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z" stroke="#1a7a4a" stroke-width="1.5"/><path d="M14 2v6h6" stroke="#1a7a4a" stroke-width="1.5"/></svg><span class="pdf-loaded-name">'+file.name+'</span><span class="pdf-loaded-size">'+sz+'</span><span class="pdf-remove" onclick="quitarPDF()">Quitar</span></div>';
+  $('balance-pdf-status').innerHTML='<div class="ib ib-info" style="margin-top:10px;">'+iI()+'<span class="spin" style="margin:0 4px;"></span> Leyendo el PDF...</div>';
+  try{
+    const buf=await file.arrayBuffer();
+    const pdf=await pdfjsLib.getDocument({data:buf}).promise;
+    let txt='';
+    for(let i=1;i<=Math.min(pdf.numPages,20);i++){
+      const pg=await pdf.getPage(i);
+      const ct=await pg.getTextContent();
+      txt+=ct.items.map(x=>x.str).join(' ')+'\n';
+    }
+    if(txt.trim().length<80)throw new Error('escaneado');
+    const ex=extraerRubros(txt);
+    if(ex.encontrados>=2){
+      $('balance-pdf-status').innerHTML='<div class="ib ib-ok" style="margin-top:10px;">'+iC()+'<span>PDF leído correctamente. Se extrajeron '+ex.encontrados+' rubros. Verificá y ajustá si es necesario.</span></div>';
+      $('form-source').textContent='datos extraídos del PDF — verificá';
+      badge('balance-badge','PDF procesado','badge-ok');
+      rellenarForm(ex);
+    }else throw new Error('pocos datos');
+  }catch(err){
+    const msg=err.message==='escaneado'||err.message==='pocos datos'?'El PDF es una imagen escaneada o no tiene texto digital. Completá los datos manualmente abajo.':'No se pudieron extraer datos del PDF. Completá los datos manualmente.';
+    $('balance-pdf-status').innerHTML='<div class="ib ib-warn" style="margin-top:10px;">'+iW()+'<span>'+msg+'</span></div>';
+    $('form-source').textContent='completá manualmente';
+    badge('balance-badge','Carga manual','badge-warn');
+  }
+}
+function quitarPDF(){
+  $('balance-file-info').innerHTML='';$('balance-pdf-status').innerHTML='';
+  $('form-source').textContent='completá manualmente o subí el PDF';
+  badge('balance-badge','PDF o carga manual','badge-warn');
+  ['b-ac','b-pc','b-at','b-pt','b-pn','b-ventas','b-resultado'].forEach(id=>$(id).value='');
+  ['ext-ac','ext-pc','ext-at','ext-pt','ext-pn','ext-ventas','ext-resultado'].forEach(id=>$(id).textContent='');
+  $('balance-result').style.display='none';
+}
+function extraerRubros(txt){
+  const t=txt.replace(/(\d)\.(\d{3})/g,'$1$2').replace(/,(\d)/g,'.$1').replace(/\$/g,'');
+  const b=(...ps)=>{for(const p of ps){const m=t.match(p);if(m){const n=parseFloat(m[1]);if(!isNaN(n)&&n>0)return n;}}return null;};
+  const ac=b(/activo\s+corriente\D{0,40}?(\d[\d]{3,})/i,/activos?\s+corrientes?\D{0,40}?(\d[\d]{3,})/i);
+  const pc=b(/pasivo\s+corriente\D{0,40}?(\d[\d]{3,})/i,/pasivos?\s+corrientes?\D{0,40}?(\d[\d]{3,})/i);
+  const at=b(/activo\s+total\D{0,40}?(\d[\d]{3,})/i,/total\s+del?\s+activo\D{0,40}?(\d[\d]{3,})/i,/total\s+activo\D{0,40}?(\d[\d]{3,})/i);
+  const pt=b(/pasivo\s+total\D{0,40}?(\d[\d]{3,})/i,/total\s+del?\s+pasivo\D{0,40}?(\d[\d]{3,})/i,/total\s+pasivo\D{0,40}?(\d[\d]{3,})/i);
+  const pn=b(/patrimonio\s+neto\D{0,40}?(\d[\d]{3,})/i,/capital\s+y\s+reservas\D{0,40}?(\d[\d]{3,})/i);
+  const ventas=b(/ventas\s+netas\D{0,40}?(\d[\d]{3,})/i,/ingresos?\s+por\s+ventas?\D{0,40}?(\d[\d]{3,})/i,/ventas?\D{0,40}?(\d[\d]{3,})/i);
+  const resultado=b(/resultado\s+del\s+ejercicio\D{0,40}?(-?\d[\d]{3,})/i,/ganancia\s+neta\D{0,40}?(\d[\d]{3,})/i,/utilidad\s+neta\D{0,40}?(\d[\d]{3,})/i,/resultado\s+neto\D{0,40}?(-?\d[\d]{3,})/i);
+  const enc=[ac,pc,at,pt,pn,ventas,resultado].filter(v=>v!==null).length;
+  return{ac,pc,at,pt,pn,ventas,resultado,encontrados:enc};
+}
+function rellenarForm(d){
+  const f=(id,val,eid)=>{if(val!==null){$(id).value=Math.round(val);$(eid).textContent='↑ Extraído del PDF';}};
+  f('b-ac',d.ac,'ext-ac');f('b-pc',d.pc,'ext-pc');f('b-at',d.at,'ext-at');
+  f('b-pt',d.pt,'ext-pt');f('b-pn',d.pn,'ext-pn');f('b-ventas',d.ventas,'ext-ventas');
+  f('b-resultado',d.resultado,'ext-resultado');
+  setTimeout(()=>calcularRatios(true),300);
+}
+
+// RATIOS
+function calcularRatios(mostrar=false){
+  const v=id=>parseFloat($(id).value)||0;
+  const ac=v('b-ac'),pc=v('b-pc'),at=v('b-at'),pt=v('b-pt'),pn=v('b-pn'),ventas=v('b-ventas'),res=v('b-resultado');
+  const ej=$('b-ejercicio').value||'';
+  if(!pn&&!ac&&!at)return;
+  const liq=pc>0?ac/pc:0,end=at>0?pt/at*100:0,rent=pn>0?res/pn*100:0,sol=pt>0?at/pt:0,mgn=ventas>0?res/ventas*100:0;
+  let pct=0.35;
+  if(liq>=1.5)pct+=0.05;else if(liq<1.0)pct-=0.10;
+  if(end<50)pct+=0.05;else if(end>70)pct-=0.10;
+  if(rent>10)pct+=0.05;else if(rent<0)pct-=0.15;
+  if(sol>=2)pct+=0.05;
+  pct=Math.max(0.10,Math.min(0.60,pct));
+  const cupo=pn*pct;
+  let cat,catScore;
+  if(liq>=1.5&&end<60&&rent>5){cat='Solvente';catScore=85;}
+  else if(liq>=1.0&&end<75){cat='Moderado';catScore=60;}
+  else{cat='Débil';catScore=30;}
+  _s.ratiosData={liq,end,rent,sol,mgn,pn,cupo,cat,catScore,ej,pct};
+  if(mostrar)renderRatios(_s.ratiosData);
+}
+function renderRatios(r){
+  $('balance-result').style.display='block';
+  $('ej-lbl').textContent=r.ej?'Ejercicio '+r.ej:'';
+  const ri=(val,name,ref,lo,hi,max,tipo)=>{
+    const vc=val>=hi?'vg':val>=lo?'va':'vr';
+    const fc=val>=hi?'fg-green':val>=lo?'fg-amber':'fg-red';
+    const pct=Math.min(100,Math.max(0,Math.abs(val)/max*100)).toFixed(0);
+    const fv=tipo==='pct'?val.toFixed(1)+'%':tipo==='x'?val.toFixed(2)+'x':val.toFixed(2);
+    return'<div class="ratio-item"><div class="ratio-val '+vc+'">'+fv+'</div><div class="ratio-name">'+name+'</div><div class="ratio-ref">Ref: '+ref+'</div><div class="ratio-bar"><div class="ratio-fill '+fc+'" style="width:'+pct+'%"></div></div></div>';
+  };
+  $('ratios-grid').innerHTML=
+    ri(r.liq,'Liquidez corriente','≥ 1.5 óptimo',1.0,1.5,3,'x')+
+    ri(100-r.end,'Solvencia (100-end.)','> 40%',30,40,100,'pct')+
+    ri(r.rent,'Rentabilidad s/PN','> 10%',5,10,30,'pct')+
+    ri(r.sol,'Ratio de solvencia','≥ 1.5',1.2,1.5,4,'x')+
+    ri(r.mgn,'Margen neto','> 5%',3,5,20,'pct')+
+    '<div class="ratio-item"><div class="ratio-val '+(r.cat==='Solvente'?'vg':r.cat==='Moderado'?'va':'vr')+'">'+r.cat+'</div><div class="ratio-name">Categoría</div><div class="ratio-ref">Solvente/Moderado/Débil</div><div class="ratio-bar"><div class="ratio-fill '+(r.cat==='Solvente'?'fg-green':r.cat==='Moderado'?'fg-amber':'fg-red')+'" style="width:'+(r.cat==='Solvente'?'85%':r.cat==='Moderado'?'55%':'25%')+'"></div></div></div>';
+  const ok=r.cat!=='Débil';
+  $('cupo-box-html').innerHTML=
+    '<div class="cupo-box"><div>'+
+    '<div class="cupo-lbl">Cupo máximo sugerido de emisión</div>'+
+    '<div class="cupo-amount">$'+Math.round(r.cupo).toLocaleString('es-AR')+'</div>'+
+    '<div class="cupo-cond">'+(r.pct*100).toFixed(0)+'% del patrimonio neto · Renovación anual de balance</div>'+
+    '</div><div class="cupo-badge" style="background:'+(ok?'rgba(26,122,74,0.25)':'rgba(192,57,43,0.2)')+';color:'+(ok?'#4ade80':'#f87171')+'">'+(ok?'APROBADO':'OBSERVADO')+'</div></div>';
+}
+
+// SCORECARD
+function calcularScore(){
+  const bcra=_s.bcraData;
+  let cred=70;
+  if(bcra){
+    const base={1:100,2:75,3:50,4:25,5:10,6:10};
+    cred=base[bcra.situacion||1]||70;
+    if((bcra.cheques_rechazados||0)>0)cred=Math.max(0,cred-15);
+    if(bcra.sin_deuda)cred=Math.min(100,cred+5);
+  }
+  cred=Math.round(Math.max(0,Math.min(100,cred)));
+
+  const nosisS=_s.nosisScore!==null?_s.nosisScore:50;
+
+  const pw=parseInt($('presencia-web').value)||3;
+  const pj=parseInt($('juicios-pjn').value)||3;
+  const im=parseInt($('imagen').value)||3;
+  const pres=Math.round((pw+pj+im)/9*100);
+
+  const fin=_s.ratiosData?_s.ratiosData.catScore:50;
+  const cap=75;
+
+  // Ponderación: BCRA 30%, Nosis 15%, Presencia 20%, Balance 25%, Capacidad 10%
+  const total=Math.round(cred*0.30+nosisS*0.15+pres*0.20+fin*0.25+cap*0.10);
+
+  [{id:'cred',v:cred},{id:'nosis',v:nosisS},{id:'pres',v:pres},{id:'fin',v:fin},{id:'cap',v:cap}].forEach(({id,v})=>{
+    const clr=v>=70?'var(--green)':v>=50?'var(--amber)':'var(--red)';
+    const fc=v>=70?'fg-green':v>=50?'fg-amber':'fg-red';
+    $('bar-'+id).className='score-bar-fill '+fc;
+    $('bar-'+id).style.width=v+'%';
+    $('pts-'+id).textContent=v+' / 100';
+    $('pts-'+id).style.color=clr;
+  });
+
+  const tc=total>=70?'var(--green)':total>=50?'var(--amber)':'var(--red)';
+  $('score-total').textContent=total+' / 100';
+  $('score-total').style.color=tc;
+
+  let res,sc,cc,fund,cupoS;
+  const cupoFmt=_s.ratiosData?'$'+Math.round(_s.ratiosData.cupo).toLocaleString('es-AR'):null;
+  if(total>=70){res='APROBADO';sc='var(--green)';cc='var(--green-l)';fund='El cliente presenta condiciones crediticias y financieras adecuadas para la emisión.';cupoS=cupoFmt;}
+  else if(total>=50){res='APROBADO CON CONDICIONES';sc='var(--amber)';cc='var(--amber-l)';fund='Se detectan observaciones. Se recomienda evaluar garantías adicionales o reducir el monto.';cupoS=cupoFmt?cupoFmt+' (con condiciones)':null;}
+  else{res='RECHAZADO';sc='var(--red)';cc='var(--red-l)';fund='El perfil crediticio y/o financiero no cumple los requisitos mínimos para emisión de caución.';cupoS=null;}
+
+  const sb=$('semaforo-box');
+  sb.style.cssText='display:flex;align-items:center;gap:18px;padding:18px 22px;border-radius:12px;border:2px solid '+sc+';background:'+cc+';margin-top:14px;';
+  sb.innerHTML='<div style="width:44px;height:44px;border-radius:50%;background:'+sc+';flex-shrink:0;"></div><div><div style="font-size:15px;font-weight:600;color:'+sc+';">'+res+'</div><div style="font-size:12px;margin-top:3px;color:var(--muted);">'+fund+'</div>'+(cupoS?'<div style="font-size:18px;font-weight:600;font-family:var(--mono);color:'+sc+';margin-top:3px;">Cupo recomendado: '+cupoS+'</div>':'')+'</div>';
+}
+
+const $=id=>document.getElementById(id);
+function show(id){$(id).style.display='';}
+function hide(id){$(id).style.display='none';}
+function badge(id,txt,cls){const el=$(id);el.textContent=txt;el.className='badge '+cls;}
+function iC(){return'<svg width="14" height="14" viewBox="0 0 16 16" fill="none" style="flex-shrink:0;margin-top:1px"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.3"/><path d="M5 8l2 2 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';}
+function iW(){return'<svg width="14" height="14" viewBox="0 0 16 16" fill="none" style="flex-shrink:0;margin-top:1px"><path d="M8 2L14 13H2L8 2Z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M8 7v3M8 11.5v.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>';}
+function iX(){return'<svg width="14" height="14" viewBox="0 0 16 16" fill="none" style="flex-shrink:0;margin-top:1px"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.3"/><path d="M5.5 5.5l5 5M10.5 5.5l-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>';}
+function iI(){return'<svg width="14" height="14" viewBox="0 0 16 16" fill="none" style="flex-shrink:0;margin-top:1px"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.3"/><path d="M8 7v5M8 5v1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>';}
+</script>
+</body>
+</html>
