@@ -10,21 +10,22 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Libre+Franklin:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --navy:#152648;
-    --navy-deep:#0d1830;
-    --navy-soft:#24365c;
-    --gold:#e0a13c;
-    --gold-deep:#c1872b;
-    --bg:#faf9f6;
+    /* Palette taken from Alcion Seguros (reference site): wine/burgundy + warm mauve-gray, white-dominant */
+    --navy:#7c2233;       /* primary wine — headings, solid CTAs, dark blocks */
+    --navy-deep:#4a1420;  /* deep wine — footer, hover-dark */
+    --navy-soft:#a04a5a;  /* softer wine — hover, secondary emphasis */
+    --gold:#d3a2a9;       /* dusty rose accent — used on dark wine backgrounds */
+    --gold-deep:#8b3b48;  /* muted rose-wine accent — used on light backgrounds (eyebrows) */
+    --bg:#fdfbfa;
     --surface:#ffffff;
-    --text:#1c2434;
-    --muted:#5e6579;
-    --border:#e7e4dc;
+    --text:#2a2226;
+    --muted:#6f6469;
+    --border:#e8e1e3;
     --whatsapp:#25d366;
     --font-display:'Cormorant Garamond',serif;
     --font-body:'Libre Franklin',sans-serif;
     --radius:14px;
-    --shadow:0 8px 28px rgba(21,38,72,0.08);
+    --shadow:0 8px 28px rgba(124,34,51,0.1);
   }
 
   *{box-sizing:border-box;margin:0;padding:0;}
@@ -58,13 +59,15 @@
     border:1.5px solid transparent;cursor:pointer;transition:transform .15s ease,box-shadow .15s ease,background .15s ease,color .15s ease;
     white-space:nowrap;
   }
-  .btn-gold{background:var(--gold);color:var(--navy-deep);}
-  .btn-gold:hover{background:var(--gold-deep);transform:translateY(-1px);box-shadow:0 10px 22px rgba(224,161,60,0.35);}
-  .btn-outline{background:transparent;border-color:rgba(255,255,255,0.35);color:#fff;}
-  .btn-outline:hover{background:rgba(255,255,255,0.1);border-color:rgba(255,255,255,0.6);}
+  .btn-gold{background:var(--navy);color:#fff;}
+  .btn-gold:hover{background:var(--navy-deep);transform:translateY(-1px);box-shadow:0 10px 22px rgba(124,34,51,0.3);}
+  .btn-outline{background:transparent;border-color:var(--navy);color:var(--navy);}
+  .btn-outline:hover{background:rgba(124,34,51,0.06);border-color:var(--navy-deep);}
   .btn-navy{background:var(--navy);color:#fff;}
   .btn-navy:hover{background:var(--navy-soft);transform:translateY(-1px);}
-  .btn:focus-visible{outline:2.5px solid var(--gold-deep);outline-offset:3px;}
+  .btn-white{background:#fff;color:var(--navy);}
+  .btn-white:hover{background:var(--gold);color:var(--navy-deep);transform:translateY(-1px);}
+  .btn:focus-visible{outline:2.5px solid var(--navy-soft);outline-offset:3px;}
 
   /* Header */
   header{
@@ -85,21 +88,26 @@
 
   /* Hero */
   .hero{
-    background:linear-gradient(160deg,var(--navy) 0%,var(--navy-deep) 100%);
-    color:#fff;padding:110px 0 120px;position:relative;overflow:hidden;
+    background:var(--bg);color:var(--text);padding:96px 0 0;position:relative;overflow:hidden;
+  }
+  .hero::before{
+    content:"";position:absolute;top:0;right:0;bottom:0;width:40%;
+    background:var(--navy);
+    clip-path:polygon(30% 0,100% 0,100% 100%,44% 100%);
   }
   .hero::after{
-    content:"";position:absolute;right:-120px;top:-120px;width:520px;height:520px;
-    border-radius:50%;background:radial-gradient(circle,rgba(224,161,60,0.18) 0%,rgba(224,161,60,0) 70%);
+    content:"";position:absolute;top:0;right:22%;bottom:0;width:8%;
+    background:#8a7c85;opacity:0.55;
+    clip-path:polygon(55% 0,100% 0,45% 100%,0 100%);
   }
-  .hero-inner{position:relative;max-width:640px;}
-  .hero h1{color:#fff;font-size:clamp(36px,5.2vw,58px);margin-bottom:22px;}
-  .hero h1 em{font-style:normal;color:var(--gold);}
-  .hero p{font-size:18px;color:rgba(255,255,255,0.75);max-width:520px;margin-bottom:36px;}
+  .hero-inner{position:relative;max-width:480px;padding-bottom:72px;}
+  .hero h1{color:var(--navy);font-size:clamp(36px,5.2vw,56px);margin-bottom:22px;}
+  .hero h1 em{font-style:normal;color:var(--navy-soft);}
+  .hero p{font-size:18px;color:var(--muted);max-width:480px;margin-bottom:36px;}
   .hero-actions{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:56px;}
-  .hero-stats{display:flex;flex-wrap:wrap;gap:40px;border-top:1px solid rgba(255,255,255,0.14);padding-top:28px;}
-  .hero-stat b{font-family:var(--font-display);font-size:26px;color:var(--gold);display:block;}
-  .hero-stat span{font-size:12.5px;color:rgba(255,255,255,0.6);letter-spacing:0.3px;}
+  .hero-stats{display:flex;flex-wrap:wrap;gap:40px;border-top:1px solid var(--border);padding-top:28px;}
+  .hero-stat b{font-family:var(--font-display);font-size:26px;color:var(--navy);display:block;}
+  .hero-stat span{font-size:12.5px;color:var(--muted);letter-spacing:0.3px;}
 
   /* Nosotros */
   .nosotros{background:var(--surface);}
@@ -112,7 +120,7 @@
     padding:22px 20px;
   }
   .value-icon{
-    width:38px;height:38px;border-radius:10px;background:rgba(224,161,60,0.14);
+    width:38px;height:38px;border-radius:10px;background:rgba(124,34,51,0.1);
     display:flex;align-items:center;justify-content:center;margin-bottom:14px;color:var(--gold-deep);
   }
   .value-card h3{font-family:var(--font-body);font-size:15px;font-weight:600;color:var(--navy);margin-bottom:6px;}
@@ -150,12 +158,12 @@
     font-family:var(--font-display);font-weight:600;font-size:16px;color:var(--navy-soft);
     background:var(--bg);min-height:84px;transition:border-color .15s,color .15s;
   }
-  .insurer-badge:hover{border-color:var(--gold);color:var(--navy);}
+  .insurer-badge:hover{border-color:var(--navy);color:var(--navy);}
   .insurer-note{margin-top:22px;font-size:13px;color:var(--muted);text-align:center;}
 
   /* Contacto */
   .contacto{
-    background:linear-gradient(160deg,var(--navy) 0%,var(--navy-deep) 100%);color:#fff;
+    background:var(--navy);color:#fff;
   }
   .contacto .section-head p{color:rgba(255,255,255,0.65);}
   .contacto .eyebrow{color:var(--gold);}
@@ -163,7 +171,7 @@
   .contact-grid{display:grid;grid-template-columns:0.9fr 1.1fr;gap:56px;}
   .contact-info-item{display:flex;gap:14px;margin-bottom:26px;}
   .contact-info-icon{
-    width:40px;height:40px;border-radius:10px;background:rgba(224,161,60,0.16);color:var(--gold);
+    width:40px;height:40px;border-radius:10px;background:rgba(255,255,255,0.14);color:var(--gold);
     display:flex;align-items:center;justify-content:center;flex-shrink:0;
   }
   .contact-info-item b{display:block;font-size:14.5px;margin-bottom:2px;}
@@ -457,7 +465,7 @@
         <label for="mensaje">Contanos más</label>
         <textarea id="mensaje" name="mensaje" placeholder="Marca, modelo, ubicación, lo que sirva para cotizar más rápido"></textarea>
       </div>
-      <button type="submit" class="btn btn-gold">Solicitar cotización</button>
+      <button type="submit" class="btn btn-white">Solicitar cotización</button>
     </form>
   </div>
 </section>
