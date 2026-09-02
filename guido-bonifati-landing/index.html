@@ -88,19 +88,19 @@
 
   /* Hero */
   .hero{
-    background:var(--bg);color:var(--text);padding:96px 0 0;position:relative;overflow:hidden;
+    background:var(--bg);color:var(--text);position:relative;overflow:hidden;
   }
-  .hero::before{
-    content:"";position:absolute;top:0;right:0;bottom:0;width:40%;
-    background:var(--navy);
+  .hero-frame{position:relative;max-width:1400px;margin:0 auto;padding:0 28px;overflow:hidden;}
+  .hero-shape{position:absolute;top:0;bottom:0;}
+  .hero-shape--main{
+    right:28px;width:36%;background:var(--navy);
     clip-path:polygon(30% 0,100% 0,100% 100%,44% 100%);
   }
-  .hero::after{
-    content:"";position:absolute;top:0;right:22%;bottom:0;width:8%;
-    background:#8a7c85;opacity:0.55;
+  .hero-shape--accent{
+    right:calc(28px + 34%);width:8%;background:#8a7c85;opacity:0.55;
     clip-path:polygon(55% 0,100% 0,45% 100%,0 100%);
   }
-  .hero-inner{position:relative;max-width:480px;padding-bottom:72px;}
+  .hero-inner{position:relative;max-width:560px;padding:96px 0 72px;}
   .hero h1{color:var(--navy);font-size:clamp(36px,5.2vw,56px);margin-bottom:22px;}
   .hero h1 em{font-style:normal;color:var(--navy-soft);}
   .hero p{font-size:18px;color:var(--muted);max-width:480px;margin-bottom:36px;}
@@ -111,26 +111,36 @@
 
   /* Nosotros */
   .nosotros{background:var(--surface);}
-  .nosotros-grid{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center;}
+  .nosotros-copy{max-width:700px;}
   .nosotros-copy p{color:var(--muted);margin-bottom:16px;font-size:16px;}
   .nosotros-copy p:last-of-type{margin-bottom:28px;}
-  .values{display:grid;grid-template-columns:1fr 1fr;gap:22px;}
-  .value-card{
-    background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);
-    padding:22px 20px;
-  }
   .value-icon{
     width:38px;height:38px;border-radius:10px;background:rgba(124,34,51,0.1);
     display:flex;align-items:center;justify-content:center;margin-bottom:14px;color:var(--gold-deep);
   }
-  .value-card h3{font-family:var(--font-body);font-size:15px;font-weight:600;color:var(--navy);margin-bottom:6px;}
-  .value-card p{font-size:13.5px;color:var(--muted);}
   .credential{
     display:flex;align-items:center;gap:12px;background:var(--navy);color:#fff;
-    border-radius:var(--radius);padding:16px 20px;margin-top:24px;
+    border-radius:var(--radius);padding:16px 20px;margin-top:24px;max-width:560px;
   }
   .credential b{display:block;font-size:14px;}
   .credential span{font-size:12.5px;color:rgba(255,255,255,0.65);}
+
+  /* Seguros para Personas / Empresas */
+  .persona-empresa-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:56px;}
+  .pe-card{
+    background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);
+    overflow:hidden;transition:transform .18s ease,box-shadow .18s ease;
+  }
+  .pe-card:hover{transform:translateY(-4px);box-shadow:var(--shadow);}
+  .pe-visual{height:168px;display:flex;align-items:center;justify-content:center;color:#fff;}
+  .pe-visual--personas{background:var(--navy);}
+  .pe-visual--empresas{background:#736575;}
+  .pe-visual svg{width:52px;height:52px;opacity:0.92;}
+  .pe-body{padding:24px 26px 28px;}
+  .pe-body h3{font-family:var(--font-body);font-size:18px;font-weight:600;color:var(--navy);margin-bottom:9px;}
+  .pe-body p{font-size:14px;color:var(--muted);margin-bottom:14px;}
+  .pe-link{font-size:13.5px;font-weight:600;color:var(--gold-deep);}
+  .pe-link:hover{color:var(--navy);}
 
   /* Productos */
   .productos{background:var(--bg);}
@@ -159,6 +169,17 @@
     background:var(--bg);min-height:84px;transition:border-color .15s,color .15s;
   }
   .insurer-badge:hover{border-color:var(--navy);color:var(--navy);}
+  .insurer-extra{display:none;}
+  .insurer-grid.show-all .insurer-extra{display:flex;}
+  .insurer-toggle{
+    display:flex;align-items:center;gap:7px;margin:28px auto 0;background:transparent;
+    border:1.5px solid var(--navy);color:var(--navy);padding:10px 22px;border-radius:999px;
+    font-size:13.5px;font-weight:600;cursor:pointer;font-family:var(--font-body);
+    transition:background .15s,color .15s;
+  }
+  .insurer-toggle:hover{background:var(--navy);color:#fff;}
+  .insurer-toggle svg{width:14px;height:14px;transition:transform .2s;}
+  .insurer-toggle[aria-expanded="true"] svg{transform:rotate(180deg);}
   .insurer-note{margin-top:22px;font-size:13px;color:var(--muted);text-align:center;}
 
   /* Contacto */
@@ -220,10 +241,12 @@
   }
 
   @media (max-width:900px){
-    .nosotros-grid,.contact-grid{grid-template-columns:1fr;}
+    .nosotros-grid,.contact-grid,.persona-empresa-grid{grid-template-columns:1fr;}
     .product-grid{grid-template-columns:repeat(2,1fr);}
     .insurer-grid{grid-template-columns:repeat(3,1fr);}
-    .hero{padding:88px 0 90px;}
+    .hero-inner{padding:80px 0 64px;max-width:60%;}
+    .hero-shape--main{width:30%;}
+    .hero-shape--accent{display:none;}
   }
   @media (max-width:720px){
     .nav-links{
@@ -239,10 +262,12 @@
     .nav-toggle{display:block;}
     nav.nav{position:relative;}
     section{padding:68px 0;}
-    .values,.form-row{grid-template-columns:1fr;}
+    .form-row{grid-template-columns:1fr;}
     .product-grid{grid-template-columns:1fr 1fr;}
     .insurer-grid{grid-template-columns:repeat(2,1fr);}
     .hero-stats{gap:26px;}
+    .hero-inner{max-width:100%;padding:64px 0 48px;}
+    .hero-shape{display:none;}
   }
 </style>
 </head>
@@ -271,23 +296,27 @@
 </header>
 
 <section id="inicio" class="hero">
-  <div class="container hero-inner">
-    <h1>Tu seguro, <em>bien asesorado.</em></h1>
-    <p>Te ayudo a elegir la cobertura que realmente necesitás, sin letra chica ni vueltas. Comparo entre las principales aseguradoras del país y te acompaño en cada paso — desde la cotización hasta el siniestro.</p>
-    <div class="hero-actions">
-      <a href="#contacto" class="btn btn-gold">Cotizar ahora</a>
-      <a href="#productos" class="btn btn-outline">Ver coberturas</a>
-    </div>
-    <div class="hero-stats">
-      <div class="hero-stat"><b>+10</b><span>años de trayectoria</span></div>
-      <div class="hero-stat"><b>+8</b><span>aseguradoras aliadas</span></div>
-      <div class="hero-stat"><b>100%</b><span>atención personalizada</span></div>
+  <div class="hero-frame">
+    <div class="hero-shape hero-shape--accent" aria-hidden="true"></div>
+    <div class="hero-shape hero-shape--main" aria-hidden="true"></div>
+    <div class="hero-inner">
+      <h1>Tu seguro, <em>bien asesorado.</em></h1>
+      <p>Te ayudo a elegir la cobertura que realmente necesitás, sin letra chica ni vueltas. Comparo entre las principales aseguradoras del país y te acompaño en cada paso — desde la cotización hasta el siniestro.</p>
+      <div class="hero-actions">
+        <a href="#contacto" class="btn btn-gold">Cotizar ahora</a>
+        <a href="#productos" class="btn btn-outline">Ver coberturas</a>
+      </div>
+      <div class="hero-stats">
+        <div class="hero-stat"><b>+10</b><span>años de trayectoria</span></div>
+        <div class="hero-stat"><b>+8</b><span>aseguradoras aliadas</span></div>
+        <div class="hero-stat"><b>100%</b><span>atención personalizada</span></div>
+      </div>
     </div>
   </div>
 </section>
 
 <section id="nosotros" class="nosotros">
-  <div class="container nosotros-grid">
+  <div class="container">
     <div class="nosotros-copy">
       <span class="eyebrow">Nosotros</span>
       <h2>Un asesor, no un call center.</h2>
@@ -303,34 +332,27 @@
         </div>
       </div>
     </div>
-    <div class="values">
-      <div class="value-card">
-        <div class="value-icon">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+
+    <div class="persona-empresa-grid">
+      <div class="pe-card">
+        <div class="pe-visual pe-visual--personas">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/><circle cx="10" cy="7" r="4"/><path d="M21 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
         </div>
-        <h3>Atención personal</h3>
-        <p>Hablás siempre con la misma persona, no con un conmutador.</p>
+        <div class="pe-body">
+          <h3>Seguros para Personas</h3>
+          <p>Auto, hogar, vida y salud: cobertura pensada para vos y tu familia, sin resignar el trato personalizado.</p>
+          <a href="#productos" class="pe-link">+ Más info</a>
+        </div>
       </div>
-      <div class="value-card">
-        <div class="value-icon">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+      <div class="pe-card">
+        <div class="pe-visual pe-visual--empresas">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
         </div>
-        <h3>Múltiples aseguradoras</h3>
-        <p>Comparo y elijo la mejor relación cobertura-precio para vos.</p>
-      </div>
-      <div class="value-card">
-        <div class="value-icon">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        <div class="pe-body">
+          <h3>Seguros para Empresas</h3>
+          <p>ART, seguro comercial y PyME: protección para tu negocio, tu equipo de trabajo y tus activos.</p>
+          <a href="#productos" class="pe-link">+ Más info</a>
         </div>
-        <h3>Gestión de siniestros</h3>
-        <p>Te acompaño en el trámite para que se resuelva rápido.</p>
-      </div>
-      <div class="value-card">
-        <div class="value-icon">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-        </div>
-        <h3>Respuesta rápida</h3>
-        <p>Cotizaciones y consultas resueltas en el día, por WhatsApp.</p>
       </div>
     </div>
   </div>
@@ -397,7 +419,7 @@
       <h2>Trabajo con las compañías líderes del mercado</h2>
       <p>Comparo entre distintas aseguradoras para conseguirte la mejor cobertura al mejor precio.</p>
     </div>
-    <div class="insurer-grid">
+    <div class="insurer-grid" id="insurerGrid">
       <div class="insurer-badge">Sancor Seguros</div>
       <div class="insurer-badge">Zurich</div>
       <div class="insurer-badge">Federación Patronal</div>
@@ -406,7 +428,15 @@
       <div class="insurer-badge">Río Uruguay Seguros</div>
       <div class="insurer-badge">La Segunda</div>
       <div class="insurer-badge">Allianz</div>
+      <div class="insurer-badge insurer-extra">Provincia Seguros</div>
+      <div class="insurer-badge insurer-extra">La Caja</div>
+      <div class="insurer-badge insurer-extra">Nación Seguros</div>
+      <div class="insurer-badge insurer-extra">Orbis Seguros</div>
     </div>
+    <button type="button" class="insurer-toggle" id="insurerToggle" aria-expanded="false" aria-controls="insurerGrid">
+      <span id="insurerToggleLabel">Ver más aseguradoras</span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
     <p class="insurer-note">Logos de muestra — se reemplazan por los oficiales de cada aseguradora aliada.</p>
   </div>
 </section>
@@ -502,6 +532,15 @@
     navLinks.classList.remove('open');
     navToggle.setAttribute('aria-expanded', 'false');
   }));
+
+  const insurerGrid = document.getElementById('insurerGrid');
+  const insurerToggle = document.getElementById('insurerToggle');
+  const insurerToggleLabel = document.getElementById('insurerToggleLabel');
+  insurerToggle.addEventListener('click', () => {
+    const expanded = insurerGrid.classList.toggle('show-all');
+    insurerToggle.setAttribute('aria-expanded', String(expanded));
+    insurerToggleLabel.textContent = expanded ? 'Ver menos aseguradoras' : 'Ver más aseguradoras';
+  });
 
   document.getElementById('quoteForm').addEventListener('submit', function (e) {
     e.preventDefault();
