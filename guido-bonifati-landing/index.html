@@ -156,12 +156,6 @@
     background:var(--surface);border:1px solid var(--border);transition:transform .18s ease,box-shadow .18s ease;
   }
   .quick-card:hover{transform:translateY(-3px);box-shadow:var(--shadow);}
-  .quick-icon{
-    width:104px;height:104px;border-radius:50%;color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;
-  }
-  .quick-icon svg{width:44px;height:44px;}
-  .quick-card--personas .quick-icon{background:var(--mauve);}
-  .quick-card--empresas .quick-icon{background:var(--wine);}
   .quick-copy{flex:1;}
   .quick-card h3{font-family:var(--font-cond);font-size:28px;font-weight:600;color:#000;margin-bottom:6px;}
   .quick-card span{font-size:16px;color:var(--muted);}
@@ -408,10 +402,7 @@
     .hero-box{margin-top:-40px;padding:32px 22px 26px;}
     .hero-box .hero-sub{letter-spacing:4px;font-size:13px;}
     .sim-form{flex-direction:column;}
-    .quick-card{flex-wrap:wrap;}
-    .quick-icon{width:64px;height:64px;}
-    .quick-icon svg{width:28px;height:28px;}
-    .quick-illustration{display:none;}
+    .quick-illustration{width:64px;height:64px;}
   }
 </style>
 </head>
@@ -478,24 +469,18 @@
 <section class="quick-nav" data-page="inicio">
   <div class="container quick-grid">
     <a href="#personas" class="quick-card quick-card--personas">
-      <div class="quick-icon">
-        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/><circle cx="10" cy="7" r="4"/><path d="M21 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-      </div>
+      <img class="quick-illustration" src="assets/quick/personas.jpg" alt="" aria-hidden="true">
       <div class="quick-copy">
         <h3>Seguros para Personas</h3>
         <span>Auto, vida, hogar y más →</span>
       </div>
-      <img class="quick-illustration" src="assets/quick/personas.jpg" alt="" aria-hidden="true">
     </a>
     <a href="#empresas" class="quick-card quick-card--empresas">
-      <div class="quick-icon">
-        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
-      </div>
+      <img class="quick-illustration" src="assets/quick/empresas.jpg" alt="" aria-hidden="true">
       <div class="quick-copy">
         <h3>Seguros para Empresas</h3>
         <span>ART, RC, caución y más →</span>
       </div>
-      <img class="quick-illustration" src="assets/quick/empresas.jpg" alt="" aria-hidden="true">
     </a>
   </div>
 </section>
