@@ -4,19 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Guido Bonifati — Asesor de Seguros</title>
-<meta name="description" content="Asesoramiento personalizado en seguros de auto, hogar, vida, ART y más. Trabajo con las principales aseguradoras del país para conseguirte la cobertura que realmente necesitás.">
+<meta name="description" content="Asesoramiento personalizado en seguros para personas y empresas. Trabajo con las principales aseguradoras del país para conseguirte la cobertura que realmente necesitás.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Saira:wght@200;300;400;500;600;700&family=Saira+Condensed:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    /* Exact palette extracted from alcionseguros.com.ar's own CSS (not guessed from screenshots) */
-    --wine:#82202B;        /* primary accent — nav active, ASEGURADORAS heading, contact block */
-    --wine-deep:#5e1620;   /* hover / dark variant of wine */
-    --mauve:#655D68;       /* secondary — big display headings, counters, footer bg, dividers */
+    --wine:#82202B;
+    --wine-deep:#5e1620;
+    --mauve:#655D68;
     --mauve-deep:#4c4650;
-    --text:#4B464F;        /* body copy */
-    --muted:#848484;       /* small labels */
+    --text:#4B464F;
+    --muted:#848484;
     --bg:#ffffff;
     --surface:#faf9fa;
     --border:#e8e4e6;
@@ -64,7 +63,10 @@
   .btn-outline:hover{background:rgba(130,32,43,0.06);border-color:var(--wine-deep);}
   .btn-white{background:#fff;color:var(--wine);}
   .btn-white:hover{background:var(--surface);transform:translateY(-1px);}
+  .btn-outline-white{background:transparent;border-color:rgba(255,255,255,0.6);color:#fff;}
+  .btn-outline-white:hover{background:rgba(255,255,255,0.12);}
   .btn:focus-visible{outline:2.5px solid var(--mauve);outline-offset:3px;}
+  .btn-sm{padding:8px 16px;font-size:12.5px;}
 
   /* Header */
   header{
@@ -72,12 +74,12 @@
     background:rgba(255,255,255,0.94);backdrop-filter:blur(10px);
     border-bottom:1px solid var(--border);
   }
-  .nav{display:flex;align-items:center;justify-content:space-between;padding:18px 28px;max-width:1180px;margin:0 auto;}
+  .nav{display:flex;align-items:center;justify-content:space-between;padding:16px 28px;max-width:1180px;margin:0 auto;}
   .brand{display:flex;flex-direction:column;line-height:1;}
-  .brand-name{font-family:var(--font-cond);font-weight:600;font-size:23px;color:var(--wine);letter-spacing:0.3px;}
-  .brand-tag{font-size:9.5px;font-weight:500;letter-spacing:2.5px;color:var(--muted);margin-top:3px;}
-  .nav-links{display:flex;align-items:center;gap:32px;}
-  .nav-links a{font-size:14.5px;font-weight:500;color:var(--text);transition:color .15s;position:relative;padding-bottom:3px;}
+  .brand-name{font-family:var(--font-cond);font-weight:600;font-size:22px;color:var(--wine);letter-spacing:0.3px;}
+  .brand-tag{font-size:9px;font-weight:500;letter-spacing:2.5px;color:var(--muted);margin-top:3px;}
+  .nav-links{display:flex;align-items:center;gap:24px;}
+  .nav-links a{font-size:13.5px;font-weight:500;color:var(--text);transition:color .15s;position:relative;padding-bottom:3px;white-space:nowrap;}
   .nav-links a::after{
     content:"";position:absolute;left:0;right:0;bottom:0;height:2px;background:var(--wine);
     transform:scaleX(0);transition:transform .2s ease;
@@ -85,7 +87,7 @@
   .nav-links a:hover{color:var(--wine);}
   .nav-links a:hover::after,.nav-links a.active::after{transform:scaleX(1);}
   .nav-links a.active{color:var(--wine);}
-  .nav-actions{display:flex;align-items:center;gap:18px;}
+  .nav-actions{display:flex;align-items:center;gap:16px;}
   .nav-toggle{display:none;background:none;border:none;cursor:pointer;padding:6px;}
   .nav-toggle span{display:block;width:22px;height:2px;background:var(--wine);margin:5px 0;border-radius:2px;}
 
@@ -115,27 +117,33 @@
   }
   .hero-actions{display:flex;flex-wrap:wrap;justify-content:center;gap:14px;}
 
-  /* Nosotros intro strip */
+  /* Nosotros / Quiénes somos */
   .nosotros{background:var(--bg);}
-  .intro-grid{display:grid;grid-template-columns:1.1fr 1fr 1.2fr;gap:44px;align-items:center;}
-  .intro-copy p{font-size:16px;color:var(--text);}
-  .intro-copy p + p{margin-top:14px;}
-  .intro-copy strong{font-weight:600;}
-  .intro-highlight{
-    position:relative;min-height:220px;border-radius:2px;overflow:hidden;
-    color:#fff;display:flex;align-items:center;
+  .bio{display:grid;grid-template-columns:auto 1fr;gap:32px;align-items:center;margin-bottom:56px;}
+  .avatar{
+    width:104px;height:104px;border-radius:50%;background:var(--wine);color:#fff;
+    display:flex;align-items:center;justify-content:center;font-family:var(--font-cond);
+    font-size:34px;font-weight:600;flex-shrink:0;
   }
-  .intro-slide{
-    position:absolute;inset:0;display:flex;align-items:center;padding:36px 34px;
-    font-size:16px;line-height:1.6;opacity:0;transition:opacity 1s ease;
+  .bio-name{font-family:var(--font-cond);font-size:26px;font-weight:600;color:#000;letter-spacing:0.3px;}
+  .bio-role{font-size:14px;color:var(--wine);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;}
+  .bio-text{font-size:15px;color:var(--text);max-width:640px;margin-bottom:16px;}
+  .bio-social{display:flex;gap:10px;}
+  .bio-social a{
+    width:38px;height:38px;border-radius:50%;border:1.5px solid var(--border);color:var(--wine);
+    display:flex;align-items:center;justify-content:center;transition:background .15s,border-color .15s,color .15s;
   }
-  .intro-slide.is-active{opacity:1;}
-  .intro-slide:nth-child(1){background:var(--mauve);}
-  .intro-slide:nth-child(2){background:var(--wine);}
+  .bio-social a:hover{background:var(--wine);border-color:var(--wine);color:#fff;}
+  .bio-social svg{width:16px;height:16px;}
+
+  .pillars{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-bottom:56px;}
+  .pillar{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:26px 24px;}
+  .pillar h3{font-family:var(--font-cond);font-size:16px;font-weight:600;text-transform:uppercase;color:var(--wine);margin-bottom:10px;letter-spacing:0.4px;}
+  .pillar p{font-size:14.5px;color:var(--text);}
 
   .credential{
     display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--border);
-    border-radius:var(--radius);padding:16px 20px;margin-top:32px;max-width:640px;
+    border-radius:var(--radius);padding:16px 20px;max-width:640px;
   }
   .credential-icon{
     width:36px;height:36px;border-radius:50%;background:var(--wine);color:#fff;flex-shrink:0;
@@ -143,26 +151,6 @@
   }
   .credential b{display:block;font-size:14px;font-weight:600;color:var(--mauve);}
   .credential span{font-size:12.5px;color:var(--muted);}
-
-  /* Seguros para Personas / Empresas */
-  .persona-empresa-grid{display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:80px;}
-  .pe-card{text-align:left;}
-  .pe-visual{
-    height:200px;display:flex;align-items:center;justify-content:center;color:#fff;
-    border-radius:2px;margin-bottom:22px;
-  }
-  .pe-visual--personas{background:var(--mauve);}
-  .pe-visual--empresas{background:var(--wine);}
-  .pe-visual svg{width:56px;height:56px;opacity:0.92;}
-  .pe-card h3{
-    font-family:var(--font-cond);font-size:28px;font-weight:500;text-transform:uppercase;
-    color:#000;margin-bottom:10px;letter-spacing:0.3px;
-  }
-  .pe-card p{font-size:15px;line-height:1.9;color:var(--text);margin-bottom:14px;}
-  .pe-link{
-    display:inline-flex;align-items:center;gap:7px;font-size:14px;font-weight:600;color:var(--wine);
-  }
-  .pe-link:hover{color:var(--wine-deep);}
 
   /* Counters */
   .stats{background:var(--surface);}
@@ -172,25 +160,71 @@
   }
   .stat span{font-size:14px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text);}
 
-  /* Productos */
-  .productos{background:var(--bg);}
-  .product-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;}
-  .product-card{
-    background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
-    padding:28px 24px;transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease;
+  /* Seguros para Personas / Empresas — product lists */
+  .productos-personas{background:var(--bg);}
+  .productos-empresas{background:var(--surface);}
+  .prod-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;}
+  .prod-card{
+    background:#fff;border:1px solid var(--border);border-radius:var(--radius);
+    padding:22px 20px;transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease;
+    display:flex;flex-direction:column;
   }
-  .product-card:hover{transform:translateY(-4px);box-shadow:var(--shadow);border-color:transparent;}
-  .product-icon{
-    width:44px;height:44px;border-radius:50%;background:var(--wine);color:#fff;
-    display:flex;align-items:center;justify-content:center;margin-bottom:18px;
+  .productos-empresas .prod-card{background:#fff;}
+  .prod-card:hover{transform:translateY(-3px);box-shadow:var(--shadow);border-color:transparent;}
+  .prod-icon{
+    width:40px;height:40px;border-radius:50%;background:var(--wine);color:#fff;
+    display:flex;align-items:center;justify-content:center;margin-bottom:14px;
   }
-  .product-card h3{
-    font-family:var(--font-cond);font-size:19px;font-weight:600;text-transform:uppercase;
-    color:var(--mauve);margin-bottom:8px;
-  }
-  .product-card p{font-size:14px;color:var(--text);}
+  .productos-personas .prod-icon{background:var(--mauve);}
+  .prod-card h3{font-family:var(--font-cond);font-size:16.5px;font-weight:600;color:#000;margin-bottom:6px;}
+  .prod-card p{font-size:13px;color:var(--text);margin-bottom:14px;flex:1;}
+  .prod-quote{font-size:12.5px;font-weight:600;color:var(--wine);display:inline-flex;align-items:center;gap:5px;}
+  .prod-quote:hover{color:var(--wine-deep);}
 
-  /* Aseguradoras */
+  /* Revisión gratis */
+  .revision{background:var(--wine);color:#fff;text-align:center;}
+  .revision .eyebrow{color:rgba(255,255,255,0.65);}
+  .revision h2{color:#fff;font-size:clamp(26px,3vw,36px);}
+  .revision p{max-width:620px;margin:16px auto 28px;color:rgba(255,255,255,0.85);font-size:16px;}
+
+  /* Referidos */
+  .referidos{background:var(--bg);}
+  .ref-steps{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin:44px 0 36px;}
+  .ref-step{position:relative;padding-top:8px;}
+  .ref-num{
+    width:36px;height:36px;border-radius:50%;background:var(--mauve);color:#fff;
+    display:flex;align-items:center;justify-content:center;font-family:var(--font-cond);font-weight:600;
+    margin-bottom:14px;
+  }
+  .ref-step h3{font-family:var(--font-cond);font-size:17px;font-weight:600;color:var(--wine);margin-bottom:6px;text-transform:uppercase;}
+  .ref-step p{font-size:14px;color:var(--text);}
+  .ref-note{font-size:12.5px;color:var(--muted);margin-top:20px;}
+
+  /* Simulador de riesgo */
+  .simulador{background:var(--surface);}
+  .sim-panel{
+    max-width:760px;margin:0 auto;background:#fff;border:1px solid var(--border);
+    border-radius:var(--radius);padding:40px 36px;text-align:center;
+  }
+  .sim-badge{
+    display:inline-block;font-size:11px;font-weight:600;letter-spacing:0.8px;text-transform:uppercase;
+    color:var(--wine);background:rgba(130,32,43,0.08);padding:5px 12px;border-radius:20px;margin-bottom:16px;
+  }
+  .sim-form{display:flex;gap:10px;margin:24px 0;flex-wrap:wrap;justify-content:center;}
+  .sim-form input{
+    flex:1;min-width:220px;padding:13px 16px;border-radius:4px;border:1.5px solid var(--border);
+    font-family:var(--font);font-size:14px;outline:none;transition:border-color .15s;
+  }
+  .sim-form input:focus{border-color:var(--wine);}
+  .sim-result{
+    display:none;margin-top:24px;text-align:left;background:var(--surface);border:1px solid var(--border);
+    border-radius:8px;padding:22px 24px;
+  }
+  .sim-result.show{display:block;}
+  .sim-result b{color:var(--wine);}
+  .sim-result .sim-fine{display:block;margin-top:12px;font-size:12px;color:var(--muted);}
+
+  /* Aseguradoras — logo slider */
   .aseguradoras{background:var(--bg);text-align:center;}
   .aseg-divider{width:70px;height:3px;background:var(--mauve);margin:0 auto 24px;}
   .aseg-label{font-size:15px;color:var(--muted);letter-spacing:0.3px;margin-bottom:2px;}
@@ -199,28 +233,20 @@
     color:var(--wine);margin-bottom:16px;
   }
   .aseguradoras > .container > p{max-width:560px;margin:0 auto 44px;color:var(--text);}
-  .insurer-grid{
-    display:grid;grid-template-columns:repeat(4,1fr);gap:16px;
+  .slider{
+    overflow:hidden;position:relative;
+    -webkit-mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);
+    mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);
   }
-  .insurer-badge{
-    border:1px solid var(--border);border-radius:6px;padding:22px 16px;
-    display:flex;align-items:center;justify-content:center;text-align:center;
-    font-family:var(--font-cond);font-weight:600;font-size:17px;color:var(--mauve);
-    background:var(--surface);min-height:84px;transition:border-color .15s,color .15s,background .15s;
+  .slider-track{display:flex;align-items:center;gap:64px;width:max-content;animation:slide 28s linear infinite;}
+  .slider:hover .slider-track{animation-play-state:paused;}
+  .slider-track img{
+    height:52px;width:auto;object-fit:contain;filter:grayscale(1) opacity(0.65);
+    transition:filter .2s ease;flex-shrink:0;
   }
-  .insurer-badge:hover{border-color:var(--wine);color:var(--wine);background:#fff;}
-  .insurer-extra{display:none;}
-  .insurer-grid.show-all .insurer-extra{display:flex;}
-  .insurer-toggle{
-    display:flex;align-items:center;gap:7px;margin:28px auto 0;background:transparent;
-    border:1.5px solid var(--wine);color:var(--wine);padding:10px 22px;border-radius:3px;
-    font-size:14px;font-weight:600;cursor:pointer;font-family:var(--font);
-    transition:background .15s,color .15s;
-  }
-  .insurer-toggle:hover{background:var(--wine);color:#fff;}
-  .insurer-toggle svg{width:14px;height:14px;transition:transform .2s;}
-  .insurer-toggle[aria-expanded="true"] svg{transform:rotate(180deg);}
-  .insurer-note{margin-top:22px;font-size:13px;color:var(--muted);}
+  .slider-track img:hover{filter:grayscale(0) opacity(1);}
+  @keyframes slide{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+  .insurer-note{margin-top:32px;font-size:13px;color:var(--muted);}
 
   /* Contacto */
   .contacto{background:var(--wine);color:#fff;}
@@ -228,13 +254,22 @@
   .contacto .eyebrow{color:rgba(255,255,255,0.6);}
   .contacto h2{color:#fff;}
   .contact-grid{display:grid;grid-template-columns:0.9fr 1.1fr;gap:56px;}
-  .contact-info-item{display:flex;gap:14px;margin-bottom:26px;}
+  .contact-info-item{
+    display:flex;gap:14px;margin-bottom:20px;padding:10px;margin-left:-10px;border-radius:8px;
+    transition:background .15s;
+  }
+  a.contact-info-item:hover{background:rgba(255,255,255,0.08);}
   .contact-info-icon{
     width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,0.16);color:#fff;
     display:flex;align-items:center;justify-content:center;flex-shrink:0;
   }
   .contact-info-item b{display:block;font-size:14.5px;margin-bottom:2px;}
   .contact-info-item span{font-size:13.5px;color:rgba(255,255,255,0.68);}
+  .contact-map{
+    margin-top:18px;border-radius:8px;overflow:hidden;border:1px solid rgba(255,255,255,0.2);
+    filter:grayscale(0.3);
+  }
+  .contact-map iframe{width:100%;height:200px;border:0;display:block;}
   .contact-form{
     background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.16);
     border-radius:6px;padding:32px;backdrop-filter:blur(6px);
@@ -289,14 +324,20 @@
   @media (prefers-reduced-motion:reduce){
     html{scroll-behavior:auto;}
     *{transition-duration:0.001ms !important;animation-duration:0.001ms !important;}
+    .slider-track{animation:none;}
   }
 
+  @media (max-width:1024px){
+    .nav-links{gap:16px;}
+    .nav-links a{font-size:13px;}
+  }
   @media (max-width:900px){
-    .contact-grid,.persona-empresa-grid{grid-template-columns:1fr;}
-    .intro-grid{grid-template-columns:1fr;gap:28px;}
-    .intro-highlight{min-height:140px;}
-    .product-grid{grid-template-columns:repeat(2,1fr);}
-    .insurer-grid{grid-template-columns:repeat(3,1fr);}
+    .contact-grid{grid-template-columns:1fr;}
+    .bio{grid-template-columns:1fr;text-align:center;}
+    .bio-social{justify-content:center;}
+    .pillars{grid-template-columns:1fr;}
+    .prod-grid{grid-template-columns:repeat(2,1fr);}
+    .ref-steps{grid-template-columns:1fr;}
     .stats-grid{grid-template-columns:repeat(3,1fr);gap:16px;}
     .footer-grid{grid-template-columns:1fr 1fr;gap:36px;}
     .hero-box{padding:40px 32px 32px;margin-top:-60px;}
@@ -316,12 +357,12 @@
     nav.nav{position:relative;}
     section{padding:64px 0;}
     .form-row{grid-template-columns:1fr;}
-    .product-grid{grid-template-columns:1fr 1fr;}
-    .insurer-grid{grid-template-columns:repeat(2,1fr);}
+    .prod-grid{grid-template-columns:1fr 1fr;}
     .stats-grid{grid-template-columns:1fr;gap:28px;}
     .footer-grid{grid-template-columns:1fr;gap:28px;}
     .hero-box{margin-top:-40px;padding:32px 22px 26px;}
     .hero-box .hero-sub{letter-spacing:4px;font-size:13px;}
+    .sim-form{flex-direction:column;}
   }
 </style>
 </head>
@@ -336,7 +377,8 @@
     <ul class="nav-links" id="navLinks">
       <li><a href="#inicio" class="active">Inicio</a></li>
       <li><a href="#nosotros">Nosotros</a></li>
-      <li><a href="#productos">Productos</a></li>
+      <li><a href="#personas">Personas</a></li>
+      <li><a href="#empresas">Empresas</a></li>
       <li><a href="#aseguradoras">Aseguradoras</a></li>
       <li><a href="#contacto">Contacto</a></li>
     </ul>
@@ -356,24 +398,53 @@
     <p class="hero-sub">Nuestra diferencia es nuestro servicio</p>
     <div class="hero-actions">
       <a href="#contacto" class="btn btn-wine">Cotizar ahora</a>
-      <a href="#productos" class="btn btn-outline">Ver coberturas</a>
+      <a href="#personas" class="btn btn-outline">Ver coberturas</a>
     </div>
   </div>
 </section>
 
 <section id="nosotros" class="nosotros">
   <div class="container">
-    <div class="intro-grid">
-      <div class="intro-copy">
-        <p><strong>Te asesoro con honestidad sobre las compañías y pólizas de seguros.</strong></p>
-        <p><strong>Te acompaño en la contratación, brindándote el mejor asesoramiento en todo momento.</strong></p>
+    <div class="section-head">
+      <span class="eyebrow">Nosotros</span>
+      <h2>Quiénes somos</h2>
+    </div>
+
+    <div class="bio">
+      <div class="avatar">GB</div>
+      <div>
+        <div class="bio-name">Guido Bonifati</div>
+        <div class="bio-role">Productor Asesor de Seguros</div>
+        <p class="bio-text">Con más de 10 años en el mercado asegurador, ayudo a personas y empresas a proteger lo que más les importa. Mi trabajo es simple: escuchar, comparar entre distintas aseguradoras y recomendar con honestidad — sin venderte más cobertura de la que necesitás.</p>
+        <div class="bio-social">
+          <a href="mailto:guido@completar.com.ar" aria-label="Email">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z" opacity="0"/><path d="M22 6 12 13 2 6"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg>
+          </a>
+          <a href="https://wa.me/5491100000000" target="_blank" rel="noopener" aria-label="WhatsApp">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.47 14.38c-.29-.15-1.72-.85-1.99-.95-.27-.1-.46-.15-.66.15-.2.29-.76.95-.93 1.15-.17.2-.34.22-.63.07-.29-.15-1.22-.45-2.33-1.44-.86-.77-1.44-1.71-1.61-2-.17-.29-.02-.45.13-.6.13-.13.29-.34.44-.51.15-.17.2-.29.29-.49.1-.2.05-.37-.02-.51-.07-.15-.66-1.59-.9-2.18-.24-.57-.48-.5-.66-.51h-.56c-.2 0-.51.07-.78.37-.27.29-1.02.99-1.02 2.43s1.04 2.82 1.19 3.02c.15.2 2.06 3.15 5 4.42.7.3 1.24.48 1.67.61.7.22 1.34.19 1.84.12.56-.08 1.72-.7 1.97-1.38.24-.68.24-1.26.17-1.38-.07-.12-.27-.2-.56-.35z"/><path d="M12.02 2C6.5 2 2.02 6.48 2.02 12c0 1.87.5 3.62 1.38 5.13L2 22l4.99-1.31A9.96 9.96 0 0 0 12.02 22C17.53 22 22 17.52 22 12S17.53 2 12.02 2zm0 18.11c-1.7 0-3.29-.47-4.65-1.28l-.33-.2-3.09.81.82-3.02-.22-.31A8.09 8.09 0 0 1 3.91 12c0-4.47 3.64-8.1 8.11-8.1 4.47 0 8.1 3.63 8.1 8.1s-3.63 8.11-8.1 8.11z"/></svg>
+          </a>
+          <a href="https://linkedin.com/in/completar" target="_blank" rel="noopener" aria-label="LinkedIn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+          </a>
+          <a href="https://instagram.com/completar" target="_blank" rel="noopener" aria-label="Instagram">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1"/></svg>
+          </a>
+        </div>
       </div>
-      <div class="intro-copy">
-        <p>Guido Bonifati está dedicado al asesoramiento y auditoría técnica al Empresariado y al Particular en materia de:</p>
+    </div>
+
+    <div class="pillars">
+      <div class="pillar">
+        <h3>Historia</h3>
+        <p>Empecé en el mundo de los seguros hace más de una década, trabajando de cerca con distintas aseguradoras. Con el tiempo entendí que lo que más valora un cliente no es la compañía más grande, sino tener a alguien de confianza del otro lado del teléfono. Así nació este espacio de asesoramiento independiente.</p>
       </div>
-      <div class="intro-highlight">
-        <div class="intro-slide is-active">Condiciones contractuales, jurídicas, técnicas y comerciales de la contratación de pólizas de seguros para cubrir riesgos patrimoniales y personales.</div>
-        <div class="intro-slide">Asesoramiento y acompañamiento en la gestión y cobro de indemnizaciones por siniestros ante las compañías aseguradoras.</div>
+      <div class="pillar">
+        <h3>Misión</h3>
+        <p>Ayudarte a tomar decisiones informadas sobre tus seguros, comparando opciones reales entre aseguradoras y acompañándote en cada paso — desde la cotización hasta el momento en que más lo necesitás: un siniestro.</p>
+      </div>
+      <div class="pillar">
+        <h3>Visión</h3>
+        <p>Ser el asesor de seguros de referencia para familias y empresas de la zona, reconocido por la transparencia, la rapidez de respuesta y el trato cercano.</p>
       </div>
     </div>
 
@@ -386,85 +457,190 @@
         <span>Matrícula N° [completar] — Superintendencia de Seguros de la Nación</span>
       </div>
     </div>
-
-    <div class="persona-empresa-grid">
-      <div class="pe-card">
-        <div class="pe-visual pe-visual--personas">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/><circle cx="10" cy="7" r="4"/><path d="M21 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-        </div>
-        <h3>Seguros para Personas</h3>
-        <p>Acceso inmediato a la información de tu póliza, certificados de cobertura al instante, cotización de riesgos y seguimiento de siniestros.</p>
-        <a href="#productos" class="pe-link">+ Más info</a>
-      </div>
-      <div class="pe-card">
-        <div class="pe-visual pe-visual--empresas">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
-        </div>
-        <h3>Seguros para Empresas</h3>
-        <p>El mejor asesoramiento corporativo, con soluciones personalizadas a las necesidades de tu negocio y acompañamiento en todas las gestiones.</p>
-        <a href="#productos" class="pe-link">+ Más info</a>
-      </div>
-    </div>
   </div>
 </section>
 
 <section class="stats">
   <div class="container stats-grid">
-    <div class="stat"><b>+150</b><span>Asegurados</span></div>
-    <div class="stat"><b>+10</b><span>Años de trayectoria</span></div>
-    <div class="stat"><b>+8</b><span>Aseguradoras aliadas</span></div>
+    <div class="stat"><b data-count="100">0</b><span>Asegurados</span></div>
+    <div class="stat"><b data-count="5">0</b><span>Años de trayectoria</span></div>
+    <div class="stat"><b data-count="8">0</b><span>Aseguradoras aliadas</span></div>
   </div>
 </section>
 
-<section id="productos" class="productos">
+<section id="personas" class="productos-personas">
   <div class="container">
     <div class="section-head center">
-      <span class="eyebrow">Línea de productos</span>
-      <h2>Coberturas para cada momento</h2>
-      <p>Seguros personales, familiares y para tu negocio, adaptados a lo que necesitás proteger.</p>
+      <span class="eyebrow">Seguros para Personas</span>
+      <h2>Cobertura para vos y tu familia</h2>
+      <p>Elegí lo que necesitás proteger y pedime una cotización directa, sin vueltas.</p>
     </div>
-    <div class="product-grid">
-      <div class="product-card">
-        <div class="product-icon">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17h14M5 17a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm14 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zM5 17V9l2-5h10l2 5v8"/></svg>
-        </div>
-        <h3>Seguro de Auto</h3>
-        <p>Terceros, terceros completo o todo riesgo, con la aseguradora que mejor se ajuste a tu vehículo.</p>
+    <div class="prod-grid">
+      <div class="prod-card">
+        <div class="prod-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg></div>
+        <h3>Seguro de Retiro</h3>
+        <p>Ahorro planificado para tu jubilación, con beneficios impositivos.</p>
+        <a href="#contacto" class="prod-quote" data-product="Seguro de Retiro">Cotizar →</a>
       </div>
-      <div class="product-card">
-        <div class="product-icon">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5V21a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg>
-        </div>
-        <h3>Seguro de Hogar</h3>
-        <p>Incendio, robo, responsabilidad civil y contenidos para tu casa o departamento.</p>
-      </div>
-      <div class="product-card">
-        <div class="product-icon">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 1 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>
-        </div>
+      <div class="prod-card">
+        <div class="prod-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 1 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg></div>
         <h3>Seguro de Vida</h3>
-        <p>Protección económica para tu familia ante imprevistos, con capitales a tu medida.</p>
+        <p>Protección económica para tu familia ante imprevistos.</p>
+        <a href="#contacto" class="prod-quote" data-product="Seguro de Vida">Cotizar →</a>
       </div>
-      <div class="product-card">
-        <div class="product-icon">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
-        </div>
-        <h3>ART</h3>
-        <p>Riesgos del trabajo para tu empresa, cumpliendo con la normativa vigente.</p>
+      <div class="prod-card">
+        <div class="prod-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5V21a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg></div>
+        <h3>Combinado Familiar</h3>
+        <p>Incendio, robo y responsabilidad civil para tu hogar.</p>
+        <a href="#contacto" class="prod-quote" data-product="Seguro Combinado Familiar">Cotizar →</a>
       </div>
-      <div class="product-card">
-        <div class="product-icon">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V7l8-4 8 4v14M9 9h1m4 0h1m-6 4h1m4 0h1m-6 4h1m4 0h1"/></svg>
-        </div>
-        <h3>Seguro Comercial / PyME</h3>
-        <p>Cobertura integral para locales, oficinas e industrias: incendio, robo y responsabilidad civil.</p>
+      <div class="prod-card">
+        <div class="prod-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l8 4v6c0 5-3.4 8.4-8 10-4.6-1.6-8-5-8-10V6l8-4z"/></svg></div>
+        <h3>RC por Mala Praxis</h3>
+        <p>Cobertura profesional ante reclamos por tu actividad.</p>
+        <a href="#contacto" class="prod-quote" data-product="RC por Mala Praxis">Cotizar →</a>
       </div>
-      <div class="product-card">
-        <div class="product-icon">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.5 0 2 1 2 2v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-1c0-1 .5-2 2-2h14zM12 14V4M8 8h8"/></svg>
-        </div>
-        <h3>Salud</h3>
-        <p>Planes de medicina prepaga y seguros de salud para vos y tu familia.</p>
+      <div class="prod-card">
+        <div class="prod-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17h14M5 17a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm14 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zM5 17V9l2-5h10l2 5v8"/></svg></div>
+        <h3>Seguro de Auto</h3>
+        <p>Terceros, terceros completo o todo riesgo para tu vehículo.</p>
+        <a href="#contacto" class="prod-quote" data-product="Seguro de Auto">Cotizar →</a>
+      </div>
+      <div class="prod-card">
+        <div class="prod-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="17" r="3"/><circle cx="18" cy="17" r="3"/><path d="M9 17h6l3-7h3M9 10h3l1 3"/></svg></div>
+        <h3>Seguro de Moto</h3>
+        <p>Cobertura a medida para tu moto o ciclomotor.</p>
+        <a href="#contacto" class="prod-quote" data-product="Seguro de Moto">Cotizar →</a>
+      </div>
+      <div class="prod-card">
+        <div class="prod-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l3 8 4-16 3 8h4"/></svg></div>
+        <h3>Accidentes Personales</h3>
+        <p>Indemnización por incapacidad o fallecimiento accidental.</p>
+        <a href="#contacto" class="prod-quote" data-product="Accidentes Personales">Cotizar →</a>
+      </div>
+      <div class="prod-card">
+        <div class="prod-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="1"/><path d="M8 8h8M8 12h8M8 16h4"/></svg></div>
+        <h3>Seguro de Caución</h3>
+        <p>Garantías para alquileres, obras y trámites.</p>
+        <a href="#contacto" class="prod-quote" data-product="Seguro de Caución">Cotizar →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="empresas" class="productos-empresas">
+  <div class="container">
+    <div class="section-head center">
+      <span class="eyebrow">Seguros para Empresas</span>
+      <h2>Cobertura para tu negocio</h2>
+      <p>Protección para tu operación, tu equipo y tus activos. Pedime una cotización directa.</p>
+    </div>
+    <div class="prod-grid">
+      <div class="prod-card">
+        <div class="prod-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14a8 8 0 0 1 16 0v1H4v-1z"/><path d="M2 15h20v2H2z"/></svg></div>
+        <h3>Seguro de ART</h3>
+        <p>Riesgos del trabajo, cumpliendo con la normativa vigente.</p>
+        <a href="#contacto" class="prod-quote" data-product="Seguro de ART">Cotizar →</a>
+      </div>
+      <div class="prod-card">
+        <div class="prod-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="1"/><path d="M8 8h8M8 12h8M8 16h4"/></svg></div>
+        <h3>Seguro de Caución</h3>
+        <p>Garantías comerciales, judiciales y de obra.</p>
+        <a href="#contacto" class="prod-quote" data-product="Seguro de Caución (empresa)">Cotizar →</a>
+      </div>
+      <div class="prod-card">
+        <div class="prod-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8V21H3V8"/><path d="M1 3h22v5H1z"/><path d="M10 12h4"/></svg></div>
+        <h3>Todo Riesgo Operativo</h3>
+        <p>Cobertura integral para maquinaria, bienes e instalaciones.</p>
+        <a href="#contacto" class="prod-quote" data-product="Todo Riesgo Operativo">Cotizar →</a>
+      </div>
+      <div class="prod-card">
+        <div class="prod-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l8 4v6c0 5-3.4 8.4-8 10-4.6-1.6-8-5-8-10V6l8-4z"/></svg></div>
+        <h3>Responsabilidad Civil</h3>
+        <p>Protección ante reclamos de terceros por tu actividad.</p>
+        <a href="#contacto" class="prod-quote" data-product="RC Empresas">Cotizar →</a>
+      </div>
+      <div class="prod-card">
+        <div class="prod-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 1 0-5.4 5.4L2 19v3h3l7.3-7.3a4 4 0 0 0 5.4-5.4l-2.8 2.8-2-2 2.8-2.8z"/></svg></div>
+        <h3>Seguro Técnico</h3>
+        <p>Cobertura para equipos, montajes y obras civiles.</p>
+        <a href="#contacto" class="prod-quote" data-product="Seguro Técnico">Cotizar →</a>
+      </div>
+      <div class="prod-card">
+        <div class="prod-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/><circle cx="10" cy="7" r="4"/><path d="M21 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+        <h3>Vida Colectivo</h3>
+        <p>Beneficio de vida para todo tu equipo de trabajo.</p>
+        <a href="#contacto" class="prod-quote" data-product="Vida Colectivo">Cotizar →</a>
+      </div>
+      <div class="prod-card">
+        <div class="prod-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l3 8 4-16 3 8h4"/></svg></div>
+        <h3>Accidentes Personales</h3>
+        <p>Cobertura para tu personal ante accidentes.</p>
+        <a href="#contacto" class="prod-quote" data-product="Accidentes Personales (empresa)">Cotizar →</a>
+      </div>
+      <div class="prod-card">
+        <div class="prod-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V7l8-4 8 4v14M9 9h1m4 0h1m-6 4h1m4 0h1m-6 4h1m4 0h1"/></svg></div>
+        <h3>Integral de Comercio</h3>
+        <p>Protección completa para tu local: incendio, robo y RC.</p>
+        <a href="#contacto" class="prod-quote" data-product="Integral de Comercio">Cotizar →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="revision" class="revision">
+  <div class="container">
+    <span class="eyebrow">Sin costo, sin compromiso</span>
+    <h2>Revisión de coberturas 100% gratis</h2>
+    <p>Reviso las pólizas que ya tenés — sean conmigo o con otro asesor — y te digo, sin vueltas, si están bien cubiertas, si te falta algo importante o si estás pagando de más.</p>
+    <a href="#contacto" class="btn btn-white prod-quote" data-product="Revisión de coberturas gratis">Pedir mi revisión gratis</a>
+  </div>
+</section>
+
+<section id="referidos" class="referidos">
+  <div class="container">
+    <div class="section-head center">
+      <span class="eyebrow">Programa de referidos</span>
+      <h2>Recomendame y ganás vos también</h2>
+      <p>¿Conocés a alguien que necesita un seguro? Referilo y, si termina asegurándose, los dos salen ganando.</p>
+    </div>
+    <div class="ref-steps">
+      <div class="ref-step">
+        <div class="ref-num">1</div>
+        <h3>Referís</h3>
+        <p>Me contás quién necesita un seguro y por qué medio prefiere que lo contacte.</p>
+      </div>
+      <div class="ref-step">
+        <div class="ref-num">2</div>
+        <h3>Se asegura</h3>
+        <p>Si esa persona contrata una póliza conmigo, la referencia se hace efectiva.</p>
+      </div>
+      <div class="ref-step">
+        <div class="ref-num">3</div>
+        <h3>Ganan los dos</h3>
+        <p>Vos recibís una bonificación en tu próxima renovación, y la persona referida arranca con condiciones preferenciales.</p>
+      </div>
+    </div>
+    <div style="text-align:center;">
+      <a href="#contacto" class="btn btn-outline prod-quote" data-product="Quiero referir a alguien">Quiero referir a alguien</a>
+      <p class="ref-note">* Porcentaje o monto de la bonificación a definir.</p>
+    </div>
+  </div>
+</section>
+
+<section id="simulador" class="simulador">
+  <div class="container">
+    <div class="sim-panel">
+      <span class="sim-badge">Próximamente</span>
+      <h2 style="font-size:clamp(24px,3vw,32px);">Simulador de Riesgo por Zona</h2>
+      <p style="color:var(--text);margin-top:12px;">Ingresá tu dirección y te muestro, a modo orientativo, los riesgos más frecuentes de tu zona — robo, granizo, inundación — para ayudarte a elegir la cobertura correcta antes de que la necesites.</p>
+      <form class="sim-form" id="simForm">
+        <input type="text" id="simAddress" placeholder="Tu dirección o barrio" required>
+        <button type="submit" class="btn btn-wine">Simular</button>
+      </form>
+      <div class="sim-result" id="simResult">
+        <p>📍 <b>Ejemplo ilustrativo</b> para tu zona: el <b>30%</b> de los reclamos son por robo de auto y el <b>18%</b> por daños de granizo. Te recomendamos evaluar cobertura contra robo total/parcial y daños climáticos.</p>
+        <span class="sim-fine">* Resultado de ejemplo — la versión final usará estadísticas reales por zona.</span>
       </div>
     </div>
   </div>
@@ -476,25 +652,31 @@
     <div class="aseg-label">Confiamos en estas</div>
     <div class="aseg-title">Aseguradoras</div>
     <p>Mi trayectoria me permitió elegir las aseguradoras que mejores beneficios brindan a mis clientes.</p>
-    <div class="insurer-grid" id="insurerGrid">
-      <div class="insurer-badge">Sancor Seguros</div>
-      <div class="insurer-badge">Zurich</div>
-      <div class="insurer-badge">Federación Patronal</div>
-      <div class="insurer-badge">San Cristóbal</div>
-      <div class="insurer-badge">Mercantil Andina</div>
-      <div class="insurer-badge">Río Uruguay Seguros</div>
-      <div class="insurer-badge">La Segunda</div>
-      <div class="insurer-badge">Allianz</div>
-      <div class="insurer-badge insurer-extra">Provincia Seguros</div>
-      <div class="insurer-badge insurer-extra">La Caja</div>
-      <div class="insurer-badge insurer-extra">Nación Seguros</div>
-      <div class="insurer-badge insurer-extra">Orbis Seguros</div>
+  </div>
+  <div class="slider">
+    <div class="slider-track">
+      <img src="assets/aseguradoras/1-Federacion-Patronal.png" alt="Federación Patronal">
+      <img src="assets/aseguradoras/2-swiss-medical.png" alt="Swiss Medical">
+      <img src="assets/aseguradoras/3-zurich.png" alt="Zurich">
+      <img src="assets/aseguradoras/4-PREVENCION.png" alt="Prevención">
+      <img src="assets/aseguradoras/5-GALENO.png" alt="Galeno">
+      <img src="assets/aseguradoras/6-ALLIANZ.png" alt="Allianz">
+      <img src="assets/aseguradoras/7-HDI.png" alt="HDI">
+      <img src="assets/aseguradoras/8-La-Perseverancia-Seguros.png" alt="La Perseverancia Seguros">
+      <img src="assets/aseguradoras/9-SANCOR-SEGUROS.png" alt="Sancor Seguros">
+      <img src="assets/aseguradoras/1-Federacion-Patronal.png" alt="Federación Patronal" aria-hidden="true">
+      <img src="assets/aseguradoras/2-swiss-medical.png" alt="Swiss Medical" aria-hidden="true">
+      <img src="assets/aseguradoras/3-zurich.png" alt="Zurich" aria-hidden="true">
+      <img src="assets/aseguradoras/4-PREVENCION.png" alt="Prevención" aria-hidden="true">
+      <img src="assets/aseguradoras/5-GALENO.png" alt="Galeno" aria-hidden="true">
+      <img src="assets/aseguradoras/6-ALLIANZ.png" alt="Allianz" aria-hidden="true">
+      <img src="assets/aseguradoras/7-HDI.png" alt="HDI" aria-hidden="true">
+      <img src="assets/aseguradoras/8-La-Perseverancia-Seguros.png" alt="La Perseverancia Seguros" aria-hidden="true">
+      <img src="assets/aseguradoras/9-SANCOR-SEGUROS.png" alt="Sancor Seguros" aria-hidden="true">
     </div>
-    <button type="button" class="insurer-toggle" id="insurerToggle" aria-expanded="false" aria-controls="insurerGrid">
-      <span id="insurerToggleLabel">Ver más aseguradoras</span>
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-    </button>
-    <p class="insurer-note">Logos de muestra — se reemplazan por los oficiales de cada aseguradora aliada.</p>
+  </div>
+  <div class="container">
+    <p class="insurer-note">Logos de referencia — se confirman las aseguradoras aliadas definitivas.</p>
   </div>
 </section>
 
@@ -505,23 +687,32 @@
       <h2>Pidamos tu cotización</h2>
       <p style="margin:16px 0 32px;font-size:16px;">Contame qué necesitás asegurar y te respondo con opciones concretas, sin compromiso.</p>
 
-      <div class="contact-info-item">
+      <a class="contact-info-item" href="https://wa.me/5491100000000" target="_blank" rel="noopener">
         <div class="contact-info-icon">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.47 14.38c-.29-.15-1.72-.85-1.99-.95-.27-.1-.46-.15-.66.15-.2.29-.76.95-.93 1.15-.17.2-.34.22-.63.07-.29-.15-1.22-.45-2.33-1.44-.86-.77-1.44-1.71-1.61-2-.17-.29-.02-.45.13-.6.13-.13.29-.34.44-.51.15-.17.2-.29.29-.49.1-.2.05-.37-.02-.51-.07-.15-.66-1.59-.9-2.18-.24-.57-.48-.5-.66-.51h-.56c-.2 0-.51.07-.78.37-.27.29-1.02.99-1.02 2.43s1.04 2.82 1.19 3.02c.15.2 2.06 3.15 5 4.42.7.3 1.24.48 1.67.61.7.22 1.34.19 1.84.12.56-.08 1.72-.7 1.97-1.38.24-.68.24-1.26.17-1.38-.07-.12-.27-.2-.56-.35z"/><path d="M12.02 2C6.5 2 2.02 6.48 2.02 12c0 1.87.5 3.62 1.38 5.13L2 22l4.99-1.31A9.96 9.96 0 0 0 12.02 22C17.53 22 22 17.52 22 12S17.53 2 12.02 2zm0 18.11c-1.7 0-3.29-.47-4.65-1.28l-.33-.2-3.09.81.82-3.02-.22-.31A8.09 8.09 0 0 1 3.91 12c0-4.47 3.64-8.1 8.11-8.1 4.47 0 8.1 3.63 8.1 8.1s-3.63 8.11-8.1 8.11z"/></svg>
         </div>
         <div><b>[completar] Teléfono / WhatsApp</b><span>Lun a vie, 9 a 18 hs</span></div>
-      </div>
-      <div class="contact-info-item">
+      </a>
+      <a class="contact-info-item" href="mailto:guido@completar.com.ar">
         <div class="contact-info-icon">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z" opacity="0"/><path d="M22 6 12 13 2 6"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg>
         </div>
         <div><b>guido@[completar].com.ar</b><span>Respondo en el día</span></div>
-      </div>
-      <div class="contact-info-item">
+      </a>
+      <a class="contact-info-item" href="https://linkedin.com/in/completar" target="_blank" rel="noopener">
+        <div class="contact-info-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+        </div>
+        <div><b>LinkedIn</b><span>Conectemos profesionalmente</span></div>
+      </a>
+      <a class="contact-info-item" href="mailto:guido@completar.com.ar?subject=Quiero%20agendar%20una%20reuni%C3%B3n" target="_blank" rel="noopener">
         <div class="contact-info-icon">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
         </div>
-        <div><b>[completar] Ciudad, Provincia</b><span>Atención presencial con cita</span></div>
+        <div><b>[completar] Ciudad, Provincia</b><span>Click para agendar una reunión — virtual o presencial</span></div>
+      </a>
+      <div class="contact-map">
+        <iframe src="https://www.google.com/maps?q=Buenos+Aires,+Argentina&output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Ubicación"></iframe>
       </div>
     </div>
 
@@ -537,14 +728,33 @@
         </div>
       </div>
       <div class="field">
+        <label for="email">Correo</label>
+        <input type="email" id="email" name="email" placeholder="tu@email.com">
+      </div>
+      <div class="field">
         <label for="producto">¿Qué querés cotizar?</label>
         <select id="producto" name="producto">
-          <option>Seguro de Auto</option>
-          <option>Seguro de Hogar</option>
-          <option>Seguro de Vida</option>
-          <option>ART</option>
-          <option>Seguro Comercial / PyME</option>
-          <option>Salud</option>
+          <optgroup label="Personas">
+            <option>Seguro de Retiro</option>
+            <option>Seguro de Vida</option>
+            <option>Seguro Combinado Familiar</option>
+            <option>RC por Mala Praxis</option>
+            <option>Seguro de Auto</option>
+            <option>Seguro de Moto</option>
+            <option>Accidentes Personales</option>
+            <option>Seguro de Caución</option>
+          </optgroup>
+          <optgroup label="Empresas">
+            <option>Seguro de ART</option>
+            <option>Seguro de Caución (empresa)</option>
+            <option>Todo Riesgo Operativo</option>
+            <option>RC Empresas</option>
+            <option>Seguro Técnico</option>
+            <option>Vida Colectivo</option>
+            <option>Accidentes Personales (empresa)</option>
+            <option>Integral de Comercio</option>
+          </optgroup>
+          <option>Revisión de coberturas gratis</option>
           <option>Otro</option>
         </select>
       </div>
@@ -575,7 +785,7 @@
       <div class="footer-col">
         <h4>Dónde estamos</h4>
         <ul>
-          <li><a href="#">
+          <li><a href="mailto:guido@completar.com.ar?subject=Quiero%20agendar%20una%20reuni%C3%B3n">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
             [completar] Ciudad, Provincia</a></li>
           <li><span>Coordinar entrevista previa</span></li>
@@ -590,9 +800,8 @@
       <div class="footer-col">
         <h4>Seguinos</h4>
         <div class="footer-social">
-          <a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1"/></svg></a>
-          <a href="#" aria-label="Facebook"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg></a>
-          <a href="#" aria-label="LinkedIn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg></a>
+          <a href="https://instagram.com/completar" target="_blank" rel="noopener" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1"/></svg></a>
+          <a href="https://linkedin.com/in/completar" target="_blank" rel="noopener" aria-label="LinkedIn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg></a>
         </div>
       </div>
     </div>
@@ -618,13 +827,14 @@
     navToggle.setAttribute('aria-expanded', 'false');
   }));
 
-  const insurerGrid = document.getElementById('insurerGrid');
-  const insurerToggle = document.getElementById('insurerToggle');
-  const insurerToggleLabel = document.getElementById('insurerToggleLabel');
-  insurerToggle.addEventListener('click', () => {
-    const expanded = insurerGrid.classList.toggle('show-all');
-    insurerToggle.setAttribute('aria-expanded', String(expanded));
-    insurerToggleLabel.textContent = expanded ? 'Ver menos aseguradoras' : 'Ver más aseguradoras';
+  // Pre-fill the "producto" select when a "Cotizar" link is clicked anywhere on the page
+  document.querySelectorAll('.prod-quote[data-product]').forEach(link => {
+    link.addEventListener('click', () => {
+      const select = document.getElementById('producto');
+      const value = link.getAttribute('data-product');
+      const match = Array.from(select.options).find(o => o.text === value);
+      if (match) select.value = match.value;
+    });
   });
 
   document.getElementById('quoteForm').addEventListener('submit', function (e) {
@@ -633,20 +843,47 @@
     const producto = document.getElementById('producto').value;
     const mensaje = document.getElementById('mensaje').value;
     const telefono = document.getElementById('telefono').value;
+    const email = document.getElementById('email').value;
     const text = encodeURIComponent(
-      `Hola Guido, soy ${nombre}. Quiero cotizar: ${producto}. ${mensaje}\nMi teléfono: ${telefono}`
+      `Hola Guido, soy ${nombre}. Quiero cotizar: ${producto}. ${mensaje}\nMi teléfono: ${telefono}${email ? '\nMi email: ' + email : ''}`
     );
     window.open(`https://wa.me/5491100000000?text=${text}`, '_blank');
   });
 
-  const introSlides = document.querySelectorAll('.intro-slide');
-  if (introSlides.length > 1) {
-    let introIndex = 0;
-    setInterval(() => {
-      introSlides[introIndex].classList.remove('is-active');
-      introIndex = (introIndex + 1) % introSlides.length;
-      introSlides[introIndex].classList.add('is-active');
-    }, 5000);
+  // Animated counters — count from 0 to target once the stats section enters the viewport
+  const counters = document.querySelectorAll('.stat b[data-count]');
+  const animateCounter = (el) => {
+    const target = parseInt(el.getAttribute('data-count'), 10);
+    const duration = 1400;
+    const start = performance.now();
+    const step = (now) => {
+      const progress = Math.min((now - start) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      el.textContent = '+' + Math.round(eased * target);
+      if (progress < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  };
+  const statsObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        counters.forEach(animateCounter);
+        statsObserver.disconnect();
+      }
+    });
+  }, { threshold: 0.4 });
+  const statsSection = document.querySelector('.stats');
+  if (statsSection) statsObserver.observe(statsSection);
+
+  // Simulador de riesgo — illustrative demo only (see note in the panel)
+  const simForm = document.getElementById('simForm');
+  const simResult = document.getElementById('simResult');
+  if (simForm) {
+    simForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      simResult.classList.add('show');
+      simResult.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    });
   }
 </script>
 
