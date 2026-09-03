@@ -78,7 +78,9 @@
     border-bottom:1px solid var(--border);
   }
   .nav{display:flex;align-items:center;justify-content:space-between;padding:16px 28px;max-width:1180px;margin:0 auto;}
-  .brand{display:flex;flex-direction:column;line-height:1;}
+  .brand{display:flex;align-items:center;gap:10px;line-height:1;}
+  .brand-mark{height:38px;width:auto;display:block;}
+  .brand-text{display:flex;flex-direction:column;}
   .brand-name{font-family:var(--font-cond);font-weight:600;font-size:22px;color:var(--wine);letter-spacing:0.3px;}
   .brand-tag{font-size:9px;font-weight:700;letter-spacing:2.5px;color:var(--yellow-deep);margin-top:3px;}
   .nav-links{display:flex;align-items:center;gap:24px;}
@@ -185,10 +187,9 @@
   }
   .cv-card .avatar-photo{
     width:100%;max-width:150px;aspect-ratio:3/4;border-radius:10px;margin:0 auto 20px;
-    background:linear-gradient(160deg,var(--mauve),var(--wine));color:#fff;
-    display:flex;align-items:center;justify-content:center;font-family:var(--font-cond);
-    font-size:40px;font-weight:600;background-size:cover;background-position:center;
+    overflow:hidden;background:linear-gradient(160deg,var(--mauve),var(--wine));
   }
+  .cv-card .avatar-photo img{width:100%;height:100%;object-fit:cover;display:block;}
   .cv-card .cv-name{font-family:var(--font-cond);font-size:19px;font-weight:600;color:#000;letter-spacing:0.4px;}
   .cv-card .cv-role{font-size:13px;color:var(--wine);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin:6px 0 20px;}
   .cv-card .bio-social{justify-content:center;}
@@ -417,8 +418,11 @@
 <header>
   <nav class="nav">
     <a href="#inicio" class="brand">
-      <span class="brand-name">Guido Bonifati</span>
-      <span class="brand-tag">ASESOR&nbsp;DE&nbsp;SEGUROS</span>
+      <img src="assets/logo/logo-mark.png" alt="" class="brand-mark">
+      <span class="brand-text">
+        <span class="brand-name">Guido Bonifati</span>
+        <span class="brand-tag">ASESOR&nbsp;DE&nbsp;SEGUROS</span>
+      </span>
     </a>
     <ul class="nav-links" id="navLinks">
       <li><a href="#inicio" class="active">Inicio</a></li>
@@ -483,10 +487,15 @@
         <circle cx="50" cy="50" r="48" fill="#EEF1F4"/>
         <circle cx="38" cy="34" r="11" fill="#5B6472"/>
         <path d="M20 82c0-14 8-24 18-24s18 10 18 24" fill="#5B6472"/>
+        <path d="M34 34a4.5 3 0 0 0 8 0" fill="none" stroke="#EEF1F4" stroke-width="1.6" stroke-linecap="round"/>
+        <circle cx="34.5" cy="30.5" r="1.1" fill="#EEF1F4"/><circle cx="41.5" cy="30.5" r="1.1" fill="#EEF1F4"/>
         <circle cx="63" cy="30" r="11" fill="#34506B"/>
         <path d="M45 84c0-15 8-26 18-26s18 11 18 26" fill="#34506B"/>
+        <path d="M59 30a4.5 3 0 0 0 8 0" fill="none" stroke="#EEF1F4" stroke-width="1.6" stroke-linecap="round"/>
+        <circle cx="59.5" cy="26.5" r="1.1" fill="#EEF1F4"/><circle cx="66.5" cy="26.5" r="1.1" fill="#EEF1F4"/>
         <circle cx="50" cy="58" r="7" fill="#C9A227"/>
         <path d="M38 88c0-9 5-16 12-16s12 7 12 16" fill="#C9A227"/>
+        <path d="M46.5 58a3.5 2.2 0 0 0 7 0" fill="none" stroke="#40390c" stroke-width="1.4" stroke-linecap="round" opacity="0.55"/>
       </svg>
     </a>
     <a href="#empresas" class="quick-card quick-card--empresas">
@@ -511,6 +520,8 @@
         <rect x="72" y="50" width="4" height="4" fill="#EEF1F4"/>
         <rect x="72" y="60" width="4" height="4" fill="#EEF1F4"/>
         <circle cx="50" cy="14" r="6" fill="#C9A227"/>
+        <circle cx="50" cy="70" r="4.5" fill="#40390c" opacity="0.85"/>
+        <path d="M43 90c0-6 3-11 7-11s7 5 7 11" fill="#40390c" opacity="0.85"/>
       </svg>
     </a>
   </div>
@@ -567,7 +578,7 @@
     </div>
 
     <div class="cv-card">
-      <div class="avatar-photo">GB</div>
+      <div class="avatar-photo"><img src="assets/guido/guido-bonifati.jpg" alt="Guido Bonifati"></div>
       <div class="cv-name">TEC. GUIDO BONIFATI</div>
       <div class="cv-role">Asesor de Seguros</div>
       <div class="bio-social">
