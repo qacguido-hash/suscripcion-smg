@@ -41,6 +41,7 @@
   a{color:inherit;text-decoration:none;}
   ul{list-style:none;}
   section{padding:90px 0;}
+  [data-page].page-hidden{display:none;}
   .container{max-width:1180px;margin:0 auto;padding:0 28px;}
   .eyebrow{
     font-size:13px;font-weight:500;letter-spacing:1px;
@@ -168,6 +169,7 @@
   .nosotros{background:var(--surface);}
   .nosotros-grid{display:grid;grid-template-columns:1.4fr 0.9fr;gap:48px;align-items:start;margin-bottom:56px;}
   .nosotros-text p{font-size:15px;color:var(--text);margin-bottom:16px;}
+  .nosotros-text p:first-of-type{margin-top:26px;}
   .bio-social{display:flex;gap:10px;}
   .bio-social a{
     width:38px;height:38px;border-radius:50%;border:1.5px solid var(--border);color:var(--wine);
@@ -178,13 +180,14 @@
 
   .cv-card{
     background:#fff;border:1px solid var(--border);border-radius:var(--radius);
-    padding:28px 28px 32px;text-align:center;box-shadow:var(--shadow);
+    padding:24px 22px 30px;text-align:center;box-shadow:var(--shadow);
+    max-width:260px;margin:0 auto;
   }
   .cv-card .avatar-photo{
-    width:100%;max-width:190px;aspect-ratio:3/4;border-radius:10px;margin:0 auto 20px;
+    width:100%;max-width:150px;aspect-ratio:3/4;border-radius:10px;margin:0 auto 20px;
     background:linear-gradient(160deg,var(--mauve),var(--wine));color:#fff;
     display:flex;align-items:center;justify-content:center;font-family:var(--font-cond);
-    font-size:46px;font-weight:600;background-size:cover;background-position:center;
+    font-size:40px;font-weight:600;background-size:cover;background-position:center;
   }
   .cv-card .cv-name{font-family:var(--font-cond);font-size:19px;font-weight:600;color:#000;letter-spacing:0.4px;}
   .cv-card .cv-role{font-size:13px;color:var(--wine);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin:6px 0 20px;}
@@ -368,7 +371,6 @@
   @media (max-width:900px){
     .contact-grid{grid-template-columns:1fr;}
     .nosotros-grid{grid-template-columns:1fr;}
-    .cv-card{max-width:360px;margin:0 auto;}
     .prod-grid{grid-template-columns:repeat(2,1fr);}
     .ref-steps{grid-template-columns:1fr;}
     .stats-grid{grid-template-columns:repeat(3,1fr);gap:16px;}
@@ -435,7 +437,7 @@
   </nav>
 </header>
 
-<section id="inicio" class="hero">
+<section id="inicio" class="hero" data-page="inicio">
   <div class="hero-media" aria-hidden="true"></div>
   <div class="hero-box">
     <div class="hero-grid">
@@ -467,7 +469,7 @@
   </div>
 </section>
 
-<section class="quick-nav">
+<section class="quick-nav" data-page="inicio">
   <div class="container quick-grid">
     <a href="#personas" class="quick-card quick-card--personas">
       <div class="quick-icon">
@@ -514,7 +516,7 @@
   </div>
 </section>
 
-<section class="stats">
+<section class="stats" data-page="inicio">
   <div class="container stats-grid">
     <div class="stat"><b data-count="100">0</b><span>Asegurados</span></div>
     <div class="stat"><b data-count="5">0</b><span>Años de trayectoria</span></div>
@@ -522,7 +524,7 @@
   </div>
 </section>
 
-<section id="aseguradoras" class="aseguradoras">
+<section id="aseguradoras" class="aseguradoras" data-page="inicio">
   <div class="container">
     <div class="aseg-divider"></div>
     <div class="aseg-label">Confiamos en estas</div>
@@ -554,7 +556,7 @@
   </div>
 </section>
 
-<section id="nosotros" class="nosotros">
+<section id="nosotros" class="nosotros" data-page="nosotros">
   <div class="container nosotros-grid">
     <div class="nosotros-text">
       <span class="eyebrow">Nosotros</span>
@@ -609,7 +611,7 @@
   </div>
 </section>
 
-<section id="personas" class="productos-personas">
+<section id="personas" class="productos-personas" data-page="personas">
   <div class="container">
     <div class="section-head center">
       <span class="eyebrow">Seguros para Personas</span>
@@ -682,7 +684,7 @@
   </div>
 </section>
 
-<section id="empresas" class="productos-empresas">
+<section id="empresas" class="productos-empresas" data-page="empresas">
   <div class="container">
     <div class="section-head center">
       <span class="eyebrow">Seguros para Empresas</span>
@@ -742,7 +744,7 @@
   </div>
 </section>
 
-<section id="referidos" class="referidos">
+<section id="referidos" class="referidos" data-page="referidos">
   <div class="container">
     <div class="section-head center">
       <span class="eyebrow">Programa de referidos</span>
@@ -773,7 +775,7 @@
   </div>
 </section>
 
-<section id="contacto" class="contacto">
+<section id="contacto" class="contacto" data-page="contacto">
   <div class="container contact-grid">
     <div>
       <span class="eyebrow">Contacto</span>
@@ -920,6 +922,42 @@
     navToggle.setAttribute('aria-expanded', 'false');
   }));
 
+  // Page routing — only one "page" (Inicio, Nosotros, Personas, Empresas,
+  // Referidos or Contacto) is visible at a time. Inicio groups the hero,
+  // the Personas/Empresas cards, the stats and the aseguradoras strip;
+  // scrolling past it doesn't reveal the other sections — you get there
+  // by clicking a nav link (or any "Cotizar"/"Ver coberturas" link).
+  const pageKeys = ['inicio', 'nosotros', 'personas', 'empresas', 'referidos', 'contacto'];
+  const pageSections = {};
+  pageKeys.forEach(key => {
+    pageSections[key] = Array.from(document.querySelectorAll('[data-page="' + key + '"]'));
+  });
+
+  function showPage(key, opts) {
+    opts = opts || {};
+    if (!pageSections[key]) return;
+    pageKeys.forEach(k => {
+      pageSections[k].forEach(sec => sec.classList.toggle('page-hidden', k !== key));
+    });
+    document.querySelectorAll('.nav-links a').forEach(a => {
+      a.classList.toggle('active', a.getAttribute('href') === '#' + key);
+    });
+    if (!opts.skipScroll) window.scrollTo({ top: 0, behavior: 'auto' });
+    history.replaceState(null, '', '#' + key);
+  }
+
+  document.addEventListener('click', (e) => {
+    const link = e.target.closest('a[href^="#"]');
+    if (!link) return;
+    const key = link.getAttribute('href').slice(1);
+    if (!pageKeys.includes(key)) return;
+    e.preventDefault();
+    showPage(key);
+  });
+
+  const initialKey = pageKeys.includes(location.hash.slice(1)) ? location.hash.slice(1) : 'inicio';
+  showPage(initialKey, { skipScroll: true });
+
   // Pre-fill the "producto" select when a "Cotizar" link is clicked anywhere on the page
   document.querySelectorAll('.prod-quote[data-product]').forEach(link => {
     link.addEventListener('click', () => {
@@ -969,6 +1007,7 @@
   if (statsSection) statsObserver.observe(statsSection);
 
   // Simulador de riesgo — resultado por zona (estimación propia, no un dato en vivo)
+  // Nivel 1: partidos del GBA y grandes ciudades, con un resultado específico por zona.
   const riskZones = [
     { match: ['quilmes'], text: 'el <b>28%</b> de los reclamos son por robo de auto y el <b>15%</b> por daños de granizo.', tip: 'Te recomiendo evaluar cobertura contra robo total/parcial y daños climáticos.' },
     { match: ['caba', 'capital federal', 'ciudad de buenos aires', 'palermo', 'belgrano', 'recoleta', 'caballito', 'flores', 'almagro'], text: 'el <b>35%</b> de los reclamos son por robo/hurto y el <b>20%</b> por daños a terceros en la vía pública.', tip: 'Te recomiendo priorizar cobertura contra robo total/parcial y responsabilidad civil.' },
@@ -977,8 +1016,31 @@
     { match: ['san isidro', 'vicente lópez', 'vicente lopez', 'tigre', 'san fernando', 'olivos', 'martinez', 'martínez'], text: 'el <b>26%</b> de los reclamos son por inundación (zonas costeras) y el <b>18%</b> por robo.', tip: 'Te recomiendo evaluar cobertura contra inundación y robo total/parcial.' },
     { match: ['moreno', 'merlo', 'moron', 'morón', 'ituzaingó', 'ituzaingo', 'hurlingham'], text: 'el <b>32%</b> de los reclamos son por robo total y el <b>14%</b> por daños por granizo.', tip: 'Te recomiendo priorizar cobertura contra robo total/parcial.' },
     { match: ['mar del plata'], text: 'el <b>24%</b> de los reclamos son por daños climáticos (viento y granizo) y el <b>16%</b> por robo.', tip: 'Te recomiendo evaluar cobertura contra daños climáticos.' },
-    { match: ['córdoba', 'cordoba'], text: 'el <b>27%</b> de los reclamos son por granizo y el <b>19%</b> por robo de auto.', tip: 'Te recomiendo priorizar cobertura contra granizo y robo total/parcial.' },
+    { match: ['córdoba capital', 'cordoba capital', 'córdoba', 'cordoba'], text: 'el <b>27%</b> de los reclamos son por granizo y el <b>19%</b> por robo de auto.', tip: 'Te recomiendo priorizar cobertura contra granizo y robo total/parcial.' },
     { match: ['rosario'], text: 'el <b>29%</b> de los reclamos son por robo de auto y el <b>16%</b> por daños a terceros.', tip: 'Te recomiendo evaluar cobertura contra robo total/parcial y responsabilidad civil.' },
+  ];
+
+  // Nivel 2: el resto del país, agrupado por región — no es un dato hiperlocal, es un
+  // patrón general de riesgo por zona geográfica de Argentina.
+  const riskRegions = [
+    { name: 'Cuyo', match: ['mendoza', 'san juan', 'san luis', 'san rafael', 'godoy cruz'],
+      text: 'los riesgos más comunes en tu región son <b>sismo</b> y <b>granizo</b> (tormentas de verano en la zona serrana).',
+      tip: 'Te recomiendo evaluar cobertura contra granizo y una cláusula de riesgo sísmico si corresponde.' },
+    { name: 'Litoral / NEA', match: ['santa fe', 'paraná', 'parana', 'entre ríos', 'entre rios', 'corrientes', 'resistencia', 'chaco', 'formosa', 'posadas', 'misiones'],
+      text: 'los riesgos más comunes en tu región son <b>inundación</b> por crecida de ríos y <b>daños eléctricos por tormenta</b>.',
+      tip: 'Te recomiendo priorizar cobertura contra inundación y daños eléctricos.' },
+    { name: 'NOA', match: ['salta', 'jujuy', 'tucumán', 'tucuman', 'santiago del estero', 'catamarca', 'la rioja'],
+      text: 'los riesgos más comunes en tu región son <b>granizo</b> y <b>tormentas de verano</b>.',
+      tip: 'Te recomiendo priorizar cobertura contra granizo y daños climáticos.' },
+    { name: 'Patagonia', match: ['neuquén', 'neuquen', 'río negro', 'rio negro', 'bariloche', 'chubut', 'comodoro rivadavia', 'santa cruz', 'río gallegos', 'rio gallegos', 'tierra del fuego', 'ushuaia'],
+      text: 'los riesgos más comunes en tu región son <b>viento fuerte</b> y <b>daños por nieve/heladas</b> en temporada.',
+      tip: 'Te recomiendo evaluar cobertura contra daños climáticos (viento y nieve).' },
+    { name: 'Costa atlántica bonaerense', match: ['pinamar', 'villa gesell', 'necochea', 'bahía blanca', 'bahia blanca', 'tandil'],
+      text: 'los riesgos más comunes en tu región son <b>temporales/viento</b> y <b>robo</b> en temporada alta.',
+      tip: 'Te recomiendo evaluar cobertura contra daños climáticos y robo total/parcial.' },
+    { name: 'Buenos Aires (provincia, general)', match: ['buenos aires', 'provincia de buenos aires', 'gba', 'conurbano'],
+      text: 'los riesgos más comunes en tu región son <b>robo de auto</b> y <b>granizo</b>.',
+      tip: 'Te recomiendo evaluar cobertura contra robo total/parcial y daños climáticos.' },
   ];
 
   const simForm = document.getElementById('simForm');
@@ -991,9 +1053,13 @@
       const input = document.getElementById('simAddress').value.trim();
       const normalized = input.toLowerCase();
       const zone = riskZones.find(z => z.match.some(name => normalized.includes(name)));
+      const region = !zone && riskRegions.find(r => r.match.some(name => normalized.includes(name)));
       if (zone) {
         simResultText.innerHTML = `📍 Para tu zona, ${zone.text} ${zone.tip}`;
         simResultFine.textContent = '* Estimación propia por zona — no proviene de un dato en vivo. Para un análisis exacto de tu dirección, escribime por WhatsApp.';
+      } else if (region) {
+        simResultText.innerHTML = `📍 En la región de <b>${region.name}</b>, ${region.text} ${region.tip}`;
+        simResultFine.textContent = '* Patrón general de la región, no un dato hiperlocal — para un análisis exacto de tu dirección, escribime por WhatsApp.';
       } else {
         simResultText.innerHTML = `📍 Todavía no tengo datos cargados para "<b>${input}</b>" en particular.`;
         simResultFine.textContent = 'Escribime tu dirección por WhatsApp y te cuento los riesgos típicos de tu zona.';
