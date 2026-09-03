@@ -80,7 +80,7 @@
   .nav{display:flex;align-items:center;justify-content:space-between;padding:16px 28px;max-width:1180px;margin:0 auto;}
   .brand{display:flex;align-items:center;gap:10px;line-height:1;}
   .brand-mark{height:38px;width:auto;display:block;}
-  .brand-text{display:flex;flex-direction:column;}
+  .brand-text{display:flex;flex-direction:column;align-items:center;text-align:center;}
   .brand-name{font-family:var(--font-cond);font-weight:600;font-size:22px;color:var(--wine);letter-spacing:0.3px;}
   .brand-tag{font-size:9px;font-weight:700;letter-spacing:2.5px;color:var(--yellow-deep);margin-top:3px;}
   .nav-links{display:flex;align-items:center;gap:24px;}
@@ -165,13 +165,15 @@
   .quick-copy{flex:1;}
   .quick-card h3{font-family:var(--font-cond);font-size:28px;font-weight:600;color:#000;margin-bottom:6px;}
   .quick-card span{font-size:16px;color:var(--muted);}
-  .quick-illustration{width:96px;height:96px;flex-shrink:0;}
+  .quick-illustration{
+    width:116px;height:116px;flex-shrink:0;border-radius:50%;
+    object-fit:cover;box-shadow:0 4px 14px rgba(40,55,70,0.18);
+  }
 
   /* Nosotros / Quiénes somos */
-  .nosotros{background:var(--surface);}
-  .nosotros-grid{display:grid;grid-template-columns:1.4fr 0.9fr;gap:48px;align-items:start;margin-bottom:56px;}
+  .nosotros{background:#fff;}
+  .nosotros-grid{display:grid;grid-template-columns:1.4fr 0.9fr;gap:48px;align-items:center;margin-bottom:56px;}
   .nosotros-text p{font-size:15px;color:var(--text);margin-bottom:16px;}
-  .nosotros-text p:first-of-type{margin-top:26px;}
   .bio-social{display:flex;gap:10px;}
   .bio-social a{
     width:38px;height:38px;border-radius:50%;border:1.5px solid var(--border);color:var(--wine);
@@ -181,7 +183,7 @@
   .bio-social svg{width:16px;height:16px;}
 
   .cv-card{
-    background:#fff;border:1px solid var(--border);border-radius:var(--radius);
+    background:#fff;border:2px solid var(--wine);border-radius:var(--radius);
     padding:24px 22px 30px;text-align:center;box-shadow:var(--shadow);
     max-width:260px;margin:0 auto;
   }
@@ -421,7 +423,7 @@
       <img src="assets/logo/logo-mark.png" alt="" class="brand-mark">
       <span class="brand-text">
         <span class="brand-name">Guido Bonifati</span>
-        <span class="brand-tag">ASESOR&nbsp;DE&nbsp;SEGUROS</span>
+        <span class="brand-tag">— ASESOR&nbsp;DE&nbsp;SEGUROS —</span>
       </span>
     </a>
     <ul class="nav-links" id="navLinks">
@@ -483,20 +485,7 @@
         <h3>Seguros para Personas</h3>
         <span>Auto, vida, hogar y más →</span>
       </div>
-      <svg class="quick-illustration" viewBox="0 0 100 100" aria-hidden="true">
-        <circle cx="50" cy="50" r="48" fill="#EEF1F4"/>
-        <circle cx="38" cy="34" r="11" fill="#5B6472"/>
-        <path d="M20 82c0-14 8-24 18-24s18 10 18 24" fill="#5B6472"/>
-        <path d="M34 34a4.5 3 0 0 0 8 0" fill="none" stroke="#EEF1F4" stroke-width="1.6" stroke-linecap="round"/>
-        <circle cx="34.5" cy="30.5" r="1.1" fill="#EEF1F4"/><circle cx="41.5" cy="30.5" r="1.1" fill="#EEF1F4"/>
-        <circle cx="63" cy="30" r="11" fill="#34506B"/>
-        <path d="M45 84c0-15 8-26 18-26s18 11 18 26" fill="#34506B"/>
-        <path d="M59 30a4.5 3 0 0 0 8 0" fill="none" stroke="#EEF1F4" stroke-width="1.6" stroke-linecap="round"/>
-        <circle cx="59.5" cy="26.5" r="1.1" fill="#EEF1F4"/><circle cx="66.5" cy="26.5" r="1.1" fill="#EEF1F4"/>
-        <circle cx="50" cy="58" r="7" fill="#C9A227"/>
-        <path d="M38 88c0-9 5-16 12-16s12 7 12 16" fill="#C9A227"/>
-        <path d="M46.5 58a3.5 2.2 0 0 0 7 0" fill="none" stroke="#40390c" stroke-width="1.4" stroke-linecap="round" opacity="0.55"/>
-      </svg>
+      <img class="quick-illustration" src="assets/quick/personas.jpg" alt="" aria-hidden="true">
     </a>
     <a href="#empresas" class="quick-card quick-card--empresas">
       <div class="quick-icon">
@@ -506,23 +495,7 @@
         <h3>Seguros para Empresas</h3>
         <span>ART, RC, caución y más →</span>
       </div>
-      <svg class="quick-illustration" viewBox="0 0 100 100" aria-hidden="true">
-        <circle cx="50" cy="50" r="48" fill="#EEF1F4"/>
-        <rect x="30" y="24" width="40" height="56" rx="3" fill="#34506B"/>
-        <rect x="38" y="34" width="7" height="7" fill="#EEF1F4"/>
-        <rect x="55" y="34" width="7" height="7" fill="#EEF1F4"/>
-        <rect x="38" y="48" width="7" height="7" fill="#EEF1F4"/>
-        <rect x="55" y="48" width="7" height="7" fill="#EEF1F4"/>
-        <rect x="42" y="64" width="16" height="16" fill="#EEF1F4"/>
-        <rect x="16" y="50" width="16" height="30" rx="2" fill="#5B6472"/>
-        <rect x="20" y="58" width="4" height="4" fill="#EEF1F4"/>
-        <rect x="68" y="42" width="16" height="38" rx="2" fill="#5B6472"/>
-        <rect x="72" y="50" width="4" height="4" fill="#EEF1F4"/>
-        <rect x="72" y="60" width="4" height="4" fill="#EEF1F4"/>
-        <circle cx="50" cy="14" r="6" fill="#C9A227"/>
-        <circle cx="50" cy="70" r="4.5" fill="#40390c" opacity="0.85"/>
-        <path d="M43 90c0-6 3-11 7-11s7 5 7 11" fill="#40390c" opacity="0.85"/>
-      </svg>
+      <img class="quick-illustration" src="assets/quick/empresas.jpg" alt="" aria-hidden="true">
     </a>
   </div>
 </section>
@@ -562,9 +535,6 @@
       <img src="assets/aseguradoras/9-SANCOR-SEGUROS.png" alt="Sancor Seguros" aria-hidden="true">
     </div>
   </div>
-  <div class="container">
-    <p class="insurer-note">Logos de referencia — se confirman las aseguradoras aliadas definitivas.</p>
-  </div>
 </section>
 
 <section id="nosotros" class="nosotros" data-page="nosotros">
@@ -585,7 +555,7 @@
         <a href="mailto:guidobonifatiseguros@gmail.com" aria-label="Email">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 6 12 13 2 6"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg>
         </a>
-        <a href="https://wa.me/5491121600427" target="_blank" rel="noopener" aria-label="WhatsApp">
+        <a href="https://wa.me/5491173669857" target="_blank" rel="noopener" aria-label="WhatsApp">
           <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.47 14.38c-.29-.15-1.72-.85-1.99-.95-.27-.1-.46-.15-.66.15-.2.29-.76.95-.93 1.15-.17.2-.34.22-.63.07-.29-.15-1.22-.45-2.33-1.44-.86-.77-1.44-1.71-1.61-2-.17-.29-.02-.45.13-.6.13-.13.29-.34.44-.51.15-.17.2-.29.29-.49.1-.2.05-.37-.02-.51-.07-.15-.66-1.59-.9-2.18-.24-.57-.48-.5-.66-.51h-.56c-.2 0-.51.07-.78.37-.27.29-1.02.99-1.02 2.43s1.04 2.82 1.19 3.02c.15.2 2.06 3.15 5 4.42.7.3 1.24.48 1.67.61.7.22 1.34.19 1.84.12.56-.08 1.72-.7 1.97-1.38.24-.68.24-1.26.17-1.38-.07-.12-.27-.2-.56-.35z"/><path d="M12.02 2C6.5 2 2.02 6.48 2.02 12c0 1.87.5 3.62 1.38 5.13L2 22l4.99-1.31A9.96 9.96 0 0 0 12.02 22C17.53 22 22 17.52 22 12S17.53 2 12.02 2zm0 18.11c-1.7 0-3.29-.47-4.65-1.28l-.33-.2-3.09.81.82-3.02-.22-.31A8.09 8.09 0 0 1 3.91 12c0-4.47 3.64-8.1 8.11-8.1 4.47 0 8.1 3.63 8.1 8.1s-3.63 8.11-8.1 8.11z"/></svg>
         </a>
         <a href="https://www.linkedin.com/in/guidobonifati" target="_blank" rel="noopener" aria-label="LinkedIn">
@@ -793,11 +763,11 @@
       <h2>Pedime tu cotización</h2>
       <p style="margin:16px 0 32px;font-size:16px;">Contame qué necesitás asegurar y te respondo con opciones concretas, sin compromiso.</p>
 
-      <a class="contact-info-item" href="https://wa.me/5491121600427" target="_blank" rel="noopener">
+      <a class="contact-info-item" href="https://wa.me/5491173669857" target="_blank" rel="noopener">
         <div class="contact-info-icon">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.47 14.38c-.29-.15-1.72-.85-1.99-.95-.27-.1-.46-.15-.66.15-.2.29-.76.95-.93 1.15-.17.2-.34.22-.63.07-.29-.15-1.22-.45-2.33-1.44-.86-.77-1.44-1.71-1.61-2-.17-.29-.02-.45.13-.6.13-.13.29-.34.44-.51.15-.17.2-.29.29-.49.1-.2.05-.37-.02-.51-.07-.15-.66-1.59-.9-2.18-.24-.57-.48-.5-.66-.51h-.56c-.2 0-.51.07-.78.37-.27.29-1.02.99-1.02 2.43s1.04 2.82 1.19 3.02c.15.2 2.06 3.15 5 4.42.7.3 1.24.48 1.67.61.7.22 1.34.19 1.84.12.56-.08 1.72-.7 1.97-1.38.24-.68.24-1.26.17-1.38-.07-.12-.27-.2-.56-.35z"/><path d="M12.02 2C6.5 2 2.02 6.48 2.02 12c0 1.87.5 3.62 1.38 5.13L2 22l4.99-1.31A9.96 9.96 0 0 0 12.02 22C17.53 22 22 17.52 22 12S17.53 2 12.02 2zm0 18.11c-1.7 0-3.29-.47-4.65-1.28l-.33-.2-3.09.81.82-3.02-.22-.31A8.09 8.09 0 0 1 3.91 12c0-4.47 3.64-8.1 8.11-8.1 4.47 0 8.1 3.63 8.1 8.1s-3.63 8.11-8.1 8.11z"/></svg>
         </div>
-        <div><b>11 2160-0427 · WhatsApp</b><span>Escribime cuando quieras</span></div>
+        <div><b>11 7366-9857 · WhatsApp</b><span>Lunes a viernes, 9 a 18 hs</span></div>
       </a>
       <a class="contact-info-item" href="mailto:guidobonifatiseguros@gmail.com">
         <div class="contact-info-icon">
@@ -884,9 +854,9 @@
           <li><a href="mailto:guidobonifatiseguros@gmail.com">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z" opacity="0"/><path d="M22 6 12 13 2 6"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg>
             guidobonifatiseguros@gmail.com</a></li>
-          <li><a href="https://wa.me/5491121600427" target="_blank" rel="noopener">
+          <li><a href="https://wa.me/5491173669857" target="_blank" rel="noopener">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.47 14.38c-.29-.15-1.72-.85-1.99-.95-.27-.1-.46-.15-.66.15-.2.29-.76.95-.93 1.15-.17.2-.34.22-.63.07-.29-.15-1.22-.45-2.33-1.44-.86-.77-1.44-1.71-1.61-2-.17-.29-.02-.45.13-.6.13-.13.29-.34.44-.51.15-.17.2-.29.29-.49.1-.2.05-.37-.02-.51-.07-.15-.66-1.59-.9-2.18-.24-.57-.48-.5-.66-.51h-.56c-.2 0-.51.07-.78.37-.27.29-1.02.99-1.02 2.43s1.04 2.82 1.19 3.02c.15.2 2.06 3.15 5 4.42.7.3 1.24.48 1.67.61.7.22 1.34.19 1.84.12.56-.08 1.72-.7 1.97-1.38.24-.68.24-1.26.17-1.38-.07-.12-.27-.2-.56-.35z"/></svg>
-            11 2160-0427</a></li>
+            11 7366-9857</a></li>
         </ul>
       </div>
       <div class="footer-col">
@@ -915,7 +885,7 @@
   <div class="footer-bar">Productor Asesor de Seguros — Matrícula N° [completar] ante la Superintendencia de Seguros de la Nación</div>
 </footer>
 
-<a class="wa-float" id="waFloat" href="https://wa.me/5491121600427?text=Hola%20Guido%2C%20quiero%20consultar%20por%20un%20seguro" target="_blank" rel="noopener" aria-label="Escribir por WhatsApp">
+<a class="wa-float" id="waFloat" href="https://wa.me/5491173669857?text=Hola%20Guido%2C%20quiero%20consultar%20por%20un%20seguro" target="_blank" rel="noopener" aria-label="Escribir por WhatsApp">
   <svg width="30" height="30" viewBox="0 0 24 24" fill="#fff"><path d="M17.47 14.38c-.29-.15-1.72-.85-1.99-.95-.27-.1-.46-.15-.66.15-.2.29-.76.95-.93 1.15-.17.2-.34.22-.63.07-.29-.15-1.22-.45-2.33-1.44-.86-.77-1.44-1.71-1.61-2-.17-.29-.02-.45.13-.6.13-.13.29-.34.44-.51.15-.17.2-.29.29-.49.1-.2.05-.37-.02-.51-.07-.15-.66-1.59-.9-2.18-.24-.57-.48-.5-.66-.51h-.56c-.2 0-.51.07-.78.37-.27.29-1.02.99-1.02 2.43s1.04 2.82 1.19 3.02c.15.2 2.06 3.15 5 4.42.7.3 1.24.48 1.67.61.7.22 1.34.19 1.84.12.56-.08 1.72-.7 1.97-1.38.24-.68.24-1.26.17-1.38-.07-.12-.27-.2-.56-.35z"/><path d="M12.02 2C6.5 2 2.02 6.48 2.02 12c0 1.87.5 3.62 1.38 5.13L2 22l4.99-1.31A9.96 9.96 0 0 0 12.02 22C17.53 22 22 17.52 22 12S17.53 2 12.02 2zm0 18.11c-1.7 0-3.29-.47-4.65-1.28l-.33-.2-3.09.81.82-3.02-.22-.31A8.09 8.09 0 0 1 3.91 12c0-4.47 3.64-8.1 8.11-8.1 4.47 0 8.1 3.63 8.1 8.1s-3.63 8.11-8.1 8.11z"/></svg>
 </a>
 
@@ -989,7 +959,7 @@
     const text = encodeURIComponent(
       `Hola Guido, soy ${nombre}. Quiero cotizar: ${producto}. ${mensaje}\nMi teléfono: ${telefono}${email ? '\nMi email: ' + email : ''}`
     );
-    window.open(`https://wa.me/5491121600427?text=${text}`, '_blank');
+    window.open(`https://wa.me/5491173669857?text=${text}`, '_blank');
   });
 
   // Animated counters — count from 0 to target once the stats section enters the viewport
@@ -1037,19 +1007,19 @@
     { name: 'Cuyo', match: ['mendoza', 'san juan', 'san luis', 'san rafael', 'godoy cruz'],
       text: 'los riesgos más comunes en tu región son <b>sismo</b> y <b>granizo</b> (tormentas de verano en la zona serrana).',
       tip: 'Te recomiendo evaluar cobertura contra granizo y una cláusula de riesgo sísmico si corresponde.' },
-    { name: 'Litoral / NEA', match: ['santa fe', 'paraná', 'parana', 'entre ríos', 'entre rios', 'corrientes', 'resistencia', 'chaco', 'formosa', 'posadas', 'misiones'],
+    { name: 'Litoral / NEA', match: ['santa fe', 'paraná', 'parana', 'entre ríos', 'entre rios', 'concordia', 'gualeguaychú', 'corrientes', 'resistencia', 'chaco', 'formosa', 'posadas', 'misiones', 'santo tomé'],
       text: 'los riesgos más comunes en tu región son <b>inundación</b> por crecida de ríos y <b>daños eléctricos por tormenta</b>.',
       tip: 'Te recomiendo priorizar cobertura contra inundación y daños eléctricos.' },
     { name: 'NOA', match: ['salta', 'jujuy', 'tucumán', 'tucuman', 'santiago del estero', 'catamarca', 'la rioja'],
       text: 'los riesgos más comunes en tu región son <b>granizo</b> y <b>tormentas de verano</b>.',
       tip: 'Te recomiendo priorizar cobertura contra granizo y daños climáticos.' },
-    { name: 'Patagonia', match: ['neuquén', 'neuquen', 'río negro', 'rio negro', 'bariloche', 'chubut', 'comodoro rivadavia', 'santa cruz', 'río gallegos', 'rio gallegos', 'tierra del fuego', 'ushuaia'],
+    { name: 'Patagonia', match: ['neuquén', 'neuquen', 'río negro', 'rio negro', 'bariloche', 'viedma', 'chubut', 'rawson', 'trelew', 'comodoro rivadavia', 'santa cruz', 'río gallegos', 'rio gallegos', 'tierra del fuego', 'ushuaia', 'río grande'],
       text: 'los riesgos más comunes en tu región son <b>viento fuerte</b> y <b>daños por nieve/heladas</b> en temporada.',
       tip: 'Te recomiendo evaluar cobertura contra daños climáticos (viento y nieve).' },
     { name: 'Costa atlántica bonaerense', match: ['pinamar', 'villa gesell', 'necochea', 'bahía blanca', 'bahia blanca', 'tandil'],
       text: 'los riesgos más comunes en tu región son <b>temporales/viento</b> y <b>robo</b> en temporada alta.',
       tip: 'Te recomiendo evaluar cobertura contra daños climáticos y robo total/parcial.' },
-    { name: 'Buenos Aires (provincia, general)', match: ['buenos aires', 'provincia de buenos aires', 'gba', 'conurbano'],
+    { name: 'Buenos Aires / La Pampa (región pampeana)', match: ['buenos aires', 'provincia de buenos aires', 'gba', 'conurbano', 'la pampa', 'santa rosa'],
       text: 'los riesgos más comunes en tu región son <b>robo de auto</b> y <b>granizo</b>.',
       tip: 'Te recomiendo evaluar cobertura contra robo total/parcial y daños climáticos.' },
   ];
