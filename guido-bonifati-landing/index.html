@@ -117,6 +117,22 @@
   }
   .hero-actions{display:flex;flex-wrap:wrap;justify-content:center;gap:14px;}
 
+  /* Quick nav: Seguros para Personas / Empresas */
+  .quick-nav{background:var(--bg);padding-top:64px;}
+  .quick-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;}
+  .quick-card{
+    display:flex;align-items:center;gap:18px;padding:28px 26px;border-radius:var(--radius);
+    background:var(--surface);border:1px solid var(--border);transition:transform .18s ease,box-shadow .18s ease;
+  }
+  .quick-card:hover{transform:translateY(-3px);box-shadow:var(--shadow);}
+  .quick-icon{
+    width:56px;height:56px;border-radius:50%;color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  }
+  .quick-card--personas .quick-icon{background:var(--mauve);}
+  .quick-card--empresas .quick-icon{background:var(--wine);}
+  .quick-card h3{font-family:var(--font-cond);font-size:19px;font-weight:600;color:#000;margin-bottom:4px;}
+  .quick-card span{font-size:13.5px;color:var(--muted);}
+
   /* Nosotros / Quiénes somos */
   .nosotros{background:var(--bg);}
   .bio{display:grid;grid-template-columns:auto 1fr;gap:32px;align-items:center;margin-bottom:56px;}
@@ -186,6 +202,10 @@
   .revision .eyebrow{color:rgba(255,255,255,0.65);}
   .revision h2{color:#fff;font-size:clamp(26px,3vw,36px);}
   .revision p{max-width:620px;margin:16px auto 28px;color:rgba(255,255,255,0.85);font-size:16px;}
+  .revision-form{max-width:520px;margin:0 auto;text-align:left;}
+  .revision-note{font-size:12.5px;color:rgba(255,255,255,0.6);margin-top:12px;text-align:center;}
+  .revision-note.error{color:#ffd3d3;}
+  .revision-note.success{color:#d3ffd8;}
 
   /* Referidos */
   .referidos{background:var(--bg);}
@@ -241,10 +261,10 @@
   .slider-track{display:flex;align-items:center;gap:64px;width:max-content;animation:slide 28s linear infinite;}
   .slider:hover .slider-track{animation-play-state:paused;}
   .slider-track img{
-    height:52px;width:auto;object-fit:contain;filter:grayscale(1) opacity(0.65);
-    transition:filter .2s ease;flex-shrink:0;
+    height:52px;width:auto;object-fit:contain;
+    transition:transform .2s ease;flex-shrink:0;
   }
-  .slider-track img:hover{filter:grayscale(0) opacity(1);}
+  .slider-track img:hover{transform:scale(1.08);}
   @keyframes slide{from{transform:translateX(0);}to{transform:translateX(-50%);}}
   .insurer-note{margin-top:32px;font-size:13px;color:var(--muted);}
 
@@ -341,6 +361,7 @@
     .stats-grid{grid-template-columns:repeat(3,1fr);gap:16px;}
     .footer-grid{grid-template-columns:1fr 1fr;gap:36px;}
     .hero-box{padding:40px 32px 32px;margin-top:-60px;}
+    .quick-grid{grid-template-columns:1fr;}
   }
   @media (max-width:720px){
     .nav-links{
@@ -376,10 +397,11 @@
     </a>
     <ul class="nav-links" id="navLinks">
       <li><a href="#inicio" class="active">Inicio</a></li>
-      <li><a href="#nosotros">Nosotros</a></li>
       <li><a href="#personas">Personas</a></li>
       <li><a href="#empresas">Empresas</a></li>
-      <li><a href="#aseguradoras">Aseguradoras</a></li>
+      <li><a href="#revision">Revisión</a></li>
+      <li><a href="#referidos">Referidos</a></li>
+      <li><a href="#nosotros">Nosotros</a></li>
       <li><a href="#contacto">Contacto</a></li>
     </ul>
     <div class="nav-actions">
@@ -394,8 +416,8 @@
 <section id="inicio" class="hero">
   <div class="hero-media" aria-hidden="true"></div>
   <div class="hero-box">
-    <h1>Un seguro para cada necesidad</h1>
-    <p class="hero-sub">Nuestra diferencia es nuestro servicio</p>
+    <h1>Asegurá hoy.</h1>
+    <p class="hero-sub">Viví tranquilo mañana</p>
     <div class="hero-actions">
       <a href="#contacto" class="btn btn-wine">Cotizar ahora</a>
       <a href="#personas" class="btn btn-outline">Ver coberturas</a>
@@ -403,60 +425,26 @@
   </div>
 </section>
 
-<section id="nosotros" class="nosotros">
-  <div class="container">
-    <div class="section-head">
-      <span class="eyebrow">Nosotros</span>
-      <h2>Quiénes somos</h2>
-    </div>
-
-    <div class="bio">
-      <div class="avatar">GB</div>
-      <div>
-        <div class="bio-name">Guido Bonifati</div>
-        <div class="bio-role">Productor Asesor de Seguros</div>
-        <p class="bio-text">Con más de 10 años en el mercado asegurador, ayudo a personas y empresas a proteger lo que más les importa. Mi trabajo es simple: escuchar, comparar entre distintas aseguradoras y recomendar con honestidad — sin venderte más cobertura de la que necesitás.</p>
-        <div class="bio-social">
-          <a href="mailto:guido@completar.com.ar" aria-label="Email">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z" opacity="0"/><path d="M22 6 12 13 2 6"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg>
-          </a>
-          <a href="https://wa.me/5491100000000" target="_blank" rel="noopener" aria-label="WhatsApp">
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.47 14.38c-.29-.15-1.72-.85-1.99-.95-.27-.1-.46-.15-.66.15-.2.29-.76.95-.93 1.15-.17.2-.34.22-.63.07-.29-.15-1.22-.45-2.33-1.44-.86-.77-1.44-1.71-1.61-2-.17-.29-.02-.45.13-.6.13-.13.29-.34.44-.51.15-.17.2-.29.29-.49.1-.2.05-.37-.02-.51-.07-.15-.66-1.59-.9-2.18-.24-.57-.48-.5-.66-.51h-.56c-.2 0-.51.07-.78.37-.27.29-1.02.99-1.02 2.43s1.04 2.82 1.19 3.02c.15.2 2.06 3.15 5 4.42.7.3 1.24.48 1.67.61.7.22 1.34.19 1.84.12.56-.08 1.72-.7 1.97-1.38.24-.68.24-1.26.17-1.38-.07-.12-.27-.2-.56-.35z"/><path d="M12.02 2C6.5 2 2.02 6.48 2.02 12c0 1.87.5 3.62 1.38 5.13L2 22l4.99-1.31A9.96 9.96 0 0 0 12.02 22C17.53 22 22 17.52 22 12S17.53 2 12.02 2zm0 18.11c-1.7 0-3.29-.47-4.65-1.28l-.33-.2-3.09.81.82-3.02-.22-.31A8.09 8.09 0 0 1 3.91 12c0-4.47 3.64-8.1 8.11-8.1 4.47 0 8.1 3.63 8.1 8.1s-3.63 8.11-8.1 8.11z"/></svg>
-          </a>
-          <a href="https://linkedin.com/in/completar" target="_blank" rel="noopener" aria-label="LinkedIn">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
-          </a>
-          <a href="https://instagram.com/completar" target="_blank" rel="noopener" aria-label="Instagram">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1"/></svg>
-          </a>
-        </div>
-      </div>
-    </div>
-
-    <div class="pillars">
-      <div class="pillar">
-        <h3>Historia</h3>
-        <p>Empecé en el mundo de los seguros hace más de una década, trabajando de cerca con distintas aseguradoras. Con el tiempo entendí que lo que más valora un cliente no es la compañía más grande, sino tener a alguien de confianza del otro lado del teléfono. Así nació este espacio de asesoramiento independiente.</p>
-      </div>
-      <div class="pillar">
-        <h3>Misión</h3>
-        <p>Ayudarte a tomar decisiones informadas sobre tus seguros, comparando opciones reales entre aseguradoras y acompañándote en cada paso — desde la cotización hasta el momento en que más lo necesitás: un siniestro.</p>
-      </div>
-      <div class="pillar">
-        <h3>Visión</h3>
-        <p>Ser el asesor de seguros de referencia para familias y empresas de la zona, reconocido por la transparencia, la rapidez de respuesta y el trato cercano.</p>
-      </div>
-    </div>
-
-    <div class="credential">
-      <div class="credential-icon">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l8 4v6c0 5-3.4 8.4-8 10-4.6-1.6-8-5-8-10V6l8-4z"/></svg>
+<section class="quick-nav">
+  <div class="container quick-grid">
+    <a href="#personas" class="quick-card quick-card--personas">
+      <div class="quick-icon">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/><circle cx="10" cy="7" r="4"/><path d="M21 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
       </div>
       <div>
-        <b>Productor Asesor de Seguros</b>
-        <span>Matrícula N° [completar] — Superintendencia de Seguros de la Nación</span>
+        <h3>Seguros para Personas</h3>
+        <span>Auto, vida, hogar y más →</span>
       </div>
-    </div>
+    </a>
+    <a href="#empresas" class="quick-card quick-card--empresas">
+      <div class="quick-icon">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+      </div>
+      <div>
+        <h3>Seguros para Empresas</h3>
+        <span>ART, RC, caución y más →</span>
+      </div>
+    </a>
   </div>
 </section>
 
@@ -465,6 +453,40 @@
     <div class="stat"><b data-count="100">0</b><span>Asegurados</span></div>
     <div class="stat"><b data-count="5">0</b><span>Años de trayectoria</span></div>
     <div class="stat"><b data-count="8">0</b><span>Aseguradoras aliadas</span></div>
+  </div>
+</section>
+
+<section id="aseguradoras" class="aseguradoras">
+  <div class="container">
+    <div class="aseg-divider"></div>
+    <div class="aseg-label">Confiamos en estas</div>
+    <div class="aseg-title">Aseguradoras</div>
+    <p>Mi trayectoria me permitió elegir las aseguradoras que mejores beneficios brindan a mis clientes.</p>
+  </div>
+  <div class="slider">
+    <div class="slider-track">
+      <img src="assets/aseguradoras/1-Federacion-Patronal.png" alt="Federación Patronal">
+      <img src="assets/aseguradoras/2-swiss-medical.png" alt="Swiss Medical">
+      <img src="assets/aseguradoras/3-zurich.png" alt="Zurich">
+      <img src="assets/aseguradoras/4-PREVENCION.png" alt="Prevención">
+      <img src="assets/aseguradoras/5-GALENO.png" alt="Galeno">
+      <img src="assets/aseguradoras/6-ALLIANZ.png" alt="Allianz">
+      <img src="assets/aseguradoras/7-HDI.png" alt="HDI">
+      <img src="assets/aseguradoras/8-La-Perseverancia-Seguros.png" alt="La Perseverancia Seguros">
+      <img src="assets/aseguradoras/9-SANCOR-SEGUROS.png" alt="Sancor Seguros">
+      <img src="assets/aseguradoras/1-Federacion-Patronal.png" alt="Federación Patronal" aria-hidden="true">
+      <img src="assets/aseguradoras/2-swiss-medical.png" alt="Swiss Medical" aria-hidden="true">
+      <img src="assets/aseguradoras/3-zurich.png" alt="Zurich" aria-hidden="true">
+      <img src="assets/aseguradoras/4-PREVENCION.png" alt="Prevención" aria-hidden="true">
+      <img src="assets/aseguradoras/5-GALENO.png" alt="Galeno" aria-hidden="true">
+      <img src="assets/aseguradoras/6-ALLIANZ.png" alt="Allianz" aria-hidden="true">
+      <img src="assets/aseguradoras/7-HDI.png" alt="HDI" aria-hidden="true">
+      <img src="assets/aseguradoras/8-La-Perseverancia-Seguros.png" alt="La Perseverancia Seguros" aria-hidden="true">
+      <img src="assets/aseguradoras/9-SANCOR-SEGUROS.png" alt="Sancor Seguros" aria-hidden="true">
+    </div>
+  </div>
+  <div class="container">
+    <p class="insurer-note">Logos de referencia — se confirman las aseguradoras aliadas definitivas.</p>
   </div>
 </section>
 
@@ -523,6 +545,20 @@
         <h3>Seguro de Caución</h3>
         <p>Garantías para alquileres, obras y trámites.</p>
         <a href="#contacto" class="prod-quote" data-product="Seguro de Caución">Cotizar →</a>
+      </div>
+    </div>
+
+    <div class="sim-panel" style="margin-top:56px;">
+      <span class="sim-badge">Próximamente</span>
+      <h2 style="font-size:clamp(24px,3vw,32px);">Simulador de Riesgo por Zona</h2>
+      <p style="color:var(--text);margin-top:12px;">Ingresá tu dirección y te muestro, a modo orientativo, los riesgos más frecuentes de tu zona — robo, granizo, inundación — para ayudarte a elegir la cobertura correcta antes de que la necesites.</p>
+      <form class="sim-form" id="simForm">
+        <input type="text" id="simAddress" placeholder="Tu dirección o barrio" required>
+        <button type="submit" class="btn btn-wine">Simular</button>
+      </form>
+      <div class="sim-result" id="simResult">
+        <p>📍 <b>Ejemplo ilustrativo</b> para tu zona: el <b>30%</b> de los reclamos son por robo de auto y el <b>18%</b> por daños de granizo. Te recomendamos evaluar cobertura contra robo total/parcial y daños climáticos.</p>
+        <span class="sim-fine">* Resultado de ejemplo — la versión final usará estadísticas reales por zona.</span>
       </div>
     </div>
   </div>
@@ -593,7 +629,27 @@
     <span class="eyebrow">Sin costo, sin compromiso</span>
     <h2>Revisión de coberturas 100% gratis</h2>
     <p>Reviso las pólizas que ya tenés — sean conmigo o con otro asesor — y te digo, sin vueltas, si están bien cubiertas, si te falta algo importante o si estás pagando de más.</p>
-    <a href="#contacto" class="btn btn-white prod-quote" data-product="Revisión de coberturas gratis">Pedir mi revisión gratis</a>
+
+    <form class="contact-form revision-form" id="revisionForm">
+      <input type="hidden" name="access_key" value="TU_ACCESS_KEY_DE_WEB3FORMS">
+      <input type="hidden" name="subject" value="Nueva solicitud de revisión de coberturas">
+      <div class="form-row">
+        <div class="field">
+          <label for="revNombre">Nombre</label>
+          <input type="text" id="revNombre" name="Nombre" placeholder="Tu nombre" required>
+        </div>
+        <div class="field">
+          <label for="revEmail">Correo</label>
+          <input type="email" id="revEmail" name="Email" placeholder="tu@correo.com" required>
+        </div>
+      </div>
+      <div class="field">
+        <label for="revFile">Tus pólizas (PDF)</label>
+        <input type="file" id="revFile" name="Póliza" accept="application/pdf" multiple required>
+      </div>
+      <button type="submit" class="btn btn-white">Enviar mis pólizas</button>
+      <p class="revision-note" id="revisionNote">Tus archivos me llegan directo por correo — no se almacenan en esta página.</p>
+    </form>
   </div>
 </section>
 
@@ -628,30 +684,56 @@
   </div>
 </section>
 
-<section id="simulador" class="simulador">
+<section id="nosotros" class="nosotros">
   <div class="container">
-    <div class="sim-panel">
-      <span class="sim-badge">Próximamente</span>
-      <h2 style="font-size:clamp(24px,3vw,32px);">Simulador de Riesgo por Zona</h2>
-      <p style="color:var(--text);margin-top:12px;">Ingresá tu dirección y te muestro, a modo orientativo, los riesgos más frecuentes de tu zona — robo, granizo, inundación — para ayudarte a elegir la cobertura correcta antes de que la necesites.</p>
-      <form class="sim-form" id="simForm">
-        <input type="text" id="simAddress" placeholder="Tu dirección o barrio" required>
-        <button type="submit" class="btn btn-wine">Simular</button>
-      </form>
-      <div class="sim-result" id="simResult">
-        <p>📍 <b>Ejemplo ilustrativo</b> para tu zona: el <b>30%</b> de los reclamos son por robo de auto y el <b>18%</b> por daños de granizo. Te recomendamos evaluar cobertura contra robo total/parcial y daños climáticos.</p>
-        <span class="sim-fine">* Resultado de ejemplo — la versión final usará estadísticas reales por zona.</span>
+    <div class="section-head center">
+      <span class="eyebrow">Nosotros</span>
+      <h2>Quiénes somos</h2>
+    </div>
+
+    <div class="bio">
+      <div class="avatar">GB</div>
+      <div>
+        <div class="bio-name">Guido Bonifati</div>
+        <div class="bio-role">Asesor de Seguros</div>
+        <p class="bio-text">Un seguro no debería ser simplemente una póliza. Mi trabajo es ayudarte a entender qué estás contratando, qué cobertura necesitás y qué opción se adapta mejor a vos. Desde la elección de la compañía y la cobertura hasta la gestión y el seguimiento de tu póliza, te acompaño durante todo el proceso.</p>
+        <div class="bio-social">
+          <a href="mailto:guido@completar.com.ar" aria-label="Email">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 6 12 13 2 6"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg>
+          </a>
+          <a href="https://wa.me/5491100000000" target="_blank" rel="noopener" aria-label="WhatsApp">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.47 14.38c-.29-.15-1.72-.85-1.99-.95-.27-.1-.46-.15-.66.15-.2.29-.76.95-.93 1.15-.17.2-.34.22-.63.07-.29-.15-1.22-.45-2.33-1.44-.86-.77-1.44-1.71-1.61-2-.17-.29-.02-.45.13-.6.13-.13.29-.34.44-.51.15-.17.2-.29.29-.49.1-.2.05-.37-.02-.51-.07-.15-.66-1.59-.9-2.18-.24-.57-.48-.5-.66-.51h-.56c-.2 0-.51.07-.78.37-.27.29-1.02.99-1.02 2.43s1.04 2.82 1.19 3.02c.15.2 2.06 3.15 5 4.42.7.3 1.24.48 1.67.61.7.22 1.34.19 1.84.12.56-.08 1.72-.7 1.97-1.38.24-.68.24-1.26.17-1.38-.07-.12-.27-.2-.56-.35z"/><path d="M12.02 2C6.5 2 2.02 6.48 2.02 12c0 1.87.5 3.62 1.38 5.13L2 22l4.99-1.31A9.96 9.96 0 0 0 12.02 22C17.53 22 22 17.52 22 12S17.53 2 12.02 2zm0 18.11c-1.7 0-3.29-.47-4.65-1.28l-.33-.2-3.09.81.82-3.02-.22-.31A8.09 8.09 0 0 1 3.91 12c0-4.47 3.64-8.1 8.11-8.1 4.47 0 8.1 3.63 8.1 8.1s-3.63 8.11-8.1 8.11z"/></svg>
+          </a>
+          <a href="https://linkedin.com/in/completar" target="_blank" rel="noopener" aria-label="LinkedIn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+          </a>
+          <a href="https://instagram.com/completar" target="_blank" rel="noopener" aria-label="Instagram">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1"/></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="pillars">
+      <div class="pillar">
+        <h3>Historia</h3>
+        <p>Mi historia en seguros comenzó en 2022, cuando ingresé a Boston Seguros como emisor de caución. Al cabo de un año pasé al sector de suscripción, que me enseñó desde cómo se recibe un negocio y cómo se analiza, hasta entender el punto de vista de la compañía. Luego, en mayo de 2024, me aventuré hacia un nuevo destino: Swiss Medical Seguros se contactó conmigo para que formara parte de su equipo de suscripción de caución. Allí seguí formándome, adquiriendo conceptos y conocimientos, y descubrí lo vital que es construir relaciones comerciales y vínculos que generen una relación suscriptor–PAS, algo fundamental en caución. Así, después de 5 años en seguros del lado de las compañías y con la tecnicatura en seguros en curso de finalización, me volqué de forma independiente del otro lado del mostrador: para asesorar a quienes necesitan un seguro, guiarlos, darles el mejor servicio y transparencia, y mostrarles cuáles son las mejores compañías para que puedan delegar en mí esa responsabilidad y disfrutar la vida sin ese miedo.</p>
+      </div>
+      <div class="pillar">
+        <h3>Misión</h3>
+        <p>Acompañar a cada persona y empresa en la elección del seguro correcto, con asesoramiento claro, honesto y presente en cada etapa: desde la cotización hasta la gestión de un siniestro.</p>
+      </div>
+      <div class="pillar">
+        <h3>Visión</h3>
+        <p>Ser el asesor de referencia para quienes buscan protegerse sin vueltas ni letra chica, construyendo relaciones de confianza a largo plazo.</p>
       </div>
     </div>
   </div>
-</section>
 
-<section id="aseguradoras" class="aseguradoras">
-  <div class="container">
+  <div class="container" style="text-align:center;">
     <div class="aseg-divider"></div>
     <div class="aseg-label">Confiamos en estas</div>
     <div class="aseg-title">Aseguradoras</div>
-    <p>Mi trayectoria me permitió elegir las aseguradoras que mejores beneficios brindan a mis clientes.</p>
   </div>
   <div class="slider">
     <div class="slider-track">
@@ -674,9 +756,6 @@
       <img src="assets/aseguradoras/8-La-Perseverancia-Seguros.png" alt="La Perseverancia Seguros" aria-hidden="true">
       <img src="assets/aseguradoras/9-SANCOR-SEGUROS.png" alt="Sancor Seguros" aria-hidden="true">
     </div>
-  </div>
-  <div class="container">
-    <p class="insurer-note">Logos de referencia — se confirman las aseguradoras aliadas definitivas.</p>
   </div>
 </section>
 
@@ -883,6 +962,40 @@
       e.preventDefault();
       simResult.classList.add('show');
       simResult.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    });
+  }
+
+  // Revisión de coberturas — envía las pólizas en PDF por correo vía Web3Forms
+  const revisionForm = document.getElementById('revisionForm');
+  const revisionNote = document.getElementById('revisionNote');
+  if (revisionForm) {
+    revisionForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const submitBtn = revisionForm.querySelector('button[type="submit"]');
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Enviando...';
+      revisionNote.textContent = 'Enviando tus pólizas, un momento...';
+      revisionNote.className = 'revision-note';
+      try {
+        const res = await fetch('https://api.web3forms.com/submit', {
+          method: 'POST',
+          body: new FormData(revisionForm)
+        });
+        const data = await res.json();
+        if (data.success) {
+          revisionForm.reset();
+          revisionNote.textContent = '¡Listo! Recibí tus pólizas y te contacto a la brevedad.';
+          revisionNote.className = 'revision-note success';
+        } else {
+          throw new Error(data.message || 'Error al enviar');
+        }
+      } catch (err) {
+        revisionNote.textContent = 'No pudimos enviar el formulario. Escribime por WhatsApp y te lo hago llegar.';
+        revisionNote.className = 'revision-note error';
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Enviar mis pólizas';
+      }
     });
   }
 </script>
