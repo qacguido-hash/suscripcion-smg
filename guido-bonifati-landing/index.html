@@ -102,48 +102,73 @@
     background:repeating-linear-gradient(115deg,rgba(255,255,255,0.05) 0 2px,transparent 2px 40px);
   }
   .hero-box{
-    max-width:900px;margin:0 auto;background:#fff;
+    max-width:1180px;margin:0 auto;background:#fff;
     box-shadow:var(--shadow);border-radius:2px;
     margin-top:-90px;position:relative;z-index:2;
-    padding:52px 56px 40px;text-align:center;
+    padding:52px 56px 44px;
   }
-  .hero-box h1{
+  .hero-grid{display:grid;grid-template-columns:1.35fr 1fr;gap:48px;align-items:center;}
+  .hero-copy{text-align:left;}
+  .hero-copy h1{
     font-size:clamp(28px,4.4vw,44px);text-transform:uppercase;font-weight:400;
-    color:var(--mauve);letter-spacing:0.5px;margin-bottom:18px;
+    color:var(--mauve);letter-spacing:0.5px;margin-bottom:14px;
   }
-  .hero-box .hero-sub{
-    font-size:16px;font-weight:200;text-transform:uppercase;letter-spacing:7px;
-    color:var(--mauve);margin-bottom:28px;
+  .hero-copy .hero-sub{
+    font-size:15px;font-weight:200;text-transform:uppercase;letter-spacing:6px;
+    color:var(--mauve);margin-bottom:20px;
   }
-  .hero-actions{display:flex;flex-wrap:wrap;justify-content:center;gap:14px;}
+  .hero-copy .hero-desc{font-size:15px;color:var(--text);max-width:520px;margin-bottom:28px;}
+  .hero-actions{display:flex;flex-wrap:wrap;justify-content:flex-start;gap:14px;}
+
+  /* Compact "Revisión de coberturas" card, inside the hero */
+  .hero-revision{
+    background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+    padding:26px 24px;text-align:left;
+  }
+  .hero-revision-badge{
+    display:inline-block;font-size:11px;font-weight:700;letter-spacing:0.6px;text-transform:uppercase;
+    color:#fff;background:var(--wine);padding:4px 11px;border-radius:20px;margin-bottom:12px;
+  }
+  .hero-revision h3{font-family:var(--font-cond);font-size:19px;font-weight:600;color:#000;margin-bottom:6px;}
+  .hero-revision > p{font-size:13.5px;color:var(--text);margin-bottom:14px;}
+  .hero-revision form{display:flex;flex-direction:column;gap:9px;}
+  .hero-revision input{
+    padding:10px 12px;border-radius:4px;border:1px solid var(--border);
+    font-family:var(--font);font-size:13px;outline:none;background:#fff;color:var(--text);
+    transition:border-color .15s;
+  }
+  .hero-revision input:focus{border-color:var(--wine);}
+  .hero-revision .btn{margin-top:2px;}
+  .hero-revision .revision-note{font-size:11.5px;margin-top:9px;color:var(--muted);text-align:left;}
+  .hero-revision .revision-note.success{color:#1a7a3c;}
+  .hero-revision .revision-note.error{color:#b0303a;}
 
   /* Quick nav: Seguros para Personas / Empresas */
   .quick-nav{background:var(--bg);padding-top:64px;}
-  .quick-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;}
+  .quick-grid{display:grid;grid-template-columns:1fr 1fr;gap:28px;}
   .quick-card{
-    display:flex;align-items:center;gap:18px;padding:28px 26px;border-radius:var(--radius);
+    display:flex;align-items:center;gap:30px;padding:52px 46px;border-radius:var(--radius);
     background:var(--surface);border:1px solid var(--border);transition:transform .18s ease,box-shadow .18s ease;
   }
   .quick-card:hover{transform:translateY(-3px);box-shadow:var(--shadow);}
   .quick-icon{
-    width:56px;height:56px;border-radius:50%;color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;
+    width:104px;height:104px;border-radius:50%;color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;
   }
+  .quick-icon svg{width:44px;height:44px;}
   .quick-card--personas .quick-icon{background:var(--mauve);}
   .quick-card--empresas .quick-icon{background:var(--wine);}
-  .quick-card h3{font-family:var(--font-cond);font-size:19px;font-weight:600;color:#000;margin-bottom:4px;}
-  .quick-card span{font-size:13.5px;color:var(--muted);}
+  .quick-card h3{font-family:var(--font-cond);font-size:28px;font-weight:600;color:#000;margin-bottom:6px;}
+  .quick-card span{font-size:16px;color:var(--muted);}
 
   /* Nosotros / Quiénes somos */
   .nosotros{background:var(--bg);}
-  .bio{display:grid;grid-template-columns:auto 1fr;gap:32px;align-items:center;margin-bottom:56px;}
+  .nosotros-grid{display:grid;grid-template-columns:1.4fr 0.9fr;gap:48px;align-items:start;}
+  .nosotros-text p{font-size:15px;color:var(--text);margin-bottom:16px;}
   .avatar{
     width:104px;height:104px;border-radius:50%;background:var(--wine);color:#fff;
     display:flex;align-items:center;justify-content:center;font-family:var(--font-cond);
     font-size:34px;font-weight:600;flex-shrink:0;
   }
-  .bio-name{font-family:var(--font-cond);font-size:26px;font-weight:600;color:#000;letter-spacing:0.3px;}
-  .bio-role{font-size:14px;color:var(--wine);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;}
-  .bio-text{font-size:15px;color:var(--text);max-width:640px;margin-bottom:16px;}
   .bio-social{display:flex;gap:10px;}
   .bio-social a{
     width:38px;height:38px;border-radius:50%;border:1.5px solid var(--border);color:var(--wine);
@@ -152,21 +177,14 @@
   .bio-social a:hover{background:var(--wine);border-color:var(--wine);color:#fff;}
   .bio-social svg{width:16px;height:16px;}
 
-  .pillars{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-bottom:56px;}
-  .pillar{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:26px 24px;}
-  .pillar h3{font-family:var(--font-cond);font-size:16px;font-weight:600;text-transform:uppercase;color:var(--wine);margin-bottom:10px;letter-spacing:0.4px;}
-  .pillar p{font-size:14.5px;color:var(--text);}
-
-  .credential{
-    display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--border);
-    border-radius:var(--radius);padding:16px 20px;max-width:640px;
+  .cv-card{
+    background:#fff;border:1px solid var(--border);border-radius:var(--radius);
+    padding:36px 28px;text-align:center;box-shadow:var(--shadow);
   }
-  .credential-icon{
-    width:36px;height:36px;border-radius:50%;background:var(--wine);color:#fff;flex-shrink:0;
-    display:flex;align-items:center;justify-content:center;
-  }
-  .credential b{display:block;font-size:14px;font-weight:600;color:var(--mauve);}
-  .credential span{font-size:12.5px;color:var(--muted);}
+  .cv-card .avatar{margin:0 auto 18px;}
+  .cv-card .cv-name{font-family:var(--font-cond);font-size:19px;font-weight:600;color:#000;letter-spacing:0.4px;}
+  .cv-card .cv-role{font-size:13px;color:var(--wine);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin:6px 0 20px;}
+  .cv-card .bio-social{justify-content:center;}
 
   /* Counters */
   .stats{background:var(--surface);}
@@ -196,16 +214,6 @@
   .prod-card p{font-size:13px;color:var(--text);margin-bottom:14px;flex:1;}
   .prod-quote{font-size:12.5px;font-weight:600;color:var(--wine);display:inline-flex;align-items:center;gap:5px;}
   .prod-quote:hover{color:var(--wine-deep);}
-
-  /* Revisión gratis */
-  .revision{background:var(--wine);color:#fff;text-align:center;}
-  .revision .eyebrow{color:rgba(255,255,255,0.65);}
-  .revision h2{color:#fff;font-size:clamp(26px,3vw,36px);}
-  .revision p{max-width:620px;margin:16px auto 28px;color:rgba(255,255,255,0.85);font-size:16px;}
-  .revision-form{max-width:520px;margin:0 auto;text-align:left;}
-  .revision-note{font-size:12.5px;color:rgba(255,255,255,0.6);margin-top:12px;text-align:center;}
-  .revision-note.error{color:#ffd3d3;}
-  .revision-note.success{color:#d3ffd8;}
 
   /* Referidos */
   .referidos{background:var(--bg);}
@@ -353,15 +361,19 @@
   }
   @media (max-width:900px){
     .contact-grid{grid-template-columns:1fr;}
-    .bio{grid-template-columns:1fr;text-align:center;}
-    .bio-social{justify-content:center;}
-    .pillars{grid-template-columns:1fr;}
+    .nosotros-grid{grid-template-columns:1fr;}
+    .cv-card{max-width:360px;margin:0 auto;}
     .prod-grid{grid-template-columns:repeat(2,1fr);}
     .ref-steps{grid-template-columns:1fr;}
     .stats-grid{grid-template-columns:repeat(3,1fr);gap:16px;}
     .footer-grid{grid-template-columns:1fr 1fr;gap:36px;}
     .hero-box{padding:40px 32px 32px;margin-top:-60px;}
+    .hero-grid{grid-template-columns:1fr;gap:32px;}
+    .hero-copy{text-align:center;}
+    .hero-actions{justify-content:center;}
+    .hero-copy .hero-desc{margin-left:auto;margin-right:auto;}
     .quick-grid{grid-template-columns:1fr;}
+    .quick-card{padding:36px 30px;}
   }
   @media (max-width:720px){
     .nav-links{
@@ -397,11 +409,10 @@
     </a>
     <ul class="nav-links" id="navLinks">
       <li><a href="#inicio" class="active">Inicio</a></li>
+      <li><a href="#nosotros">Nosotros</a></li>
       <li><a href="#personas">Personas</a></li>
       <li><a href="#empresas">Empresas</a></li>
-      <li><a href="#revision">Revisión</a></li>
       <li><a href="#referidos">Referidos</a></li>
-      <li><a href="#nosotros">Nosotros</a></li>
       <li><a href="#contacto">Contacto</a></li>
     </ul>
     <div class="nav-actions">
@@ -416,11 +427,31 @@
 <section id="inicio" class="hero">
   <div class="hero-media" aria-hidden="true"></div>
   <div class="hero-box">
-    <h1>Asegurá hoy.</h1>
-    <p class="hero-sub">Viví tranquilo mañana</p>
-    <div class="hero-actions">
-      <a href="#contacto" class="btn btn-wine">Cotizar ahora</a>
-      <a href="#personas" class="btn btn-outline">Ver coberturas</a>
+    <div class="hero-grid">
+      <div class="hero-copy">
+        <h1>Asegurá hoy.</h1>
+        <p class="hero-sub">Viví tranquilo mañana</p>
+        <p class="hero-desc">Un seguro no debería ser simplemente una póliza. Mi trabajo es ayudarte a entender qué estás contratando, qué cobertura necesitás y qué opción se adapta mejor a vos. Desde la elección de la compañía y la cobertura hasta la gestión y el seguimiento de tu póliza, te acompaño durante todo el proceso.</p>
+        <div class="hero-actions">
+          <a href="#contacto" class="btn btn-wine">Cotizar ahora</a>
+          <a href="#personas" class="btn btn-outline">Ver coberturas</a>
+        </div>
+      </div>
+
+      <div class="hero-revision" id="revision">
+        <span class="hero-revision-badge">Gratis</span>
+        <h3>Revisión de coberturas</h3>
+        <p>Te digo si tu póliza actual está bien cubierta o si estás pagando de más.</p>
+        <form id="revisionForm">
+          <input type="hidden" name="access_key" value="TU_ACCESS_KEY_DE_WEB3FORMS">
+          <input type="hidden" name="subject" value="Nueva solicitud de revisión de coberturas">
+          <input type="text" id="revNombre" name="Nombre" placeholder="Tu nombre" required>
+          <input type="email" id="revEmail" name="Email" placeholder="Tu correo" required>
+          <input type="file" id="revFile" name="Póliza" accept="application/pdf" multiple required>
+          <button type="submit" class="btn btn-wine btn-sm">Enviar pólizas</button>
+        </form>
+        <p class="revision-note" id="revisionNote"></p>
+      </div>
     </div>
   </div>
 </section>
@@ -469,7 +500,6 @@
       <img src="assets/aseguradoras/2-swiss-medical.png" alt="Swiss Medical">
       <img src="assets/aseguradoras/3-zurich.png" alt="Zurich">
       <img src="assets/aseguradoras/4-PREVENCION.png" alt="Prevención">
-      <img src="assets/aseguradoras/5-GALENO.png" alt="Galeno">
       <img src="assets/aseguradoras/6-ALLIANZ.png" alt="Allianz">
       <img src="assets/aseguradoras/7-HDI.png" alt="HDI">
       <img src="assets/aseguradoras/8-La-Perseverancia-Seguros.png" alt="La Perseverancia Seguros">
@@ -478,7 +508,6 @@
       <img src="assets/aseguradoras/2-swiss-medical.png" alt="Swiss Medical" aria-hidden="true">
       <img src="assets/aseguradoras/3-zurich.png" alt="Zurich" aria-hidden="true">
       <img src="assets/aseguradoras/4-PREVENCION.png" alt="Prevención" aria-hidden="true">
-      <img src="assets/aseguradoras/5-GALENO.png" alt="Galeno" aria-hidden="true">
       <img src="assets/aseguradoras/6-ALLIANZ.png" alt="Allianz" aria-hidden="true">
       <img src="assets/aseguradoras/7-HDI.png" alt="HDI" aria-hidden="true">
       <img src="assets/aseguradoras/8-La-Perseverancia-Seguros.png" alt="La Perseverancia Seguros" aria-hidden="true">
@@ -487,6 +516,35 @@
   </div>
   <div class="container">
     <p class="insurer-note">Logos de referencia — se confirman las aseguradoras aliadas definitivas.</p>
+  </div>
+</section>
+
+<section id="nosotros" class="nosotros">
+  <div class="container nosotros-grid">
+    <div class="nosotros-text">
+      <span class="eyebrow">Nosotros</span>
+      <h2>Quiénes somos</h2>
+      <p>Mi recorrido en el mundo de los seguros comenzó en 2022, cuando ingresé a Boston Seguros como emisor de caución. Tras un año en ese rol, pasé al sector de suscripción, donde aprendí a recibir y analizar un negocio, y a comprender la mirada de la compañía.</p>
+      <p>En mayo de 2024 me sumé al equipo de suscripción de caución de Swiss Medical Seguros. Allí profundicé mi formación, incorporé nuevos conceptos y descubrí la importancia de construir relaciones comerciales sólidas y vínculos de confianza entre suscriptor y PAS, algo fundamental en este ramo.</p>
+      <p>Después de varios años del lado de las compañías, y con la tecnicatura en seguros en etapa de finalización, di el paso hacia el otro lado del mostrador. Hoy asesoro de forma independiente a quienes necesitan un seguro: los acompaño, les brindo el mejor servicio y la máxima transparencia, y les muestro las mejores opciones del mercado para que puedan delegar esa responsabilidad y vivir con mayor tranquilidad.</p>
+    </div>
+
+    <div class="cv-card">
+      <div class="avatar">GB</div>
+      <div class="cv-name">TEC. GUIDO BONIFATI</div>
+      <div class="cv-role">Asesor de Seguros</div>
+      <div class="bio-social">
+        <a href="mailto:guidobonifatiseguros@gmail.com" aria-label="Email">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 6 12 13 2 6"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg>
+        </a>
+        <a href="https://wa.me/5491121600427" target="_blank" rel="noopener" aria-label="WhatsApp">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.47 14.38c-.29-.15-1.72-.85-1.99-.95-.27-.1-.46-.15-.66.15-.2.29-.76.95-.93 1.15-.17.2-.34.22-.63.07-.29-.15-1.22-.45-2.33-1.44-.86-.77-1.44-1.71-1.61-2-.17-.29-.02-.45.13-.6.13-.13.29-.34.44-.51.15-.17.2-.29.29-.49.1-.2.05-.37-.02-.51-.07-.15-.66-1.59-.9-2.18-.24-.57-.48-.5-.66-.51h-.56c-.2 0-.51.07-.78.37-.27.29-1.02.99-1.02 2.43s1.04 2.82 1.19 3.02c.15.2 2.06 3.15 5 4.42.7.3 1.24.48 1.67.61.7.22 1.34.19 1.84.12.56-.08 1.72-.7 1.97-1.38.24-.68.24-1.26.17-1.38-.07-.12-.27-.2-.56-.35z"/><path d="M12.02 2C6.5 2 2.02 6.48 2.02 12c0 1.87.5 3.62 1.38 5.13L2 22l4.99-1.31A9.96 9.96 0 0 0 12.02 22C17.53 22 22 17.52 22 12S17.53 2 12.02 2zm0 18.11c-1.7 0-3.29-.47-4.65-1.28l-.33-.2-3.09.81.82-3.02-.22-.31A8.09 8.09 0 0 1 3.91 12c0-4.47 3.64-8.1 8.11-8.1 4.47 0 8.1 3.63 8.1 8.1s-3.63 8.11-8.1 8.11z"/></svg>
+        </a>
+        <a href="https://www.linkedin.com/in/guidobonifati" target="_blank" rel="noopener" aria-label="LinkedIn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+        </a>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -543,22 +601,21 @@
       <div class="prod-card">
         <div class="prod-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="1"/><path d="M8 8h8M8 12h8M8 16h4"/></svg></div>
         <h3>Seguro de Caución</h3>
-        <p>Garantías para alquileres, obras y trámites.</p>
+        <p>Garantías para alquileres y obras.</p>
         <a href="#contacto" class="prod-quote" data-product="Seguro de Caución">Cotizar →</a>
       </div>
     </div>
 
     <div class="sim-panel" style="margin-top:56px;">
-      <span class="sim-badge">Próximamente</span>
       <h2 style="font-size:clamp(24px,3vw,32px);">Simulador de Riesgo por Zona</h2>
-      <p style="color:var(--text);margin-top:12px;">Ingresá tu dirección y te muestro, a modo orientativo, los riesgos más frecuentes de tu zona — robo, granizo, inundación — para ayudarte a elegir la cobertura correcta antes de que la necesites.</p>
+      <p style="color:var(--text);margin-top:12px;">Ingresá tu dirección y te muestro los riesgos más frecuentes de tu zona — robo, granizo, inundación — para ayudarte a elegir la cobertura correcta antes de que la necesites.</p>
       <form class="sim-form" id="simForm">
         <input type="text" id="simAddress" placeholder="Tu dirección o barrio" required>
-        <button type="submit" class="btn btn-wine">Simular</button>
+        <button type="submit" class="btn btn-wine">Consultar</button>
       </form>
       <div class="sim-result" id="simResult">
-        <p>📍 <b>Ejemplo ilustrativo</b> para tu zona: el <b>30%</b> de los reclamos son por robo de auto y el <b>18%</b> por daños de granizo. Te recomendamos evaluar cobertura contra robo total/parcial y daños climáticos.</p>
-        <span class="sim-fine">* Resultado de ejemplo — la versión final usará estadísticas reales por zona.</span>
+        <p>📍 Para tu zona, los reclamos más frecuentes suelen ser por <b>robo de auto (30%)</b> y <b>daños de granizo (18%)</b>. Te recomiendo evaluar cobertura contra robo total/parcial y daños climáticos.</p>
+        <span class="sim-fine">* Estimación general de la zona — para un análisis exacto, escribime por WhatsApp.</span>
       </div>
     </div>
   </div>
@@ -624,35 +681,6 @@
   </div>
 </section>
 
-<section id="revision" class="revision">
-  <div class="container">
-    <span class="eyebrow">Sin costo, sin compromiso</span>
-    <h2>Revisión de coberturas 100% gratis</h2>
-    <p>Reviso las pólizas que ya tenés — sean conmigo o con otro asesor — y te digo, sin vueltas, si están bien cubiertas, si te falta algo importante o si estás pagando de más.</p>
-
-    <form class="contact-form revision-form" id="revisionForm">
-      <input type="hidden" name="access_key" value="TU_ACCESS_KEY_DE_WEB3FORMS">
-      <input type="hidden" name="subject" value="Nueva solicitud de revisión de coberturas">
-      <div class="form-row">
-        <div class="field">
-          <label for="revNombre">Nombre</label>
-          <input type="text" id="revNombre" name="Nombre" placeholder="Tu nombre" required>
-        </div>
-        <div class="field">
-          <label for="revEmail">Correo</label>
-          <input type="email" id="revEmail" name="Email" placeholder="tu@correo.com" required>
-        </div>
-      </div>
-      <div class="field">
-        <label for="revFile">Tus pólizas (PDF)</label>
-        <input type="file" id="revFile" name="Póliza" accept="application/pdf" multiple required>
-      </div>
-      <button type="submit" class="btn btn-white">Enviar mis pólizas</button>
-      <p class="revision-note" id="revisionNote">Tus archivos me llegan directo por correo — no se almacenan en esta página.</p>
-    </form>
-  </div>
-</section>
-
 <section id="referidos" class="referidos">
   <div class="container">
     <div class="section-head center">
@@ -684,114 +712,39 @@
   </div>
 </section>
 
-<section id="nosotros" class="nosotros">
-  <div class="container">
-    <div class="section-head center">
-      <span class="eyebrow">Nosotros</span>
-      <h2>Quiénes somos</h2>
-    </div>
-
-    <div class="bio">
-      <div class="avatar">GB</div>
-      <div>
-        <div class="bio-name">Guido Bonifati</div>
-        <div class="bio-role">Asesor de Seguros</div>
-        <p class="bio-text">Un seguro no debería ser simplemente una póliza. Mi trabajo es ayudarte a entender qué estás contratando, qué cobertura necesitás y qué opción se adapta mejor a vos. Desde la elección de la compañía y la cobertura hasta la gestión y el seguimiento de tu póliza, te acompaño durante todo el proceso.</p>
-        <div class="bio-social">
-          <a href="mailto:guido@completar.com.ar" aria-label="Email">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 6 12 13 2 6"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg>
-          </a>
-          <a href="https://wa.me/5491100000000" target="_blank" rel="noopener" aria-label="WhatsApp">
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.47 14.38c-.29-.15-1.72-.85-1.99-.95-.27-.1-.46-.15-.66.15-.2.29-.76.95-.93 1.15-.17.2-.34.22-.63.07-.29-.15-1.22-.45-2.33-1.44-.86-.77-1.44-1.71-1.61-2-.17-.29-.02-.45.13-.6.13-.13.29-.34.44-.51.15-.17.2-.29.29-.49.1-.2.05-.37-.02-.51-.07-.15-.66-1.59-.9-2.18-.24-.57-.48-.5-.66-.51h-.56c-.2 0-.51.07-.78.37-.27.29-1.02.99-1.02 2.43s1.04 2.82 1.19 3.02c.15.2 2.06 3.15 5 4.42.7.3 1.24.48 1.67.61.7.22 1.34.19 1.84.12.56-.08 1.72-.7 1.97-1.38.24-.68.24-1.26.17-1.38-.07-.12-.27-.2-.56-.35z"/><path d="M12.02 2C6.5 2 2.02 6.48 2.02 12c0 1.87.5 3.62 1.38 5.13L2 22l4.99-1.31A9.96 9.96 0 0 0 12.02 22C17.53 22 22 17.52 22 12S17.53 2 12.02 2zm0 18.11c-1.7 0-3.29-.47-4.65-1.28l-.33-.2-3.09.81.82-3.02-.22-.31A8.09 8.09 0 0 1 3.91 12c0-4.47 3.64-8.1 8.11-8.1 4.47 0 8.1 3.63 8.1 8.1s-3.63 8.11-8.1 8.11z"/></svg>
-          </a>
-          <a href="https://linkedin.com/in/completar" target="_blank" rel="noopener" aria-label="LinkedIn">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
-          </a>
-          <a href="https://instagram.com/completar" target="_blank" rel="noopener" aria-label="Instagram">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1"/></svg>
-          </a>
-        </div>
-      </div>
-    </div>
-
-    <div class="pillars">
-      <div class="pillar">
-        <h3>Historia</h3>
-        <p>Mi historia en seguros comenzó en 2022, cuando ingresé a Boston Seguros como emisor de caución. Al cabo de un año pasé al sector de suscripción, que me enseñó desde cómo se recibe un negocio y cómo se analiza, hasta entender el punto de vista de la compañía. Luego, en mayo de 2024, me aventuré hacia un nuevo destino: Swiss Medical Seguros se contactó conmigo para que formara parte de su equipo de suscripción de caución. Allí seguí formándome, adquiriendo conceptos y conocimientos, y descubrí lo vital que es construir relaciones comerciales y vínculos que generen una relación suscriptor–PAS, algo fundamental en caución. Así, después de 5 años en seguros del lado de las compañías y con la tecnicatura en seguros en curso de finalización, me volqué de forma independiente del otro lado del mostrador: para asesorar a quienes necesitan un seguro, guiarlos, darles el mejor servicio y transparencia, y mostrarles cuáles son las mejores compañías para que puedan delegar en mí esa responsabilidad y disfrutar la vida sin ese miedo.</p>
-      </div>
-      <div class="pillar">
-        <h3>Misión</h3>
-        <p>Acompañar a cada persona y empresa en la elección del seguro correcto, con asesoramiento claro, honesto y presente en cada etapa: desde la cotización hasta la gestión de un siniestro.</p>
-      </div>
-      <div class="pillar">
-        <h3>Visión</h3>
-        <p>Ser el asesor de referencia para quienes buscan protegerse sin vueltas ni letra chica, construyendo relaciones de confianza a largo plazo.</p>
-      </div>
-    </div>
-  </div>
-
-  <div class="container" style="text-align:center;">
-    <div class="aseg-divider"></div>
-    <div class="aseg-label">Confiamos en estas</div>
-    <div class="aseg-title">Aseguradoras</div>
-  </div>
-  <div class="slider">
-    <div class="slider-track">
-      <img src="assets/aseguradoras/1-Federacion-Patronal.png" alt="Federación Patronal">
-      <img src="assets/aseguradoras/2-swiss-medical.png" alt="Swiss Medical">
-      <img src="assets/aseguradoras/3-zurich.png" alt="Zurich">
-      <img src="assets/aseguradoras/4-PREVENCION.png" alt="Prevención">
-      <img src="assets/aseguradoras/5-GALENO.png" alt="Galeno">
-      <img src="assets/aseguradoras/6-ALLIANZ.png" alt="Allianz">
-      <img src="assets/aseguradoras/7-HDI.png" alt="HDI">
-      <img src="assets/aseguradoras/8-La-Perseverancia-Seguros.png" alt="La Perseverancia Seguros">
-      <img src="assets/aseguradoras/9-SANCOR-SEGUROS.png" alt="Sancor Seguros">
-      <img src="assets/aseguradoras/1-Federacion-Patronal.png" alt="Federación Patronal" aria-hidden="true">
-      <img src="assets/aseguradoras/2-swiss-medical.png" alt="Swiss Medical" aria-hidden="true">
-      <img src="assets/aseguradoras/3-zurich.png" alt="Zurich" aria-hidden="true">
-      <img src="assets/aseguradoras/4-PREVENCION.png" alt="Prevención" aria-hidden="true">
-      <img src="assets/aseguradoras/5-GALENO.png" alt="Galeno" aria-hidden="true">
-      <img src="assets/aseguradoras/6-ALLIANZ.png" alt="Allianz" aria-hidden="true">
-      <img src="assets/aseguradoras/7-HDI.png" alt="HDI" aria-hidden="true">
-      <img src="assets/aseguradoras/8-La-Perseverancia-Seguros.png" alt="La Perseverancia Seguros" aria-hidden="true">
-      <img src="assets/aseguradoras/9-SANCOR-SEGUROS.png" alt="Sancor Seguros" aria-hidden="true">
-    </div>
-  </div>
-</section>
-
 <section id="contacto" class="contacto">
   <div class="container contact-grid">
     <div>
       <span class="eyebrow">Contacto</span>
-      <h2>Pidamos tu cotización</h2>
+      <h2>Pedime tu cotización</h2>
       <p style="margin:16px 0 32px;font-size:16px;">Contame qué necesitás asegurar y te respondo con opciones concretas, sin compromiso.</p>
 
-      <a class="contact-info-item" href="https://wa.me/5491100000000" target="_blank" rel="noopener">
+      <a class="contact-info-item" href="https://wa.me/5491121600427" target="_blank" rel="noopener">
         <div class="contact-info-icon">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.47 14.38c-.29-.15-1.72-.85-1.99-.95-.27-.1-.46-.15-.66.15-.2.29-.76.95-.93 1.15-.17.2-.34.22-.63.07-.29-.15-1.22-.45-2.33-1.44-.86-.77-1.44-1.71-1.61-2-.17-.29-.02-.45.13-.6.13-.13.29-.34.44-.51.15-.17.2-.29.29-.49.1-.2.05-.37-.02-.51-.07-.15-.66-1.59-.9-2.18-.24-.57-.48-.5-.66-.51h-.56c-.2 0-.51.07-.78.37-.27.29-1.02.99-1.02 2.43s1.04 2.82 1.19 3.02c.15.2 2.06 3.15 5 4.42.7.3 1.24.48 1.67.61.7.22 1.34.19 1.84.12.56-.08 1.72-.7 1.97-1.38.24-.68.24-1.26.17-1.38-.07-.12-.27-.2-.56-.35z"/><path d="M12.02 2C6.5 2 2.02 6.48 2.02 12c0 1.87.5 3.62 1.38 5.13L2 22l4.99-1.31A9.96 9.96 0 0 0 12.02 22C17.53 22 22 17.52 22 12S17.53 2 12.02 2zm0 18.11c-1.7 0-3.29-.47-4.65-1.28l-.33-.2-3.09.81.82-3.02-.22-.31A8.09 8.09 0 0 1 3.91 12c0-4.47 3.64-8.1 8.11-8.1 4.47 0 8.1 3.63 8.1 8.1s-3.63 8.11-8.1 8.11z"/></svg>
         </div>
-        <div><b>[completar] Teléfono / WhatsApp</b><span>Lun a vie, 9 a 18 hs</span></div>
+        <div><b>11 2160-0427 · WhatsApp</b><span>Escribime cuando quieras</span></div>
       </a>
-      <a class="contact-info-item" href="mailto:guido@completar.com.ar">
+      <a class="contact-info-item" href="mailto:guidobonifatiseguros@gmail.com">
         <div class="contact-info-icon">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z" opacity="0"/><path d="M22 6 12 13 2 6"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg>
         </div>
-        <div><b>guido@[completar].com.ar</b><span>Respondo en el día</span></div>
+        <div><b>guidobonifatiseguros@gmail.com</b><span>Respondo en el día</span></div>
       </a>
-      <a class="contact-info-item" href="https://linkedin.com/in/completar" target="_blank" rel="noopener">
+      <a class="contact-info-item" href="https://www.linkedin.com/in/guidobonifati" target="_blank" rel="noopener">
         <div class="contact-info-icon">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
         </div>
         <div><b>LinkedIn</b><span>Conectemos profesionalmente</span></div>
       </a>
-      <a class="contact-info-item" href="mailto:guido@completar.com.ar?subject=Quiero%20agendar%20una%20reuni%C3%B3n" target="_blank" rel="noopener">
+      <a class="contact-info-item" href="mailto:guidobonifatiseguros@gmail.com?subject=Quiero%20agendar%20una%20reuni%C3%B3n" target="_blank" rel="noopener">
         <div class="contact-info-icon">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
         </div>
-        <div><b>[completar] Ciudad, Provincia</b><span>Click para agendar una reunión — virtual o presencial</span></div>
+        <div><b>Quilmes, Buenos Aires</b><span>Click para agendar una reunión — virtual o presencial</span></div>
       </a>
       <div class="contact-map">
-        <iframe src="https://www.google.com/maps?q=Buenos+Aires,+Argentina&output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Ubicación"></iframe>
+        <iframe src="https://www.google.com/maps?q=Quilmes,+Buenos+Aires,+Argentina&output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Ubicación"></iframe>
       </div>
     </div>
 
@@ -849,24 +802,24 @@
 <footer>
   <div class="container footer-main">
     <div class="footer-grid">
-      <div class="footer-tagline">Brindándote seguridad<br><b>desde [completar año]</b></div>
+      <div class="footer-tagline">Brindándote<br><b>seguridad y tranquilidad</b></div>
       <div class="footer-col">
         <h4>Contactanos</h4>
         <ul>
-          <li><a href="mailto:guido@completar.com.ar">
+          <li><a href="mailto:guidobonifatiseguros@gmail.com">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z" opacity="0"/><path d="M22 6 12 13 2 6"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg>
-            guido@[completar].com.ar</a></li>
-          <li><a href="https://wa.me/5491100000000" target="_blank" rel="noopener">
+            guidobonifatiseguros@gmail.com</a></li>
+          <li><a href="https://wa.me/5491121600427" target="_blank" rel="noopener">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.47 14.38c-.29-.15-1.72-.85-1.99-.95-.27-.1-.46-.15-.66.15-.2.29-.76.95-.93 1.15-.17.2-.34.22-.63.07-.29-.15-1.22-.45-2.33-1.44-.86-.77-1.44-1.71-1.61-2-.17-.29-.02-.45.13-.6.13-.13.29-.34.44-.51.15-.17.2-.29.29-.49.1-.2.05-.37-.02-.51-.07-.15-.66-1.59-.9-2.18-.24-.57-.48-.5-.66-.51h-.56c-.2 0-.51.07-.78.37-.27.29-1.02.99-1.02 2.43s1.04 2.82 1.19 3.02c.15.2 2.06 3.15 5 4.42.7.3 1.24.48 1.67.61.7.22 1.34.19 1.84.12.56-.08 1.72-.7 1.97-1.38.24-.68.24-1.26.17-1.38-.07-.12-.27-.2-.56-.35z"/></svg>
-            [completar] Teléfono</a></li>
+            11 2160-0427</a></li>
         </ul>
       </div>
       <div class="footer-col">
         <h4>Dónde estamos</h4>
         <ul>
-          <li><a href="mailto:guido@completar.com.ar?subject=Quiero%20agendar%20una%20reuni%C3%B3n">
+          <li><a href="mailto:guidobonifatiseguros@gmail.com?subject=Quiero%20agendar%20una%20reuni%C3%B3n">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-            [completar] Ciudad, Provincia</a></li>
+            Quilmes, Buenos Aires</a></li>
           <li><span>Coordinar entrevista previa</span></li>
         </ul>
       </div>
@@ -879,8 +832,7 @@
       <div class="footer-col">
         <h4>Seguinos</h4>
         <div class="footer-social">
-          <a href="https://instagram.com/completar" target="_blank" rel="noopener" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1"/></svg></a>
-          <a href="https://linkedin.com/in/completar" target="_blank" rel="noopener" aria-label="LinkedIn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg></a>
+          <a href="https://www.linkedin.com/in/guidobonifati" target="_blank" rel="noopener" aria-label="LinkedIn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg></a>
         </div>
       </div>
     </div>
@@ -888,7 +840,7 @@
   <div class="footer-bar">Productor Asesor de Seguros — Matrícula N° [completar] ante la Superintendencia de Seguros de la Nación</div>
 </footer>
 
-<a class="wa-float" id="waFloat" href="https://wa.me/5491100000000?text=Hola%20Guido%2C%20quiero%20consultar%20por%20un%20seguro" target="_blank" rel="noopener" aria-label="Escribir por WhatsApp">
+<a class="wa-float" id="waFloat" href="https://wa.me/5491121600427?text=Hola%20Guido%2C%20quiero%20consultar%20por%20un%20seguro" target="_blank" rel="noopener" aria-label="Escribir por WhatsApp">
   <svg width="30" height="30" viewBox="0 0 24 24" fill="#fff"><path d="M17.47 14.38c-.29-.15-1.72-.85-1.99-.95-.27-.1-.46-.15-.66.15-.2.29-.76.95-.93 1.15-.17.2-.34.22-.63.07-.29-.15-1.22-.45-2.33-1.44-.86-.77-1.44-1.71-1.61-2-.17-.29-.02-.45.13-.6.13-.13.29-.34.44-.51.15-.17.2-.29.29-.49.1-.2.05-.37-.02-.51-.07-.15-.66-1.59-.9-2.18-.24-.57-.48-.5-.66-.51h-.56c-.2 0-.51.07-.78.37-.27.29-1.02.99-1.02 2.43s1.04 2.82 1.19 3.02c.15.2 2.06 3.15 5 4.42.7.3 1.24.48 1.67.61.7.22 1.34.19 1.84.12.56-.08 1.72-.7 1.97-1.38.24-.68.24-1.26.17-1.38-.07-.12-.27-.2-.56-.35z"/><path d="M12.02 2C6.5 2 2.02 6.48 2.02 12c0 1.87.5 3.62 1.38 5.13L2 22l4.99-1.31A9.96 9.96 0 0 0 12.02 22C17.53 22 22 17.52 22 12S17.53 2 12.02 2zm0 18.11c-1.7 0-3.29-.47-4.65-1.28l-.33-.2-3.09.81.82-3.02-.22-.31A8.09 8.09 0 0 1 3.91 12c0-4.47 3.64-8.1 8.11-8.1 4.47 0 8.1 3.63 8.1 8.1s-3.63 8.11-8.1 8.11z"/></svg>
 </a>
 
@@ -926,7 +878,7 @@
     const text = encodeURIComponent(
       `Hola Guido, soy ${nombre}. Quiero cotizar: ${producto}. ${mensaje}\nMi teléfono: ${telefono}${email ? '\nMi email: ' + email : ''}`
     );
-    window.open(`https://wa.me/5491100000000?text=${text}`, '_blank');
+    window.open(`https://wa.me/5491121600427?text=${text}`, '_blank');
   });
 
   // Animated counters — count from 0 to target once the stats section enters the viewport
