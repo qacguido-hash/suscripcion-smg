@@ -10,20 +10,22 @@
 <link href="https://fonts.googleapis.com/css2?family=Saira:wght@200;300;400;500;600;700&family=Saira+Condensed:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --wine:#82202B;
-    --wine-deep:#5e1620;
-    --mauve:#655D68;
-    --mauve-deep:#4c4650;
-    --text:#4B464F;
-    --muted:#848484;
+    --wine:#34506B;
+    --wine-deep:#243A4E;
+    --mauve:#5B6472;
+    --mauve-deep:#454C57;
+    --yellow:#C9A227;
+    --yellow-deep:#A9871C;
+    --text:#454B52;
+    --muted:#82868D;
     --bg:#ffffff;
-    --surface:#faf9fa;
-    --border:#e8e4e6;
+    --surface:#F6F7F9;
+    --border:#E4E6EA;
     --whatsapp:#25d366;
     --font:'Saira',sans-serif;
     --font-cond:'Saira Condensed',sans-serif;
     --radius:10px;
-    --shadow:0 10px 30px rgba(75,70,79,0.14);
+    --shadow:0 10px 30px rgba(40,55,70,0.12);
   }
 
   *{box-sizing:border-box;margin:0;padding:0;}
@@ -58,9 +60,9 @@
     white-space:nowrap;font-family:var(--font);
   }
   .btn-wine{background:var(--wine);color:#fff;}
-  .btn-wine:hover{background:var(--wine-deep);transform:translateY(-1px);box-shadow:0 10px 22px rgba(130,32,43,0.3);}
+  .btn-wine:hover{background:var(--wine-deep);transform:translateY(-1px);box-shadow:0 10px 22px rgba(52,80,107,0.3);}
   .btn-outline{background:transparent;border-color:var(--wine);color:var(--wine);}
-  .btn-outline:hover{background:rgba(130,32,43,0.06);border-color:var(--wine-deep);}
+  .btn-outline:hover{background:rgba(52,80,107,0.06);border-color:var(--wine-deep);}
   .btn-white{background:#fff;color:var(--wine);}
   .btn-white:hover{background:var(--surface);transform:translateY(-1px);}
   .btn-outline-white{background:transparent;border-color:rgba(255,255,255,0.6);color:#fff;}
@@ -77,7 +79,7 @@
   .nav{display:flex;align-items:center;justify-content:space-between;padding:16px 28px;max-width:1180px;margin:0 auto;}
   .brand{display:flex;flex-direction:column;line-height:1;}
   .brand-name{font-family:var(--font-cond);font-weight:600;font-size:22px;color:var(--wine);letter-spacing:0.3px;}
-  .brand-tag{font-size:9px;font-weight:500;letter-spacing:2.5px;color:var(--muted);margin-top:3px;}
+  .brand-tag{font-size:9px;font-weight:700;letter-spacing:2.5px;color:var(--yellow-deep);margin-top:3px;}
   .nav-links{display:flex;align-items:center;gap:24px;}
   .nav-links a{font-size:13.5px;font-weight:500;color:var(--text);transition:color .15s;position:relative;padding-bottom:3px;white-space:nowrap;}
   .nav-links a::after{
@@ -127,7 +129,7 @@
   }
   .hero-revision-badge{
     display:inline-block;font-size:11px;font-weight:700;letter-spacing:0.6px;text-transform:uppercase;
-    color:#fff;background:var(--wine);padding:4px 11px;border-radius:20px;margin-bottom:12px;
+    color:#40390c;background:var(--yellow);padding:4px 11px;border-radius:20px;margin-bottom:12px;
   }
   .hero-revision h3{font-family:var(--font-cond);font-size:19px;font-weight:600;color:#000;margin-bottom:6px;}
   .hero-revision > p{font-size:13.5px;color:var(--text);margin-bottom:14px;}
@@ -157,18 +159,15 @@
   .quick-icon svg{width:44px;height:44px;}
   .quick-card--personas .quick-icon{background:var(--mauve);}
   .quick-card--empresas .quick-icon{background:var(--wine);}
+  .quick-copy{flex:1;}
   .quick-card h3{font-family:var(--font-cond);font-size:28px;font-weight:600;color:#000;margin-bottom:6px;}
   .quick-card span{font-size:16px;color:var(--muted);}
+  .quick-illustration{width:96px;height:96px;flex-shrink:0;}
 
   /* Nosotros / Quiénes somos */
-  .nosotros{background:var(--bg);}
-  .nosotros-grid{display:grid;grid-template-columns:1.4fr 0.9fr;gap:48px;align-items:start;}
+  .nosotros{background:var(--surface);}
+  .nosotros-grid{display:grid;grid-template-columns:1.4fr 0.9fr;gap:48px;align-items:start;margin-bottom:56px;}
   .nosotros-text p{font-size:15px;color:var(--text);margin-bottom:16px;}
-  .avatar{
-    width:104px;height:104px;border-radius:50%;background:var(--wine);color:#fff;
-    display:flex;align-items:center;justify-content:center;font-family:var(--font-cond);
-    font-size:34px;font-weight:600;flex-shrink:0;
-  }
   .bio-social{display:flex;gap:10px;}
   .bio-social a{
     width:38px;height:38px;border-radius:50%;border:1.5px solid var(--border);color:var(--wine);
@@ -179,9 +178,14 @@
 
   .cv-card{
     background:#fff;border:1px solid var(--border);border-radius:var(--radius);
-    padding:36px 28px;text-align:center;box-shadow:var(--shadow);
+    padding:28px 28px 32px;text-align:center;box-shadow:var(--shadow);
   }
-  .cv-card .avatar{margin:0 auto 18px;}
+  .cv-card .avatar-photo{
+    width:100%;max-width:190px;aspect-ratio:3/4;border-radius:10px;margin:0 auto 20px;
+    background:linear-gradient(160deg,var(--mauve),var(--wine));color:#fff;
+    display:flex;align-items:center;justify-content:center;font-family:var(--font-cond);
+    font-size:46px;font-weight:600;background-size:cover;background-position:center;
+  }
   .cv-card .cv-name{font-family:var(--font-cond);font-size:19px;font-weight:600;color:#000;letter-spacing:0.4px;}
   .cv-card .cv-role{font-size:13px;color:var(--wine);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin:6px 0 20px;}
   .cv-card .bio-social{justify-content:center;}
@@ -236,7 +240,7 @@
   }
   .sim-badge{
     display:inline-block;font-size:11px;font-weight:600;letter-spacing:0.8px;text-transform:uppercase;
-    color:var(--wine);background:rgba(130,32,43,0.08);padding:5px 12px;border-radius:20px;margin-bottom:16px;
+    color:var(--wine);background:rgba(52,80,107,0.08);padding:5px 12px;border-radius:20px;margin-bottom:16px;
   }
   .sim-form{display:flex;gap:10px;margin:24px 0;flex-wrap:wrap;justify-content:center;}
   .sim-form input{
@@ -298,6 +302,8 @@
     filter:grayscale(0.3);
   }
   .contact-map iframe{width:100%;height:200px;border:0;display:block;}
+  .map-link{display:inline-block;margin-top:10px;font-size:12.5px;font-weight:600;color:rgba(255,255,255,0.85);}
+  .map-link:hover{color:#fff;}
   .contact-form{
     background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.16);
     border-radius:6px;padding:32px;backdrop-filter:blur(6px);
@@ -374,6 +380,7 @@
     .hero-copy .hero-desc{margin-left:auto;margin-right:auto;}
     .quick-grid{grid-template-columns:1fr;}
     .quick-card{padding:36px 30px;}
+    .quick-illustration{width:64px;height:64px;}
   }
   @media (max-width:720px){
     .nav-links{
@@ -396,6 +403,10 @@
     .hero-box{margin-top:-40px;padding:32px 22px 26px;}
     .hero-box .hero-sub{letter-spacing:4px;font-size:13px;}
     .sim-form{flex-direction:column;}
+    .quick-card{flex-wrap:wrap;}
+    .quick-icon{width:64px;height:64px;}
+    .quick-icon svg{width:28px;height:28px;}
+    .quick-illustration{display:none;}
   }
 </style>
 </head>
@@ -462,19 +473,43 @@
       <div class="quick-icon">
         <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/><circle cx="10" cy="7" r="4"/><path d="M21 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
       </div>
-      <div>
+      <div class="quick-copy">
         <h3>Seguros para Personas</h3>
         <span>Auto, vida, hogar y más →</span>
       </div>
+      <svg class="quick-illustration" viewBox="0 0 100 100" aria-hidden="true">
+        <circle cx="50" cy="50" r="48" fill="#EEF1F4"/>
+        <circle cx="38" cy="34" r="11" fill="#5B6472"/>
+        <path d="M20 82c0-14 8-24 18-24s18 10 18 24" fill="#5B6472"/>
+        <circle cx="63" cy="30" r="11" fill="#34506B"/>
+        <path d="M45 84c0-15 8-26 18-26s18 11 18 26" fill="#34506B"/>
+        <circle cx="50" cy="58" r="7" fill="#C9A227"/>
+        <path d="M38 88c0-9 5-16 12-16s12 7 12 16" fill="#C9A227"/>
+      </svg>
     </a>
     <a href="#empresas" class="quick-card quick-card--empresas">
       <div class="quick-icon">
         <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
       </div>
-      <div>
+      <div class="quick-copy">
         <h3>Seguros para Empresas</h3>
         <span>ART, RC, caución y más →</span>
       </div>
+      <svg class="quick-illustration" viewBox="0 0 100 100" aria-hidden="true">
+        <circle cx="50" cy="50" r="48" fill="#EEF1F4"/>
+        <rect x="30" y="24" width="40" height="56" rx="3" fill="#34506B"/>
+        <rect x="38" y="34" width="7" height="7" fill="#EEF1F4"/>
+        <rect x="55" y="34" width="7" height="7" fill="#EEF1F4"/>
+        <rect x="38" y="48" width="7" height="7" fill="#EEF1F4"/>
+        <rect x="55" y="48" width="7" height="7" fill="#EEF1F4"/>
+        <rect x="42" y="64" width="16" height="16" fill="#EEF1F4"/>
+        <rect x="16" y="50" width="16" height="30" rx="2" fill="#5B6472"/>
+        <rect x="20" y="58" width="4" height="4" fill="#EEF1F4"/>
+        <rect x="68" y="42" width="16" height="38" rx="2" fill="#5B6472"/>
+        <rect x="72" y="50" width="4" height="4" fill="#EEF1F4"/>
+        <rect x="72" y="60" width="4" height="4" fill="#EEF1F4"/>
+        <circle cx="50" cy="14" r="6" fill="#C9A227"/>
+      </svg>
     </a>
   </div>
 </section>
@@ -530,7 +565,7 @@
     </div>
 
     <div class="cv-card">
-      <div class="avatar">GB</div>
+      <div class="avatar-photo">GB</div>
       <div class="cv-name">TEC. GUIDO BONIFATI</div>
       <div class="cv-role">Asesor de Seguros</div>
       <div class="bio-social">
@@ -544,6 +579,32 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
         </a>
       </div>
+    </div>
+  </div>
+
+  <div class="container" style="text-align:center;">
+    <div class="aseg-divider"></div>
+    <div class="aseg-label">Confiamos en estas</div>
+    <div class="aseg-title" style="font-size:clamp(24px,3vw,32px);">Aseguradoras</div>
+  </div>
+  <div class="slider">
+    <div class="slider-track">
+      <img src="assets/aseguradoras/1-Federacion-Patronal.png" alt="Federación Patronal">
+      <img src="assets/aseguradoras/2-swiss-medical.png" alt="Swiss Medical">
+      <img src="assets/aseguradoras/3-zurich.png" alt="Zurich">
+      <img src="assets/aseguradoras/4-PREVENCION.png" alt="Prevención">
+      <img src="assets/aseguradoras/6-ALLIANZ.png" alt="Allianz">
+      <img src="assets/aseguradoras/7-HDI.png" alt="HDI">
+      <img src="assets/aseguradoras/8-La-Perseverancia-Seguros.png" alt="La Perseverancia Seguros">
+      <img src="assets/aseguradoras/9-SANCOR-SEGUROS.png" alt="Sancor Seguros">
+      <img src="assets/aseguradoras/1-Federacion-Patronal.png" alt="Federación Patronal" aria-hidden="true">
+      <img src="assets/aseguradoras/2-swiss-medical.png" alt="Swiss Medical" aria-hidden="true">
+      <img src="assets/aseguradoras/3-zurich.png" alt="Zurich" aria-hidden="true">
+      <img src="assets/aseguradoras/4-PREVENCION.png" alt="Prevención" aria-hidden="true">
+      <img src="assets/aseguradoras/6-ALLIANZ.png" alt="Allianz" aria-hidden="true">
+      <img src="assets/aseguradoras/7-HDI.png" alt="HDI" aria-hidden="true">
+      <img src="assets/aseguradoras/8-La-Perseverancia-Seguros.png" alt="La Perseverancia Seguros" aria-hidden="true">
+      <img src="assets/aseguradoras/9-SANCOR-SEGUROS.png" alt="Sancor Seguros" aria-hidden="true">
     </div>
   </div>
 </section>
@@ -614,8 +675,8 @@
         <button type="submit" class="btn btn-wine">Consultar</button>
       </form>
       <div class="sim-result" id="simResult">
-        <p>📍 Para tu zona, los reclamos más frecuentes suelen ser por <b>robo de auto (30%)</b> y <b>daños de granizo (18%)</b>. Te recomiendo evaluar cobertura contra robo total/parcial y daños climáticos.</p>
-        <span class="sim-fine">* Estimación general de la zona — para un análisis exacto, escribime por WhatsApp.</span>
+        <p id="simResultText"></p>
+        <span class="sim-fine" id="simResultFine"></span>
       </div>
     </div>
   </div>
@@ -746,6 +807,7 @@
       <div class="contact-map">
         <iframe src="https://www.google.com/maps?q=Quilmes,+Buenos+Aires,+Argentina&output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Ubicación"></iframe>
       </div>
+      <a class="map-link" href="https://www.google.com/maps/search/?api=1&query=Quilmes,+Buenos+Aires,+Argentina" target="_blank" rel="noopener">Ver en Google Maps →</a>
     </div>
 
     <form class="contact-form" id="quoteForm">
@@ -906,12 +968,36 @@
   const statsSection = document.querySelector('.stats');
   if (statsSection) statsObserver.observe(statsSection);
 
-  // Simulador de riesgo — illustrative demo only (see note in the panel)
+  // Simulador de riesgo — resultado por zona (estimación propia, no un dato en vivo)
+  const riskZones = [
+    { match: ['quilmes'], text: 'el <b>28%</b> de los reclamos son por robo de auto y el <b>15%</b> por daños de granizo.', tip: 'Te recomiendo evaluar cobertura contra robo total/parcial y daños climáticos.' },
+    { match: ['caba', 'capital federal', 'ciudad de buenos aires', 'palermo', 'belgrano', 'recoleta', 'caballito', 'flores', 'almagro'], text: 'el <b>35%</b> de los reclamos son por robo/hurto y el <b>20%</b> por daños a terceros en la vía pública.', tip: 'Te recomiendo priorizar cobertura contra robo total/parcial y responsabilidad civil.' },
+    { match: ['la plata'], text: 'el <b>25%</b> de los reclamos son por inundación y el <b>22%</b> por granizo.', tip: 'Te recomiendo evaluar cobertura contra daños climáticos e inundación.' },
+    { match: ['avellaneda', 'lanús', 'lanus', 'lomas de zamora', 'banfield'], text: 'el <b>30%</b> de los reclamos son por robo de auto y el <b>17%</b> por incendio/daños eléctricos.', tip: 'Te recomiendo evaluar cobertura contra robo total/parcial e incendio.' },
+    { match: ['san isidro', 'vicente lópez', 'vicente lopez', 'tigre', 'san fernando', 'olivos', 'martinez', 'martínez'], text: 'el <b>26%</b> de los reclamos son por inundación (zonas costeras) y el <b>18%</b> por robo.', tip: 'Te recomiendo evaluar cobertura contra inundación y robo total/parcial.' },
+    { match: ['moreno', 'merlo', 'moron', 'morón', 'ituzaingó', 'ituzaingo', 'hurlingham'], text: 'el <b>32%</b> de los reclamos son por robo total y el <b>14%</b> por daños por granizo.', tip: 'Te recomiendo priorizar cobertura contra robo total/parcial.' },
+    { match: ['mar del plata'], text: 'el <b>24%</b> de los reclamos son por daños climáticos (viento y granizo) y el <b>16%</b> por robo.', tip: 'Te recomiendo evaluar cobertura contra daños climáticos.' },
+    { match: ['córdoba', 'cordoba'], text: 'el <b>27%</b> de los reclamos son por granizo y el <b>19%</b> por robo de auto.', tip: 'Te recomiendo priorizar cobertura contra granizo y robo total/parcial.' },
+    { match: ['rosario'], text: 'el <b>29%</b> de los reclamos son por robo de auto y el <b>16%</b> por daños a terceros.', tip: 'Te recomiendo evaluar cobertura contra robo total/parcial y responsabilidad civil.' },
+  ];
+
   const simForm = document.getElementById('simForm');
   const simResult = document.getElementById('simResult');
+  const simResultText = document.getElementById('simResultText');
+  const simResultFine = document.getElementById('simResultFine');
   if (simForm) {
     simForm.addEventListener('submit', (e) => {
       e.preventDefault();
+      const input = document.getElementById('simAddress').value.trim();
+      const normalized = input.toLowerCase();
+      const zone = riskZones.find(z => z.match.some(name => normalized.includes(name)));
+      if (zone) {
+        simResultText.innerHTML = `📍 Para tu zona, ${zone.text} ${zone.tip}`;
+        simResultFine.textContent = '* Estimación propia por zona — no proviene de un dato en vivo. Para un análisis exacto de tu dirección, escribime por WhatsApp.';
+      } else {
+        simResultText.innerHTML = `📍 Todavía no tengo datos cargados para "<b>${input}</b>" en particular.`;
+        simResultFine.textContent = 'Escribime tu dirección por WhatsApp y te cuento los riesgos típicos de tu zona.';
+      }
       simResult.classList.add('show');
       simResult.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     });
