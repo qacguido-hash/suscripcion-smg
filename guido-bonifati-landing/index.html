@@ -58,7 +58,7 @@
     display:inline-flex;align-items:center;justify-content:center;gap:8px;
     padding:13px 28px;border-radius:3px;font-weight:600;font-size:14px;letter-spacing:0.3px;
     border:1.5px solid transparent;cursor:pointer;transition:transform .15s ease,box-shadow .15s ease,background .15s ease,color .15s ease;
-    white-space:nowrap;font-family:var(--font);
+    white-space:nowrap;font-family:var(--font);text-transform:uppercase;
   }
   .btn-wine{background:var(--wine);color:#fff;}
   .btn-wine:hover{background:var(--wine-deep);transform:translateY(-1px);box-shadow:0 10px 22px rgba(52,80,107,0.3);}
@@ -93,7 +93,6 @@
   .nav-links a:hover::after,.nav-links a.active::after{transform:scaleX(1);}
   .nav-links a.active{color:var(--wine);}
   .nav-actions{display:flex;align-items:center;gap:16px;}
-  .nav-actions .btn-wine{text-transform:uppercase;}
   .nav-toggle{display:none;background:none;border:none;cursor:pointer;padding:6px;}
   .nav-toggle span{display:block;width:22px;height:2px;background:var(--wine);margin:5px 0;border-radius:2px;}
 
@@ -144,6 +143,20 @@
     transition:border-color .15s;
   }
   .hero-revision input:focus{border-color:var(--wine);}
+  .file-field{
+    display:flex;align-items:center;gap:10px;padding:4px;border-radius:4px;
+    border:1px solid var(--border);background:#fff;
+  }
+  .file-field-btn{
+    flex-shrink:0;padding:7px 12px;border-radius:3px;background:var(--surface);
+    border:1px solid var(--border);font-size:12px;font-weight:600;color:var(--text);cursor:pointer;
+  }
+  .file-field-btn:hover{background:var(--border);}
+  .file-field-name{font-size:12px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .file-field input[type="file"]{
+    position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;
+    clip:rect(0,0,0,0);white-space:nowrap;border:0;
+  }
   .hero-revision .btn{margin-top:2px;}
   .hero-revision .revision-note{font-size:11.5px;margin-top:9px;color:var(--muted);text-align:left;}
   .hero-revision .revision-note.success{color:#1a7a3c;}
@@ -458,7 +471,11 @@
           <input type="hidden" name="subject" value="Nueva solicitud de revisión de coberturas">
           <input type="text" id="revNombre" name="Nombre" placeholder="Tu nombre" required>
           <input type="email" id="revEmail" name="Email" placeholder="Tu correo" required>
-          <input type="file" id="revFile" name="Póliza" accept="application/pdf" multiple required>
+          <div class="file-field">
+            <label for="revFile" class="file-field-btn">Elegir archivos</label>
+            <span class="file-field-name" id="revFileName">Ningún archivo seleccionado</span>
+            <input type="file" id="revFile" name="Póliza" accept="application/pdf" multiple required>
+          </div>
           <button type="submit" class="btn btn-wine btn-sm">Enviar pólizas</button>
         </form>
         <p class="revision-note" id="revisionNote"></p>
@@ -1046,6 +1063,19 @@
   // Revisión de coberturas — envía las pólizas en PDF por correo vía Web3Forms
   const revisionForm = document.getElementById('revisionForm');
   const revisionNote = document.getElementById('revisionNote');
+  const revFile = document.getElementById('revFile');
+  const revFileName = document.getElementById('revFileName');
+  if (revFile) {
+    revFile.addEventListener('change', () => {
+      if (revFile.files.length === 0) {
+        revFileName.textContent = 'Ningún archivo seleccionado';
+      } else if (revFile.files.length === 1) {
+        revFileName.textContent = revFile.files[0].name;
+      } else {
+        revFileName.textContent = revFile.files.length + ' archivos seleccionados';
+      }
+    });
+  }
   if (revisionForm) {
     revisionForm.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -1062,6 +1092,7 @@
         const data = await res.json();
         if (data.success) {
           revisionForm.reset();
+          revFileName.textContent = 'Ningún archivo seleccionado';
           revisionNote.textContent = '¡Listo! Recibí tus pólizas y te contacto a la brevedad.';
           revisionNote.className = 'revision-note success';
         } else {
