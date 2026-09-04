@@ -1,0 +1,1193 @@
+<title>CRM Guido Bonifati</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Saira:wght@200;300;400;500;600;700&family=Saira+Condensed:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --blue:#34506B; --blue-deep:#243A4E;
+    --gray:#5B6472; --gray-deep:#454C57;
+    --yellow:#C9A227; --yellow-deep:#A9871C;
+    --text:#454B52; --muted:#82868D;
+    --bg:#ffffff; --surface:#F6F7F9; --surface2:#EEF0F2; --border:#E4E6EA;
+    --ok:#1a7a3c; --ok-bg:#E9F6EE;
+    --warn:#B4790E; --warn-bg:#FDF3E1;
+    --danger:#b0303a; --danger-bg:#FBEAEC;
+    --font:'Saira',sans-serif; --font-cond:'Saira Condensed',sans-serif;
+    --radius:10px; --shadow:0 10px 30px rgba(40,55,70,0.12);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-behavior:smooth;}
+  body{font-family:var(--font);color:var(--text);background:var(--surface);line-height:1.5;-webkit-font-smoothing:antialiased;}
+  img{max-width:100%;display:block;}
+  a{color:inherit;}
+  button{font-family:var(--font);cursor:pointer;}
+  ul{list-style:none;}
+  input,select,textarea{font-family:var(--font);}
+  [hidden]{display:none!important;}
+
+  /* Layout */
+  #app{min-height:100vh;display:flex;flex-direction:column;}
+  header.top{
+    position:sticky;top:0;z-index:40;background:#fff;border-bottom:1px solid var(--border);
+  }
+  .top-inner{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;max-width:1400px;margin:0 auto;gap:16px;}
+  .brand{display:flex;align-items:center;gap:10px;flex-shrink:0;}
+  .brand-mark{width:34px;height:34px;border-radius:50%;background:linear-gradient(160deg,var(--gray),var(--blue));color:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--font-cond);font-weight:600;font-size:14px;}
+  .brand-text{display:flex;flex-direction:column;line-height:1.1;}
+  .brand-name{font-family:var(--font-cond);font-weight:600;font-size:17px;color:var(--blue);}
+  .brand-tag{font-size:9px;font-weight:700;letter-spacing:1.5px;color:var(--yellow-deep);}
+  nav.tabs{display:flex;gap:4px;overflow-x:auto;flex:1;scrollbar-width:none;}
+  nav.tabs::-webkit-scrollbar{display:none;}
+  nav.tabs button{
+    background:none;border:none;padding:9px 13px;border-radius:6px;font-size:13px;font-weight:600;
+    color:var(--muted);white-space:nowrap;transition:background .15s,color .15s;
+  }
+  nav.tabs button:hover{background:var(--surface);color:var(--text);}
+  nav.tabs button.active{background:var(--blue);color:#fff;}
+  .sync-dot{width:8px;height:8px;border-radius:50%;background:var(--muted);flex-shrink:0;}
+  .sync-dot.ok{background:var(--ok);}
+  .sync-dot.off{background:var(--danger);}
+  .sync-wrap{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted);flex-shrink:0;}
+
+  main{flex:1;max-width:1400px;margin:0 auto;padding:24px 20px 80px;width:100%;}
+  .page{display:none;}
+  .page.active{display:block;}
+  .page-head{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:20px;flex-wrap:wrap;}
+  .page-head h1{font-family:var(--font-cond);font-size:26px;font-weight:600;color:var(--blue);}
+  .page-head p{font-size:13px;color:var(--muted);margin-top:2px;}
+
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:6px;
+    padding:9px 16px;border-radius:5px;font-weight:600;font-size:13px;border:1.5px solid transparent;
+    cursor:pointer;transition:transform .1s,background .15s;white-space:nowrap;
+  }
+  .btn-primary{background:var(--blue);color:#fff;}
+  .btn-primary:hover{background:var(--blue-deep);}
+  .btn-outline{background:#fff;border-color:var(--border);color:var(--text);}
+  .btn-outline:hover{border-color:var(--blue);color:var(--blue);}
+  .btn-danger-outline{background:#fff;border-color:var(--danger);color:var(--danger);}
+  .btn-danger-outline:hover{background:var(--danger-bg);}
+  .btn-sm{padding:6px 11px;font-size:12px;}
+  .btn:disabled{opacity:.5;cursor:not-allowed;}
+
+  /* Dashboard */
+  .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:22px;}
+  .stat-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;}
+  .stat-card b{display:block;font-family:var(--font-cond);font-size:28px;font-weight:600;color:var(--blue);}
+  .stat-card span{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;}
+  .dash-grid{display:grid;grid-template-columns:1.3fr 1fr;gap:18px;}
+  @media (max-width:900px){.dash-grid{grid-template-columns:1fr;}}
+  .panel{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;margin-bottom:18px;}
+  .panel h2{font-family:var(--font-cond);font-size:16px;font-weight:600;color:var(--text);margin-bottom:12px;}
+  .bar-row{display:flex;align-items:center;gap:10px;margin-bottom:9px;font-size:12.5px;}
+  .bar-row .label{width:130px;flex-shrink:0;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .bar-track{flex:1;height:8px;border-radius:4px;background:var(--surface2);overflow:hidden;}
+  .bar-fill{height:100%;background:var(--blue);border-radius:4px;}
+  .bar-row .val{width:56px;text-align:right;flex-shrink:0;color:var(--muted);font-variant-numeric:tabular-nums;}
+  .empty{color:var(--muted);font-size:13px;padding:18px 0;text-align:center;}
+
+  /* Tables / lists */
+  .toolbar{display:flex;gap:10px;align-items:center;margin-bottom:14px;flex-wrap:wrap;}
+  .toolbar input[type="search"],.toolbar select{
+    padding:8px 12px;border-radius:5px;border:1px solid var(--border);font-size:13px;background:#fff;color:var(--text);
+  }
+  .table-wrap{background:#fff;border:1px solid var(--border);border-radius:var(--radius);overflow:auto;}
+  table{width:100%;border-collapse:collapse;font-size:13px;min-width:640px;}
+  thead th{
+    text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.3px;color:var(--muted);
+    padding:11px 14px;border-bottom:1px solid var(--border);background:var(--surface);white-space:nowrap;
+  }
+  tbody td{padding:11px 14px;border-bottom:1px solid var(--border);vertical-align:middle;}
+  tbody tr:last-child td{border-bottom:none;}
+  tbody tr:hover{background:var(--surface);}
+  .row-actions{display:flex;gap:6px;}
+  .icon-btn{
+    width:28px;height:28px;border-radius:5px;border:1px solid var(--border);background:#fff;
+    display:flex;align-items:center;justify-content:center;color:var(--muted);flex-shrink:0;
+  }
+  .icon-btn:hover{border-color:var(--blue);color:var(--blue);}
+  .icon-btn svg{width:14px;height:14px;}
+
+  .badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap;}
+  .badge-ok{background:var(--ok-bg);color:var(--ok);}
+  .badge-warn{background:var(--warn-bg);color:var(--warn);}
+  .badge-danger{background:var(--danger-bg);color:var(--danger);}
+  .badge-muted{background:var(--surface2);color:var(--muted);}
+
+  /* Cards (mobile list fallback / kanban-ish) */
+  .card-list{display:grid;gap:10px;}
+  .item-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;}
+  .item-card .top-row{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:6px;}
+  .item-card h3{font-family:var(--font-cond);font-size:15px;font-weight:600;color:var(--text);}
+  .item-card p{font-size:12.5px;color:var(--muted);}
+  .item-card .meta{display:flex;gap:14px;flex-wrap:wrap;margin-top:8px;font-size:12px;color:var(--text);}
+  .item-card .meta b{color:var(--blue);}
+
+  /* Modal */
+  .modal-backdrop{
+    position:fixed;inset:0;background:rgba(30,40,50,0.45);z-index:100;
+    display:flex;align-items:flex-start;justify-content:center;padding:5vh 16px;overflow:auto;
+  }
+  .modal{
+    background:#fff;border-radius:var(--radius);max-width:560px;width:100%;box-shadow:var(--shadow);
+    padding:26px 26px 22px;
+  }
+  .modal h2{font-family:var(--font-cond);font-size:19px;font-weight:600;color:var(--blue);margin-bottom:16px;}
+  .field{margin-bottom:13px;}
+  .field label{display:block;font-size:12px;font-weight:600;color:var(--text);margin-bottom:5px;}
+  .field input,.field select,.field textarea{
+    width:100%;padding:9px 11px;border-radius:5px;border:1px solid var(--border);font-size:13.5px;
+    outline:none;color:var(--text);background:#fff;
+  }
+  .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--blue);}
+  .field textarea{resize:vertical;min-height:64px;}
+  .field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  @media (max-width:520px){.field-row{grid-template-columns:1fr;}}
+  .modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:18px;}
+
+  /* Detail drawer */
+  #drawerBackdrop{position:fixed;inset:0;background:rgba(30,40,50,0.4);z-index:90;display:flex;justify-content:flex-end;}
+  #drawer{width:min(440px,100%);background:#fff;height:100%;overflow-y:auto;padding:24px;box-shadow:-8px 0 30px rgba(0,0,0,.12);}
+  #drawer h2{font-family:var(--font-cond);font-size:20px;color:var(--blue);margin-bottom:4px;}
+  #drawer .sub{font-size:12.5px;color:var(--muted);margin-bottom:18px;}
+  #drawer .kv{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;}
+  #drawer .kv span:first-child{color:var(--muted);}
+  #drawer .close-drawer{position:absolute;top:16px;right:16px;}
+
+  /* Toast */
+  #toast{
+    position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--blue-deep);color:#fff;
+    padding:11px 20px;border-radius:6px;font-size:13px;z-index:200;box-shadow:var(--shadow);
+    opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;
+  }
+  #toast.show{opacity:1;transform:translateX(-50%) translateY(-4px);}
+
+  /* Calendar mini */
+  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;}
+  .cal-dow{font-size:10px;text-align:center;color:var(--muted);font-weight:600;text-transform:uppercase;padding-bottom:4px;}
+  .cal-cell{
+    aspect-ratio:1;border-radius:6px;background:var(--surface);font-size:11px;padding:4px;position:relative;
+    display:flex;flex-direction:column;
+  }
+  .cal-cell.today{outline:2px solid var(--blue);}
+  .cal-cell .n{font-weight:600;color:var(--text);}
+  .cal-cell.other-month{opacity:.35;}
+  .cal-dot{width:5px;height:5px;border-radius:50%;background:var(--yellow-deep);position:absolute;bottom:4px;left:4px;}
+
+  section.login-gate{
+    min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:var(--surface);
+  }
+  .login-box{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:36px 32px;max-width:360px;width:100%;text-align:center;box-shadow:var(--shadow);}
+  .login-box .brand-mark{margin:0 auto 14px;width:52px;height:52px;font-size:20px;}
+  .login-box h1{font-family:var(--font-cond);font-size:20px;color:var(--blue);margin-bottom:4px;}
+  .login-box p{font-size:13px;color:var(--muted);margin-bottom:18px;}
+
+  @media (max-width:720px){
+    .top-inner{flex-wrap:wrap;}
+    nav.tabs{order:3;width:100%;border-top:1px solid var(--border);padding-top:8px;}
+    main{padding:18px 14px 90px;}
+    thead{display:none;}
+    table,tbody,tr,td{display:block;width:100%;}
+    tbody tr{border-bottom:1px solid var(--border);padding:10px 4px;}
+    tbody td{border:none;padding:4px 10px;display:flex;justify-content:space-between;gap:10px;}
+    tbody td::before{content:attr(data-label);font-weight:600;color:var(--muted);font-size:11px;text-transform:uppercase;}
+    tbody td.no-label::before{content:none;}
+  }
+</style>
+
+<div id="app"></div>
+<div id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+(function(){
+  "use strict";
+
+  /* ---------- App shell (rendered before db resolves) ---------- */
+  const app = document.getElementById('app');
+  const RAMOS_PERSONAS = ['Seguro de Retiro','Seguro de Vida','Combinado Familiar','RC por Mala Praxis','Seguro de Auto','Seguro de Moto','Accidentes Personales','Seguro de Caución'];
+  const RAMOS_EMPRESAS = ['Seguro de ART','Seguro de Caución (empresa)','Todo Riesgo Operativo','Responsabilidad Civil','Seguro Técnico','Vida Colectivo','Accidentes Personales (empresa)','Integral de Comercio'];
+  const RAMOS_ALL = RAMOS_PERSONAS.concat(RAMOS_EMPRESAS);
+  const COMPANIES = ['Federación Patronal','Swiss Medical','Zurich','Prevención ART','Allianz','Sancor Seguros','Triunfo Seguros','Gestión Seguros','Tutelar','Crédito y Caución','Otra'];
+
+  const TABS = [
+    { key:'dashboard', label:'Panel' },
+    { key:'clientes', label:'Clientes' },
+    { key:'polizas', label:'Pólizas' },
+    { key:'cotizaciones', label:'Cotizaciones' },
+    { key:'tareas', label:'Tareas' },
+    { key:'documentos', label:'Documentos' },
+    { key:'siniestros', label:'Siniestros' },
+    { key:'comisiones', label:'Comisiones' },
+  ];
+
+  app.innerHTML = `
+    <header class="top">
+      <div class="top-inner">
+        <div class="brand">
+          <div class="brand-mark">GB</div>
+          <div class="brand-text">
+            <span class="brand-name">Guido Bonifati</span>
+            <span class="brand-tag">CRM</span>
+          </div>
+        </div>
+        <nav class="tabs" id="tabs"></nav>
+        <div class="sync-wrap"><span class="sync-dot" id="syncDot"></span><span id="syncLabel">Conectando…</span></div>
+      </div>
+    </header>
+    <main id="main"></main>
+  `;
+
+  const tabsEl = document.getElementById('tabs');
+  tabsEl.innerHTML = TABS.map(t => `<button data-tab="${t.key}">${t.label}</button>`).join('');
+  const mainEl = document.getElementById('main');
+  mainEl.innerHTML = TABS.map(t => `<section class="page" data-page="${t.key}"></section>`).join('');
+
+  function toast(msg){
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toast._h);
+    toast._h = setTimeout(() => t.classList.remove('show'), 2600);
+  }
+
+  function fmtMoney(n){
+    n = Number(n) || 0;
+    return '$' + n.toLocaleString('es-AR', { maximumFractionDigits: 0 });
+  }
+  function fmtDate(d){
+    if (!d) return '—';
+    const dt = new Date(d + 'T00:00:00');
+    if (isNaN(dt)) return d;
+    return dt.toLocaleDateString('es-AR', { day:'2-digit', month:'2-digit', year:'numeric' });
+  }
+  function daysUntil(d){
+    if (!d) return null;
+    const today = new Date(); today.setHours(0,0,0,0);
+    const dt = new Date(d + 'T00:00:00');
+    return Math.round((dt - today) / 86400000);
+  }
+  function uid(){ return Math.random().toString(36).slice(2,10) + Date.now().toString(36); }
+  function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+  /* ---------- State ---------- */
+  const state = {
+    clients: [], policies: [], quotes: [], tasks: [], interactions: [], documents: [], claims: [],
+  };
+  let db = null;
+  let currentTab = 'dashboard';
+  let calMonth = new Date(); calMonth.setDate(1);
+
+  function clientName(id){
+    const c = state.clients.find(c => c.id === id);
+    return c ? c.name : '—';
+  }
+
+  /* ---------- Router ---------- */
+  function showTab(key){
+    currentTab = key;
+    document.querySelectorAll('.page').forEach(p => p.classList.toggle('active', p.dataset.page === key));
+    document.querySelectorAll('nav.tabs button').forEach(b => b.classList.toggle('active', b.dataset.tab === key));
+    location.hash = key;
+    renderCurrentTab();
+  }
+  tabsEl.addEventListener('click', e => {
+    const b = e.target.closest('button[data-tab]');
+    if (b) showTab(b.dataset.tab);
+  });
+
+  function renderCurrentTab(){
+    if (currentTab === 'dashboard') renderDashboard();
+    else if (currentTab === 'clientes') renderClientes();
+    else if (currentTab === 'polizas') renderPolizas();
+    else if (currentTab === 'cotizaciones') renderCotizaciones();
+    else if (currentTab === 'tareas') renderTareas();
+    else if (currentTab === 'documentos') renderDocumentos();
+    else if (currentTab === 'siniestros') renderSiniestros();
+    else if (currentTab === 'comisiones') renderComisiones();
+  }
+
+  /* ---------- Modal ---------- */
+  function openModal(title, fieldsHtml, onSubmit, opts){
+    opts = opts || {};
+    const backdrop = document.createElement('div');
+    backdrop.className = 'modal-backdrop';
+    backdrop.innerHTML = `
+      <form class="modal">
+        <h2>${esc(title)}</h2>
+        ${fieldsHtml}
+        <div class="modal-actions">
+          ${opts.onDelete ? '<button type="button" class="btn btn-danger-outline" data-act="del">Eliminar</button>' : ''}
+          <button type="button" class="btn btn-outline" data-act="cancel">Cancelar</button>
+          <button type="submit" class="btn btn-primary">${opts.submitLabel || 'Guardar'}</button>
+        </div>
+      </form>`;
+    document.body.appendChild(backdrop);
+    const form = backdrop.querySelector('form');
+    backdrop.addEventListener('click', e => { if (e.target === backdrop) backdrop.remove(); });
+    form.querySelector('[data-act="cancel"]').addEventListener('click', () => backdrop.remove());
+    if (opts.onDelete){
+      form.querySelector('[data-act="del"]').addEventListener('click', async () => {
+        if (!confirm('¿Eliminar este registro? No se puede deshacer.')) return;
+        await opts.onDelete();
+        backdrop.remove();
+      });
+    }
+    form.addEventListener('submit', async e => {
+      e.preventDefault();
+      const data = {};
+      form.querySelectorAll('[name]').forEach(el => {
+        data[el.name] = el.type === 'checkbox' ? el.checked : el.value;
+      });
+      const submitBtn = form.querySelector('[type="submit"]');
+      submitBtn.disabled = true;
+      try {
+        await onSubmit(data);
+        backdrop.remove();
+      } catch (err) {
+        toast('Error al guardar: ' + (err && err.message ? err.message : 'intentá de nuevo'));
+        submitBtn.disabled = false;
+      }
+    });
+    return backdrop;
+  }
+
+  function clientOptions(selected){
+    return state.clients
+      .slice().sort((a,b) => a.name.localeCompare(b.name))
+      .map(c => `<option value="${esc(c.id)}" ${c.id===selected?'selected':''}>${esc(c.name)}</option>`).join('');
+  }
+  function ramoOptions(selected){
+    return RAMOS_ALL.map(r => `<option value="${esc(r)}" ${r===selected?'selected':''}>${esc(r)}</option>`).join('');
+  }
+  function companyOptions(selected){
+    return COMPANIES.map(c => `<option value="${esc(c)}" ${c===selected?'selected':''}>${esc(c)}</option>`).join('');
+  }
+
+  /* ---------- Drawer (detail view for a client, with related records) ---------- */
+  function openClientDrawer(clientId){
+    const c = state.clients.find(x => x.id === clientId);
+    if (!c) return;
+    const backdrop = document.createElement('div');
+    backdrop.id = 'drawerBackdrop';
+    const pols = state.policies.filter(p => p.clientId === clientId);
+    const cots = state.quotes.filter(q => q.clientId === clientId);
+    const inter = state.interactions.filter(i => i.clientId === clientId).sort((a,b)=> (b.date||'').localeCompare(a.date||''));
+    const tasksC = state.tasks.filter(t => t.clientId === clientId && !t.done);
+    backdrop.innerHTML = `
+      <div id="drawer" style="position:relative;">
+        <button class="icon-btn close-drawer" aria-label="Cerrar">✕</button>
+        <h2>${esc(c.name)}</h2>
+        <div class="sub">${esc(c.type === 'empresa' ? 'Empresa' : 'Persona')} · ${esc(c.docId || 'sin documento')}</div>
+        <div class="kv"><span>Email</span><span>${esc(c.email || '—')}</span></div>
+        <div class="kv"><span>Teléfono</span><span>${esc(c.phone || '—')}</span></div>
+        <div class="kv"><span>Dirección</span><span>${esc(c.address || '—')}</span></div>
+        <div class="kv"><span>Cumpleaños</span><span>${c.birthday ? fmtDate(c.birthday) : '—'}</span></div>
+        <div style="margin-top:20px;">
+          <h2 style="font-size:15px;">Pólizas (${pols.length})</h2>
+          ${pols.length ? pols.map(p => `<div class="kv"><span>${esc(p.ramo)} · ${esc(p.company)}</span><span>${fmtDate(p.endDate)}</span></div>`).join('') : '<p class="sub">Sin pólizas cargadas.</p>'}
+        </div>
+        <div style="margin-top:20px;">
+          <h2 style="font-size:15px;">Cotizaciones (${cots.length})</h2>
+          ${cots.length ? cots.map(q => `<div class="kv"><span>${esc(q.ramo)}</span><span>${esc(q.status)}</span></div>`).join('') : '<p class="sub">Sin cotizaciones.</p>'}
+        </div>
+        <div style="margin-top:20px;">
+          <h2 style="font-size:15px;">Tareas pendientes (${tasksC.length})</h2>
+          ${tasksC.length ? tasksC.map(t => `<div class="kv"><span>${esc(t.title)}</span><span>${fmtDate(t.dueDate)}</span></div>`).join('') : '<p class="sub">Sin tareas pendientes.</p>'}
+        </div>
+        <div style="margin-top:20px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <h2 style="font-size:15px;">Interacciones (${inter.length})</h2>
+            <button class="btn btn-sm btn-outline" id="addInterBtn">+ Registrar</button>
+          </div>
+          ${inter.length ? inter.map(i => `<div class="kv"><span>${esc(i.channel)} · ${fmtDate(i.date)}</span><span style="max-width:220px;text-align:right;">${esc(i.note)}</span></div>`).join('') : '<p class="sub">Sin interacciones registradas.</p>'}
+        </div>
+        <div style="margin-top:22px;display:flex;gap:8px;">
+          <button class="btn btn-outline btn-sm" id="editClientBtn">Editar cliente</button>
+        </div>
+      </div>`;
+    document.body.appendChild(backdrop);
+    backdrop.addEventListener('click', e => { if (e.target === backdrop) backdrop.remove(); });
+    backdrop.querySelector('.close-drawer').addEventListener('click', () => backdrop.remove());
+    backdrop.querySelector('#editClientBtn').addEventListener('click', () => { backdrop.remove(); openClientForm(c); });
+    backdrop.querySelector('#addInterBtn').addEventListener('click', () => {
+      openInteractionForm(clientId, () => { backdrop.remove(); openClientDrawer(clientId); });
+    });
+  }
+
+  /* ==================== DASHBOARD ==================== */
+  function renderDashboard(){
+    const el = document.querySelector('.page[data-page="dashboard"]');
+    const activePolicies = state.policies.filter(p => p.status !== 'cancelada');
+    const totalPremium = activePolicies.reduce((s,p) => s + (Number(p.premium)||0), 0);
+    const soon = activePolicies.filter(p => { const d = daysUntil(p.endDate); return d !== null && d >= 0 && d <= 30; });
+    const overdue = activePolicies.filter(p => { const d = daysUntil(p.endDate); return d !== null && d < 0; });
+    const openTasks = state.tasks.filter(t => !t.done);
+    const openClaims = state.claims.filter(c => c.status !== 'cerrado');
+    const pendingQuotes = state.quotes.filter(q => q.status === 'pendiente' || q.status === 'enviada');
+
+    const byCompany = {};
+    activePolicies.forEach(p => { byCompany[p.company] = (byCompany[p.company]||0) + (Number(p.premium)||0); });
+    const companyRows = Object.entries(byCompany).sort((a,b)=>b[1]-a[1]);
+    const maxCompany = companyRows.length ? companyRows[0][1] : 1;
+
+    const byRamo = {};
+    activePolicies.forEach(p => { byRamo[p.ramo] = (byRamo[p.ramo]||0) + 1; });
+    const ramoRows = Object.entries(byRamo).sort((a,b)=>b[1]-a[1]);
+    const maxRamo = ramoRows.length ? ramoRows[0][1] : 1;
+
+    const upcomingTasks = openTasks.slice().sort((a,b)=>(a.dueDate||'9999').localeCompare(b.dueDate||'9999')).slice(0,6);
+
+    el.innerHTML = `
+      <div class="page-head">
+        <div>
+          <h1>Panel general</h1>
+          <p>Resumen de tu cartera y actividad</p>
+        </div>
+        <button class="btn btn-outline" id="exportBtn">Exportar respaldo (JSON)</button>
+      </div>
+      <div class="stat-grid">
+        <div class="stat-card"><b>${state.clients.length}</b><span>Clientes</span></div>
+        <div class="stat-card"><b>${activePolicies.length}</b><span>Pólizas vigentes</span></div>
+        <div class="stat-card"><b>${fmtMoney(totalPremium)}</b><span>Prima total cartera</span></div>
+        <div class="stat-card"><b style="color:var(--warn);">${soon.length}</b><span>Vencen en 30 días</span></div>
+        <div class="stat-card"><b style="color:var(--danger);">${overdue.length}</b><span>Vencidas</span></div>
+        <div class="stat-card"><b>${pendingQuotes.length}</b><span>Cotizaciones abiertas</span></div>
+        <div class="stat-card"><b>${openTasks.length}</b><span>Tareas pendientes</span></div>
+        <div class="stat-card"><b>${openClaims.length}</b><span>Siniestros abiertos</span></div>
+      </div>
+      <div class="dash-grid">
+        <div>
+          <div class="panel">
+            <h2>Cartera por aseguradora</h2>
+            ${companyRows.length ? companyRows.map(([name,val]) => `
+              <div class="bar-row">
+                <span class="label">${esc(name)}</span>
+                <span class="bar-track"><span class="bar-fill" style="width:${Math.round(val/maxCompany*100)}%"></span></span>
+                <span class="val">${fmtMoney(val)}</span>
+              </div>`).join('') : '<p class="empty">Todavía no hay pólizas cargadas.</p>'}
+          </div>
+          <div class="panel">
+            <h2>Cartera por ramo</h2>
+            ${ramoRows.length ? ramoRows.map(([name,val]) => `
+              <div class="bar-row">
+                <span class="label">${esc(name)}</span>
+                <span class="bar-track"><span class="bar-fill" style="width:${Math.round(val/maxRamo*100)}%;background:var(--yellow-deep);"></span></span>
+                <span class="val">${val}</span>
+              </div>`).join('') : '<p class="empty">Todavía no hay pólizas cargadas.</p>'}
+          </div>
+        </div>
+        <div>
+          <div class="panel">
+            <h2>Vencimientos próximos (30 días)</h2>
+            ${soon.length ? soon.slice().sort((a,b)=>a.endDate.localeCompare(b.endDate)).map(p => `
+              <div class="kv" style="border-bottom:1px solid var(--border);padding:8px 0;display:flex;justify-content:space-between;font-size:13px;">
+                <span>${esc(clientName(p.clientId))} · ${esc(p.ramo)}</span>
+                <span class="badge badge-warn">${fmtDate(p.endDate)}</span>
+              </div>`).join('') : '<p class="empty">Nada por vencer en 30 días.</p>'}
+          </div>
+          <div class="panel">
+            <h2>Próximas tareas</h2>
+            ${upcomingTasks.length ? upcomingTasks.map(t => `
+              <div class="kv" style="border-bottom:1px solid var(--border);padding:8px 0;display:flex;justify-content:space-between;font-size:13px;">
+                <span>${esc(t.title)}</span>
+                <span class="badge badge-muted">${fmtDate(t.dueDate)}</span>
+              </div>`).join('') : '<p class="empty">No tenés tareas pendientes.</p>'}
+          </div>
+        </div>
+      </div>
+    `;
+    el.querySelector('#exportBtn').addEventListener('click', exportBackup);
+  }
+
+  async function exportBackup(){
+    const dump = {
+      exportedAt: new Date().toISOString(),
+      clients: state.clients, policies: state.policies, quotes: state.quotes,
+      tasks: state.tasks, interactions: state.interactions, documents: state.documents, claims: state.claims,
+    };
+    const json = JSON.stringify(dump, null, 2);
+    const downloads = await claude.use('downloads');
+    if (!downloads){ toast('La descarga no está disponible en esta vista.'); return; }
+    try {
+      await downloads.save({ filename: `crm-guido-bonifati-respaldo-${new Date().toISOString().slice(0,10)}.json`, data: json });
+      toast('Respaldo descargado.');
+    } catch (e) { if (e && e.code !== 'declined') toast('No se pudo generar el respaldo.'); }
+  }
+
+  /* ==================== CLIENTES ==================== */
+  function renderClientes(){
+    const el = document.querySelector('.page[data-page="clientes"]');
+    if (!el.dataset.init){
+      el.dataset.init = '1';
+      el.innerHTML = `
+        <div class="page-head">
+          <div><h1>Clientes</h1><p>Personas y empresas en tu cartera</p></div>
+          <button class="btn btn-primary" id="newClientBtn">+ Nuevo cliente</button>
+        </div>
+        <div class="toolbar">
+          <input type="search" id="clientSearch" placeholder="Buscar por nombre, email o teléfono…" style="min-width:260px;">
+        </div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Nombre</th><th>Tipo</th><th>Contacto</th><th>Pólizas</th><th>Cumpleaños</th><th></th></tr></thead>
+          <tbody id="clientRows"></tbody>
+        </table></div>
+      `;
+      el.querySelector('#newClientBtn').addEventListener('click', () => openClientForm());
+      el.querySelector('#clientSearch').addEventListener('input', () => renderClientRows());
+    }
+    renderClientRows();
+  }
+  function renderClientRows(){
+    const el = document.querySelector('.page[data-page="clientes"]');
+    const q = (el.querySelector('#clientSearch').value || '').toLowerCase();
+    const rows = state.clients
+      .filter(c => !q || (c.name||'').toLowerCase().includes(q) || (c.email||'').toLowerCase().includes(q) || (c.phone||'').includes(q))
+      .sort((a,b) => a.name.localeCompare(b.name));
+    const tbody = el.querySelector('#clientRows');
+    if (!rows.length){ tbody.innerHTML = `<tr><td colspan="6" class="no-label"><p class="empty">No hay clientes que coincidan.</p></td></tr>`; return; }
+    tbody.innerHTML = rows.map(c => {
+      const nPol = state.policies.filter(p => p.clientId === c.id).length;
+      return `
+      <tr data-id="${c.id}">
+        <td data-label="Nombre"><a href="#" class="open-client" data-id="${c.id}" style="font-weight:600;color:var(--blue);">${esc(c.name)}</a></td>
+        <td data-label="Tipo">${c.type === 'empresa' ? 'Empresa' : 'Persona'}</td>
+        <td data-label="Contacto">${esc(c.phone || c.email || '—')}</td>
+        <td data-label="Pólizas">${nPol}</td>
+        <td data-label="Cumpleaños">${c.birthday ? fmtDate(c.birthday) : '—'}</td>
+        <td class="no-label"><div class="row-actions">
+          <button class="icon-btn edit-client" data-id="${c.id}" title="Editar">✎</button>
+        </div></td>
+      </tr>`;
+    }).join('');
+    tbody.querySelectorAll('.open-client').forEach(a => a.addEventListener('click', e => { e.preventDefault(); openClientDrawer(a.dataset.id); }));
+    tbody.querySelectorAll('.edit-client').forEach(b => b.addEventListener('click', () => {
+      const c = state.clients.find(x => x.id === b.dataset.id); if (c) openClientForm(c);
+    }));
+  }
+  function openClientForm(existing){
+    const c = existing || {};
+    openModal(existing ? 'Editar cliente' : 'Nuevo cliente', `
+      <div class="field"><label>Nombre / Razón social</label><input name="name" required value="${esc(c.name||'')}"></div>
+      <div class="field-row">
+        <div class="field"><label>Tipo</label><select name="type"><option value="persona" ${c.type!=='empresa'?'selected':''}>Persona</option><option value="empresa" ${c.type==='empresa'?'selected':''}>Empresa</option></select></div>
+        <div class="field"><label>DNI / CUIT</label><input name="docId" value="${esc(c.docId||'')}"></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>Email</label><input name="email" type="email" value="${esc(c.email||'')}"></div>
+        <div class="field"><label>Teléfono</label><input name="phone" value="${esc(c.phone||'')}"></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>Dirección</label><input name="address" value="${esc(c.address||'')}"></div>
+        <div class="field"><label>Cumpleaños</label><input name="birthday" type="date" value="${esc(c.birthday||'')}"></div>
+      </div>
+      <div class="field"><label>Notas</label><textarea name="notes">${esc(c.notes||'')}</textarea></div>
+    `, async data => {
+      if (!db) throw new Error('sin conexión');
+      if (existing){
+        await db.collection('clients').doc(existing.id).update(data);
+        toast('Cliente actualizado.');
+      } else {
+        data.createdAt = new Date().toISOString();
+        await db.collection('clients').add(data);
+        toast('Cliente creado.');
+      }
+    }, existing ? { onDelete: async () => {
+        await db.collection('clients').doc(existing.id).delete();
+        toast('Cliente eliminado.');
+      } } : {});
+  }
+  function openInteractionForm(clientId, after){
+    openModal('Registrar interacción', `
+      <input type="hidden" name="clientId" value="${esc(clientId)}">
+      <div class="field-row">
+        <div class="field"><label>Canal</label><select name="channel">
+          <option value="whatsapp">WhatsApp</option><option value="llamada">Llamada</option>
+          <option value="email">Email</option><option value="reunion">Reunión</option><option value="otro">Otro</option>
+        </select></div>
+        <div class="field"><label>Fecha</label><input name="date" type="date" value="${new Date().toISOString().slice(0,10)}"></div>
+      </div>
+      <div class="field"><label>Nota</label><textarea name="note" required placeholder="¿Qué se habló?"></textarea></div>
+    `, async data => {
+      data.clientName = clientName(clientId);
+      data.createdAt = new Date().toISOString();
+      await db.collection('interactions').add(data);
+      toast('Interacción registrada.');
+      if (after) after();
+    });
+  }
+
+  /* ==================== POLIZAS ==================== */
+  function policyStatusInfo(p){
+    if (p.status === 'cancelada') return { label:'Cancelada', cls:'badge-muted' };
+    const d = daysUntil(p.endDate);
+    if (d === null) return { label:'Sin fecha', cls:'badge-muted' };
+    if (d < 0) return { label:'Vencida', cls:'badge-danger' };
+    if (d <= 30) return { label:`Vence en ${d}d`, cls:'badge-warn' };
+    return { label:'Vigente', cls:'badge-ok' };
+  }
+  function renderPolizas(){
+    const el = document.querySelector('.page[data-page="polizas"]');
+    if (!el.dataset.init){
+      el.dataset.init = '1';
+      el.innerHTML = `
+        <div class="page-head">
+          <div><h1>Pólizas y cartera</h1><p>Todas las pólizas activas y su estado</p></div>
+          <button class="btn btn-primary" id="newPolBtn">+ Nueva póliza</button>
+        </div>
+        <div class="toolbar">
+          <input type="search" id="polSearch" placeholder="Buscar cliente o N° de póliza…" style="min-width:220px;">
+          <select id="polCompanyFilter"><option value="">Todas las aseguradoras</option>${companyOptions()}</select>
+          <select id="polStatusFilter">
+            <option value="">Todos los estados</option>
+            <option value="vigente">Vigente</option><option value="por_vencer">Vence en 30 días</option>
+            <option value="vencida">Vencida</option><option value="cancelada">Cancelada</option>
+          </select>
+        </div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Cliente</th><th>Ramo</th><th>Aseguradora</th><th>N° póliza</th><th>Prima</th><th>Vencimiento</th><th>Estado</th><th></th></tr></thead>
+          <tbody id="polRows"></tbody>
+        </table></div>
+      `;
+      el.querySelector('#newPolBtn').addEventListener('click', () => openPolicyForm());
+      ['polSearch','polCompanyFilter','polStatusFilter'].forEach(id => el.querySelector('#'+id).addEventListener('input', renderPolRows));
+    }
+    renderPolRows();
+  }
+  function renderPolRows(){
+    const el = document.querySelector('.page[data-page="polizas"]');
+    const q = (el.querySelector('#polSearch').value||'').toLowerCase();
+    const companyF = el.querySelector('#polCompanyFilter').value;
+    const statusF = el.querySelector('#polStatusFilter').value;
+    let rows = state.policies.slice();
+    if (q) rows = rows.filter(p => clientName(p.clientId).toLowerCase().includes(q) || (p.policyNumber||'').toLowerCase().includes(q));
+    if (companyF) rows = rows.filter(p => p.company === companyF);
+    if (statusF) rows = rows.filter(p => {
+      if (statusF === 'cancelada') return p.status === 'cancelada';
+      if (p.status === 'cancelada') return false;
+      const d = daysUntil(p.endDate);
+      if (statusF === 'vencida') return d !== null && d < 0;
+      if (statusF === 'por_vencer') return d !== null && d >= 0 && d <= 30;
+      if (statusF === 'vigente') return d === null || d > 30;
+      return true;
+    });
+    rows.sort((a,b) => (a.endDate||'9999').localeCompare(b.endDate||'9999'));
+    const tbody = el.querySelector('#polRows');
+    if (!rows.length){ tbody.innerHTML = `<tr><td colspan="8" class="no-label"><p class="empty">No hay pólizas que coincidan.</p></td></tr>`; return; }
+    tbody.innerHTML = rows.map(p => {
+      const s = policyStatusInfo(p);
+      return `<tr>
+        <td data-label="Cliente">${esc(clientName(p.clientId))}</td>
+        <td data-label="Ramo">${esc(p.ramo)}</td>
+        <td data-label="Aseguradora">${esc(p.company)}</td>
+        <td data-label="N° póliza">${esc(p.policyNumber||'—')}</td>
+        <td data-label="Prima">${fmtMoney(p.premium)}</td>
+        <td data-label="Vencimiento">${fmtDate(p.endDate)}</td>
+        <td data-label="Estado"><span class="badge ${s.cls}">${s.label}</span></td>
+        <td class="no-label"><div class="row-actions"><button class="icon-btn edit-pol" data-id="${p.id}" title="Editar">✎</button></div></td>
+      </tr>`;
+    }).join('');
+    tbody.querySelectorAll('.edit-pol').forEach(b => b.addEventListener('click', () => {
+      const p = state.policies.find(x => x.id === b.dataset.id); if (p) openPolicyForm(p);
+    }));
+  }
+  function openPolicyForm(existing){
+    const p = existing || {};
+    openModal(existing ? 'Editar póliza' : 'Nueva póliza', `
+      <div class="field"><label>Cliente</label><select name="clientId" required>${clientOptions(p.clientId)}</select></div>
+      <div class="field-row">
+        <div class="field"><label>Ramo</label><select name="ramo">${ramoOptions(p.ramo)}</select></div>
+        <div class="field"><label>Aseguradora</label><select name="company">${companyOptions(p.company)}</select></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>N° de póliza</label><input name="policyNumber" value="${esc(p.policyNumber||'')}"></div>
+        <div class="field"><label>Prima ($)</label><input name="premium" type="number" step="0.01" value="${esc(p.premium||'')}"></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>Comisión (%)</label><input name="commissionPct" type="number" step="0.01" value="${esc(p.commissionPct||'')}"></div>
+        <div class="field"><label>Estado</label><select name="status">
+          <option value="activa" ${p.status!=='cancelada'?'selected':''}>Activa</option>
+          <option value="cancelada" ${p.status==='cancelada'?'selected':''}>Cancelada</option>
+        </select></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>Inicio de vigencia</label><input name="startDate" type="date" value="${esc(p.startDate||'')}"></div>
+        <div class="field"><label>Vencimiento</label><input name="endDate" type="date" value="${esc(p.endDate||'')}"></div>
+      </div>
+      <div class="field"><label>Notas</label><textarea name="notes">${esc(p.notes||'')}</textarea></div>
+    `, async data => {
+      data.clientName = clientName(data.clientId);
+      data.premium = Number(data.premium) || 0;
+      data.commissionPct = Number(data.commissionPct) || 0;
+      if (existing){
+        await db.collection('policies').doc(existing.id).update(data);
+        toast('Póliza actualizada.');
+      } else {
+        data.createdAt = new Date().toISOString();
+        await db.collection('policies').add(data);
+        toast('Póliza creada.');
+      }
+    }, existing ? { onDelete: async () => { await db.collection('policies').doc(existing.id).delete(); toast('Póliza eliminada.'); } } : {});
+  }
+
+  /* ==================== COTIZACIONES ==================== */
+  function renderCotizaciones(){
+    const el = document.querySelector('.page[data-page="cotizaciones"]');
+    if (!el.dataset.init){
+      el.dataset.init = '1';
+      el.innerHTML = `
+        <div class="page-head">
+          <div><h1>Cotizaciones</h1><p>Seguimiento de propuestas enviadas a clientes</p></div>
+          <button class="btn btn-primary" id="newQuoteBtn">+ Nueva cotización</button>
+        </div>
+        <div class="toolbar">
+          <select id="quoteStatusFilter">
+            <option value="">Todos los estados</option>
+            <option value="pendiente">Pendiente</option><option value="enviada">Enviada</option>
+            <option value="aceptada">Aceptada</option><option value="rechazada">Rechazada</option>
+          </select>
+        </div>
+        <div class="card-list" id="quoteList"></div>
+      `;
+      el.querySelector('#newQuoteBtn').addEventListener('click', () => openQuoteForm());
+      el.querySelector('#quoteStatusFilter').addEventListener('input', renderQuoteList);
+    }
+    renderQuoteList();
+  }
+  const QUOTE_BADGE = { pendiente:'badge-muted', enviada:'badge-warn', aceptada:'badge-ok', rechazada:'badge-danger' };
+  function renderQuoteList(){
+    const el = document.querySelector('.page[data-page="cotizaciones"]');
+    const f = el.querySelector('#quoteStatusFilter').value;
+    let rows = state.quotes.slice().sort((a,b) => (b.createdAt||'').localeCompare(a.createdAt||''));
+    if (f) rows = rows.filter(q => q.status === f);
+    const list = el.querySelector('#quoteList');
+    if (!rows.length){ list.innerHTML = '<p class="empty">No hay cotizaciones cargadas.</p>'; return; }
+    list.innerHTML = rows.map(q => `
+      <div class="item-card">
+        <div class="top-row">
+          <div>
+            <h3>${esc(clientName(q.clientId))} — ${esc(q.ramo)}</h3>
+            <p>${esc(q.company)} · ${fmtMoney(q.premium)}</p>
+          </div>
+          <span class="badge ${QUOTE_BADGE[q.status]||'badge-muted'}">${esc(q.status)}</span>
+        </div>
+        <p style="margin-top:6px;">${esc(q.coverageNotes||'')}</p>
+        <div class="meta">
+          <button class="btn btn-sm btn-outline pdf-quote" data-id="${q.id}">Generar PDF</button>
+          <button class="btn btn-sm btn-outline edit-quote" data-id="${q.id}">Editar</button>
+        </div>
+      </div>`).join('');
+    list.querySelectorAll('.edit-quote').forEach(b => b.addEventListener('click', () => {
+      const q = state.quotes.find(x => x.id === b.dataset.id); if (q) openQuoteForm(q);
+    }));
+    list.querySelectorAll('.pdf-quote').forEach(b => b.addEventListener('click', () => {
+      const q = state.quotes.find(x => x.id === b.dataset.id); if (q) generateQuotePdf(q);
+    }));
+  }
+  function openQuoteForm(existing){
+    const q = existing || {};
+    openModal(existing ? 'Editar cotización' : 'Nueva cotización', `
+      <div class="field"><label>Cliente</label><select name="clientId" required>${clientOptions(q.clientId)}</select></div>
+      <div class="field-row">
+        <div class="field"><label>Ramo</label><select name="ramo">${ramoOptions(q.ramo)}</select></div>
+        <div class="field"><label>Aseguradora</label><select name="company">${companyOptions(q.company)}</select></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>Prima estimada ($)</label><input name="premium" type="number" step="0.01" value="${esc(q.premium||'')}"></div>
+        <div class="field"><label>Estado</label><select name="status">
+          <option value="pendiente" ${q.status==='pendiente'?'selected':''}>Pendiente</option>
+          <option value="enviada" ${q.status==='enviada'?'selected':''}>Enviada</option>
+          <option value="aceptada" ${q.status==='aceptada'?'selected':''}>Aceptada</option>
+          <option value="rechazada" ${q.status==='rechazada'?'selected':''}>Rechazada</option>
+        </select></div>
+      </div>
+      <div class="field"><label>Detalle de cobertura</label><textarea name="coverageNotes">${esc(q.coverageNotes||'')}</textarea></div>
+    `, async data => {
+      data.clientName = clientName(data.clientId);
+      data.premium = Number(data.premium) || 0;
+      if (existing){
+        await db.collection('quotes').doc(existing.id).update(data);
+        toast('Cotización actualizada.');
+      } else {
+        data.createdAt = new Date().toISOString();
+        await db.collection('quotes').add(data);
+        toast('Cotización creada.');
+      }
+    }, existing ? { onDelete: async () => { await db.collection('quotes').doc(existing.id).delete(); toast('Cotización eliminada.'); } } : {});
+  }
+  async function generateQuotePdf(q){
+    if (!window.jspdf){ toast('No se pudo cargar el generador de PDF.'); return; }
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    const blue = [52, 80, 107];
+    doc.setFillColor(...blue); doc.rect(0, 0, 210, 28, 'F');
+    doc.setTextColor(255,255,255); doc.setFont('helvetica','bold'); doc.setFontSize(18);
+    doc.text('Guido Bonifati — Asesor de Seguros', 14, 17);
+    doc.setTextColor(30,30,30);
+    doc.setFont('helvetica','normal'); doc.setFontSize(11);
+    let y = 42;
+    doc.setFont('helvetica','bold'); doc.setFontSize(14); doc.text('Cotización de seguro', 14, y); y += 10;
+    doc.setFont('helvetica','normal'); doc.setFontSize(11);
+    const rows = [
+      ['Cliente', clientName(q.clientId)],
+      ['Ramo', q.ramo || '—'],
+      ['Aseguradora', q.company || '—'],
+      ['Prima estimada', fmtMoney(q.premium)],
+      ['Estado', q.status || '—'],
+      ['Fecha', fmtDate(new Date().toISOString().slice(0,10))],
+    ];
+    rows.forEach(([k,v]) => { doc.setFont('helvetica','bold'); doc.text(k + ':', 14, y); doc.setFont('helvetica','normal'); doc.text(String(v), 60, y); y += 8; });
+    y += 4;
+    doc.setFont('helvetica','bold'); doc.text('Detalle de cobertura:', 14, y); y += 7;
+    doc.setFont('helvetica','normal');
+    const lines = doc.splitTextToSize(q.coverageNotes || 'Sin detalle adicional.', 180);
+    doc.text(lines, 14, y); y += lines.length * 6 + 10;
+    doc.setDrawColor(220,220,220); doc.line(14, y, 196, y); y += 8;
+    doc.setFontSize(9); doc.setTextColor(120,120,120);
+    doc.text('Cotización orientativa, sujeta a análisis y aprobación de la compañía aseguradora.', 14, y);
+    const blob = doc.output('blob');
+    const downloads = await claude.use('downloads');
+    if (!downloads){ toast('La descarga no está disponible en esta vista.'); return; }
+    try {
+      await downloads.save({ filename: `cotizacion-${(clientName(q.clientId)||'cliente').replace(/\s+/g,'-').toLowerCase()}.pdf`, data: blob });
+      toast('PDF generado.');
+    } catch (e) { if (e && e.code !== 'declined') toast('No se pudo guardar el PDF.'); }
+  }
+
+  /* ==================== TAREAS ==================== */
+  function renderTareas(){
+    const el = document.querySelector('.page[data-page="tareas"]');
+    if (!el.dataset.init){
+      el.dataset.init = '1';
+      el.innerHTML = `
+        <div class="page-head">
+          <div><h1>Tareas y calendario</h1><p>Recordatorios, llamados y reuniones</p></div>
+          <button class="btn btn-primary" id="newTaskBtn">+ Nueva tarea</button>
+        </div>
+        <div class="dash-grid">
+          <div>
+            <div class="toolbar">
+              <select id="taskFilter"><option value="pending">Pendientes</option><option value="all">Todas</option><option value="done">Completadas</option></select>
+            </div>
+            <div class="card-list" id="taskList"></div>
+          </div>
+          <div class="panel">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+              <button class="icon-btn" id="calPrev">‹</button>
+              <h2 id="calLabel" style="margin:0;"></h2>
+              <button class="icon-btn" id="calNext">›</button>
+            </div>
+            <div class="cal-grid" id="calGrid"></div>
+          </div>
+        </div>
+      `;
+      el.querySelector('#newTaskBtn').addEventListener('click', () => openTaskForm());
+      el.querySelector('#taskFilter').addEventListener('input', renderTaskList);
+      el.querySelector('#calPrev').addEventListener('click', () => { calMonth.setMonth(calMonth.getMonth()-1); renderCalendar(); });
+      el.querySelector('#calNext').addEventListener('click', () => { calMonth.setMonth(calMonth.getMonth()+1); renderCalendar(); });
+    }
+    renderTaskList();
+    renderCalendar();
+  }
+  const TASK_TYPE_LABEL = { llamado:'Llamado', recordatorio:'Recordatorio', reunion:'Reunión', vencimiento:'Vencimiento', otro:'Otro' };
+  function renderTaskList(){
+    const el = document.querySelector('.page[data-page="tareas"]');
+    const f = el.querySelector('#taskFilter').value;
+    let rows = state.tasks.slice();
+    if (f === 'pending') rows = rows.filter(t => !t.done);
+    if (f === 'done') rows = rows.filter(t => t.done);
+    rows.sort((a,b) => (a.dueDate||'9999').localeCompare(b.dueDate||'9999'));
+    const list = el.querySelector('#taskList');
+    if (!rows.length){ list.innerHTML = '<p class="empty">No hay tareas para mostrar.</p>'; return; }
+    list.innerHTML = rows.map(t => {
+      const d = daysUntil(t.dueDate);
+      const overdue = !t.done && d !== null && d < 0;
+      return `
+      <div class="item-card">
+        <div class="top-row">
+          <div>
+            <h3 style="${t.done ? 'text-decoration:line-through;color:var(--muted);' : ''}">${esc(t.title)}</h3>
+            <p>${TASK_TYPE_LABEL[t.type]||'Otro'}${t.clientId ? ' · ' + esc(clientName(t.clientId)) : ''}</p>
+          </div>
+          <span class="badge ${t.done ? 'badge-ok' : overdue ? 'badge-danger' : 'badge-muted'}">${t.done ? 'Hecha' : fmtDate(t.dueDate)}</span>
+        </div>
+        <div class="meta">
+          <label style="display:flex;align-items:center;gap:5px;"><input type="checkbox" class="toggle-task" data-id="${t.id}" ${t.done?'checked':''}> Completada</label>
+          <button class="btn btn-sm btn-outline edit-task" data-id="${t.id}">Editar</button>
+        </div>
+      </div>`;
+    }).join('');
+    list.querySelectorAll('.toggle-task').forEach(cb => cb.addEventListener('change', async () => {
+      await db.collection('tasks').doc(cb.dataset.id).update({ done: cb.checked });
+    }));
+    list.querySelectorAll('.edit-task').forEach(b => b.addEventListener('click', () => {
+      const t = state.tasks.find(x => x.id === b.dataset.id); if (t) openTaskForm(t);
+    }));
+  }
+  function renderCalendar(){
+    const el = document.querySelector('.page[data-page="tareas"]');
+    if (!el.querySelector('#calGrid')) return;
+    const label = el.querySelector('#calLabel');
+    label.textContent = calMonth.toLocaleDateString('es-AR', { month:'long', year:'numeric' });
+    const grid = el.querySelector('#calGrid');
+    const dows = ['Lu','Ma','Mi','Ju','Vi','Sá','Do'];
+    let html = dows.map(d => `<div class="cal-dow">${d}</div>`).join('');
+    const first = new Date(calMonth.getFullYear(), calMonth.getMonth(), 1);
+    const startOffset = (first.getDay() + 6) % 7; // Monday-first
+    const gridStart = new Date(first); gridStart.setDate(first.getDate() - startOffset);
+    const todayStr = new Date().toISOString().slice(0,10);
+    const tasksByDate = {};
+    state.tasks.forEach(t => { if (t.dueDate){ (tasksByDate[t.dueDate] = tasksByDate[t.dueDate] || []).push(t); } });
+    state.policies.forEach(p => { if (p.endDate && p.status !== 'cancelada'){ (tasksByDate[p.endDate] = tasksByDate[p.endDate] || []).push({title:'Vencimiento póliza'}); } });
+    for (let i=0; i<42; i++){
+      const d = new Date(gridStart); d.setDate(gridStart.getDate() + i);
+      const ds = d.toISOString().slice(0,10);
+      const otherMonth = d.getMonth() !== calMonth.getMonth();
+      const has = tasksByDate[ds] && tasksByDate[ds].length;
+      html += `<div class="cal-cell ${otherMonth?'other-month':''} ${ds===todayStr?'today':''}"><span class="n">${d.getDate()}</span>${has?'<span class="cal-dot"></span>':''}</div>`;
+    }
+    grid.innerHTML = html;
+  }
+  function openTaskForm(existing){
+    const t = existing || {};
+    openModal(existing ? 'Editar tarea' : 'Nueva tarea', `
+      <div class="field"><label>Título</label><input name="title" required value="${esc(t.title||'')}"></div>
+      <div class="field-row">
+        <div class="field"><label>Tipo</label><select name="type">
+          <option value="llamado" ${t.type==='llamado'?'selected':''}>Llamado</option>
+          <option value="recordatorio" ${t.type==='recordatorio'?'selected':''}>Recordatorio</option>
+          <option value="reunion" ${t.type==='reunion'?'selected':''}>Reunión</option>
+          <option value="otro" ${t.type==='otro'?'selected':''}>Otro</option>
+        </select></div>
+        <div class="field"><label>Vencimiento</label><input name="dueDate" type="date" value="${esc(t.dueDate||'')}" required></div>
+      </div>
+      <div class="field"><label>Cliente (opcional)</label><select name="clientId"><option value="">—</option>${clientOptions(t.clientId)}</select></div>
+      <div class="field"><label>Notas</label><textarea name="notes">${esc(t.notes||'')}</textarea></div>
+    `, async data => {
+      data.done = !!(existing && existing.done);
+      data.clientName = data.clientId ? clientName(data.clientId) : '';
+      if (existing){
+        await db.collection('tasks').doc(existing.id).update(data);
+        toast('Tarea actualizada.');
+      } else {
+        data.createdAt = new Date().toISOString();
+        await db.collection('tasks').add(data);
+        toast('Tarea creada.');
+      }
+    }, existing ? { onDelete: async () => { await db.collection('tasks').doc(existing.id).delete(); toast('Tarea eliminada.'); } } : {});
+  }
+
+  /* ==================== DOCUMENTOS ==================== */
+  function renderDocumentos(){
+    const el = document.querySelector('.page[data-page="documentos"]');
+    if (!el.dataset.init){
+      el.dataset.init = '1';
+      el.innerHTML = `
+        <div class="page-head">
+          <div><h1>Documentación</h1><p>Registro de documentos por cliente — pendientes y recibidos</p></div>
+          <button class="btn btn-primary" id="newDocBtn">+ Nuevo registro</button>
+        </div>
+        <p class="empty" style="text-align:left;padding:0 0 14px;">Por ahora este módulo lleva el registro (nombre, estado, fecha) de qué documento corresponde a cada cliente — todavía no adjunta el archivo en sí. Mientras tanto guardá los PDFs en tu Drive/mail y anotá acá el seguimiento.</p>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Cliente</th><th>Documento</th><th>Estado</th><th>Fecha</th><th></th></tr></thead>
+          <tbody id="docRows"></tbody>
+        </table></div>
+      `;
+      el.querySelector('#newDocBtn').addEventListener('click', () => openDocForm());
+    }
+    renderDocRows();
+  }
+  function renderDocRows(){
+    const el = document.querySelector('.page[data-page="documentos"]');
+    const rows = state.documents.slice().sort((a,b) => (b.date||'').localeCompare(a.date||''));
+    const tbody = el.querySelector('#docRows');
+    if (!rows.length){ tbody.innerHTML = `<tr><td colspan="5" class="no-label"><p class="empty">No hay documentos registrados.</p></td></tr>`; return; }
+    tbody.innerHTML = rows.map(d => `
+      <tr>
+        <td data-label="Cliente">${esc(clientName(d.clientId))}</td>
+        <td data-label="Documento">${esc(d.name)}</td>
+        <td data-label="Estado"><span class="badge ${d.status==='recibido'?'badge-ok':'badge-warn'}">${d.status==='recibido'?'Recibido':'Pendiente'}</span></td>
+        <td data-label="Fecha">${fmtDate(d.date)}</td>
+        <td class="no-label"><div class="row-actions"><button class="icon-btn edit-doc" data-id="${d.id}" title="Editar">✎</button></div></td>
+      </tr>`).join('');
+    tbody.querySelectorAll('.edit-doc').forEach(b => b.addEventListener('click', () => {
+      const d = state.documents.find(x => x.id === b.dataset.id); if (d) openDocForm(d);
+    }));
+  }
+  function openDocForm(existing){
+    const d = existing || {};
+    openModal(existing ? 'Editar documento' : 'Nuevo registro de documento', `
+      <div class="field"><label>Cliente</label><select name="clientId" required>${clientOptions(d.clientId)}</select></div>
+      <div class="field"><label>Documento</label><input name="name" required placeholder="Ej: DNI, póliza firmada, CBU…" value="${esc(d.name||'')}"></div>
+      <div class="field-row">
+        <div class="field"><label>Estado</label><select name="status">
+          <option value="pendiente" ${d.status!=='recibido'?'selected':''}>Pendiente</option>
+          <option value="recibido" ${d.status==='recibido'?'selected':''}>Recibido</option>
+        </select></div>
+        <div class="field"><label>Fecha</label><input name="date" type="date" value="${esc(d.date || new Date().toISOString().slice(0,10))}"></div>
+      </div>
+      <div class="field"><label>Nota</label><textarea name="note">${esc(d.note||'')}</textarea></div>
+    `, async data => {
+      if (existing){
+        await db.collection('documents').doc(existing.id).update(data);
+        toast('Documento actualizado.');
+      } else {
+        data.createdAt = new Date().toISOString();
+        await db.collection('documents').add(data);
+        toast('Registro creado.');
+      }
+    }, existing ? { onDelete: async () => { await db.collection('documents').doc(existing.id).delete(); toast('Registro eliminado.'); } } : {});
+  }
+
+  /* ==================== SINIESTROS ==================== */
+  function renderSiniestros(){
+    const el = document.querySelector('.page[data-page="siniestros"]');
+    if (!el.dataset.init){
+      el.dataset.init = '1';
+      el.innerHTML = `
+        <div class="page-head">
+          <div><h1>Siniestros</h1><p>Gestión y seguimiento de reclamos</p></div>
+          <button class="btn btn-primary" id="newClaimBtn">+ Nuevo siniestro</button>
+        </div>
+        <div class="card-list" id="claimList"></div>
+      `;
+      el.querySelector('#newClaimBtn').addEventListener('click', () => openClaimForm());
+    }
+    renderClaimList();
+  }
+  const CLAIM_BADGE = { abierto:'badge-danger', en_gestion:'badge-warn', cerrado:'badge-ok' };
+  const CLAIM_LABEL = { abierto:'Abierto', en_gestion:'En gestión', cerrado:'Cerrado' };
+  function renderClaimList(){
+    const el = document.querySelector('.page[data-page="siniestros"]');
+    const rows = state.claims.slice().sort((a,b) => (b.date||'').localeCompare(a.date||''));
+    const list = el.querySelector('#claimList');
+    if (!rows.length){ list.innerHTML = '<p class="empty">No hay siniestros cargados.</p>'; return; }
+    list.innerHTML = rows.map(c => {
+      const pol = state.policies.find(p => p.id === c.policyId);
+      return `
+      <div class="item-card">
+        <div class="top-row">
+          <div>
+            <h3>${esc(clientName(c.clientId))}</h3>
+            <p>${pol ? esc(pol.ramo) + ' · ' + esc(pol.company) : 'Sin póliza asociada'}</p>
+          </div>
+          <span class="badge ${CLAIM_BADGE[c.status]||'badge-muted'}">${CLAIM_LABEL[c.status]||c.status}</span>
+        </div>
+        <p style="margin-top:6px;">${esc(c.description||'')}</p>
+        <div class="meta">
+          <span>Fecha: <b>${fmtDate(c.date)}</b></span>
+          ${c.amount ? `<span>Monto: <b>${fmtMoney(c.amount)}</b></span>` : ''}
+          <button class="btn btn-sm btn-outline edit-claim" data-id="${c.id}">Editar</button>
+        </div>
+      </div>`;
+    }).join('');
+    list.querySelectorAll('.edit-claim').forEach(b => b.addEventListener('click', () => {
+      const c = state.claims.find(x => x.id === b.dataset.id); if (c) openClaimForm(c);
+    }));
+  }
+  function openClaimForm(existing){
+    const c = existing || {};
+    const clientPolicies = c.clientId ? state.policies.filter(p => p.clientId === c.clientId) : state.policies;
+    openModal(existing ? 'Editar siniestro' : 'Nuevo siniestro', `
+      <div class="field"><label>Cliente</label><select name="clientId" id="claimClient" required>${clientOptions(c.clientId)}</select></div>
+      <div class="field"><label>Póliza asociada</label><select name="policyId" id="claimPolicy">
+        <option value="">—</option>
+        ${clientPolicies.map(p => `<option value="${p.id}" ${p.id===c.policyId?'selected':''}>${esc(p.ramo)} · ${esc(p.company)}</option>`).join('')}
+      </select></div>
+      <div class="field-row">
+        <div class="field"><label>Fecha</label><input name="date" type="date" value="${esc(c.date || new Date().toISOString().slice(0,10))}"></div>
+        <div class="field"><label>Estado</label><select name="status">
+          <option value="abierto" ${c.status!=='en_gestion'&&c.status!=='cerrado'?'selected':''}>Abierto</option>
+          <option value="en_gestion" ${c.status==='en_gestion'?'selected':''}>En gestión</option>
+          <option value="cerrado" ${c.status==='cerrado'?'selected':''}>Cerrado</option>
+        </select></div>
+      </div>
+      <div class="field"><label>Monto estimado ($)</label><input name="amount" type="number" step="0.01" value="${esc(c.amount||'')}"></div>
+      <div class="field"><label>Descripción</label><textarea name="description" required>${esc(c.description||'')}</textarea></div>
+    `, async data => {
+      data.amount = Number(data.amount) || 0;
+      data.clientName = clientName(data.clientId);
+      if (existing){
+        await db.collection('claims').doc(existing.id).update(data);
+        toast('Siniestro actualizado.');
+      } else {
+        data.createdAt = new Date().toISOString();
+        await db.collection('claims').add(data);
+        toast('Siniestro creado.');
+      }
+    }, existing ? { onDelete: async () => { await db.collection('claims').doc(existing.id).delete(); toast('Siniestro eliminado.'); } } : {});
+  }
+
+  /* ==================== COMISIONES ==================== */
+  function renderComisiones(){
+    const el = document.querySelector('.page[data-page="comisiones"]');
+    const active = state.policies.filter(p => p.status !== 'cancelada');
+    const totalComm = active.reduce((s,p) => s + (Number(p.premium)||0) * (Number(p.commissionPct)||0)/100, 0);
+    const byCompany = {};
+    active.forEach(p => {
+      const c = (Number(p.premium)||0) * (Number(p.commissionPct)||0)/100;
+      byCompany[p.company] = (byCompany[p.company]||0) + c;
+    });
+    const rows = Object.entries(byCompany).sort((a,b)=>b[1]-a[1]);
+    el.innerHTML = `
+      <div class="page-head"><div><h1>Comisiones</h1><p>Estimado según prima y % de comisión cargado en cada póliza</p></div></div>
+      <div class="stat-grid">
+        <div class="stat-card"><b>${fmtMoney(totalComm)}</b><span>Comisión estimada total</span></div>
+        <div class="stat-card"><b>${active.length}</b><span>Pólizas activas</span></div>
+      </div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Aseguradora</th><th>Pólizas</th><th>Prima total</th><th>Comisión estimada</th></tr></thead>
+        <tbody>
+          ${rows.length ? rows.map(([name,val]) => {
+            const n = active.filter(p => p.company === name).length;
+            const prem = active.filter(p => p.company === name).reduce((s,p)=>s+(Number(p.premium)||0),0);
+            return `<tr><td data-label="Aseguradora">${esc(name)}</td><td data-label="Pólizas">${n}</td><td data-label="Prima total">${fmtMoney(prem)}</td><td data-label="Comisión">${fmtMoney(val)}</td></tr>`;
+          }).join('') : '<tr><td colspan="4" class="no-label"><p class="empty">Cargá el % de comisión en cada póliza para ver el estimado.</p></td></tr>'}
+        </tbody>
+      </table></div>
+    `;
+  }
+
+  /* ---------- DB wiring ---------- */
+  function subscribeAll(){
+    const cols = [
+      ['clients','clients'], ['policies','policies'], ['quotes','quotes'],
+      ['tasks','tasks'], ['interactions','interactions'], ['documents','documents'], ['claims','claims'],
+    ];
+    cols.forEach(([path, key]) => {
+      db.collection(path).onSnapshot(snap => {
+        state[key] = snap.docs.map(d => Object.assign({ id: d.id }, d.data()));
+        renderCurrentTab();
+      }, err => {
+        console.error(key, err);
+        setSyncStatus('off', 'Sin conexión');
+      });
+    });
+  }
+  function setSyncStatus(cls, label){
+    document.getElementById('syncDot').className = 'sync-dot ' + cls;
+    document.getElementById('syncLabel').textContent = label;
+  }
+
+  async function boot(){
+    const initialTab = (location.hash || '').replace('#','');
+    showTab(TABS.some(t => t.key === initialTab) ? initialTab : 'dashboard');
+
+    if (!window.claude || !window.claude.use){
+      setSyncStatus('off', 'No disponible fuera de Claude');
+      toast('Este CRM necesita abrirse desde el enlace de Claude para guardar datos.');
+      return;
+    }
+    db = await claude.use('db');
+    if (!db){
+      setSyncStatus('off', 'Sin conexión a la base');
+      toast('No se pudo conectar a la base de datos en esta vista.');
+      return;
+    }
+    setSyncStatus('ok', 'Sincronizado');
+    subscribeAll();
+  }
+
+  boot();
+})();
+</script>
