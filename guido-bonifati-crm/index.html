@@ -374,6 +374,7 @@
     const cots = state.quotes.filter(q => q.clientId === clientId);
     const inter = state.interactions.filter(i => i.clientId === clientId).sort((a,b)=> (b.date||'').localeCompare(a.date||''));
     const tasksC = state.tasks.filter(t => t.clientId === clientId && !t.done);
+    const docsC = state.documents.filter(d => d.clientId === clientId);
     backdrop.innerHTML = `
       <div id="drawer" style="position:relative;">
         <button class="icon-btn close-drawer" aria-label="Cerrar">✕</button>
@@ -394,6 +395,10 @@
         <div style="margin-top:20px;">
           <h2 style="font-size:15px;">Tareas pendientes (${tasksC.length})</h2>
           ${tasksC.length ? tasksC.map(t => `<div class="kv"><span>${esc(t.title)}</span><span>${fmtDate(t.dueDate)}</span></div>`).join('') : '<p class="sub">Sin tareas pendientes.</p>'}
+        </div>
+        <div style="margin-top:20px;">
+          <h2 style="font-size:15px;">Documentos (${docsC.length})</h2>
+          ${docsC.length ? docsC.map(d => `<div class="kv"><span>${esc(d.name)} <span class="badge ${d.status==='recibido'?'badge-ok':'badge-warn'}" style="margin-left:6px;">${d.status==='recibido'?'Recibido':'Pendiente'}</span></span>${d.url ? `<a href="${esc(d.url)}" target="_blank" rel="noopener" style="color:var(--blue);font-weight:600;">Abrir ↗</a>` : '<span class="sub">Sin link</span>'}</div>`).join('') : '<p class="sub">Sin documentos registrados.</p>'}
         </div>
         <div style="margin-top:20px;">
           <div style="display:flex;justify-content:space-between;align-items:center;">
@@ -987,9 +992,9 @@
           <div><h1>Documentación</h1><p>Registro de documentos por cliente — pendientes y recibidos</p></div>
           <button class="btn btn-primary" id="newDocBtn">+ Nuevo registro</button>
         </div>
-        <p class="empty" style="text-align:left;padding:0 0 14px;">Por ahora este módulo lleva el registro (nombre, estado, fecha) de qué documento corresponde a cada cliente — todavía no adjunta el archivo en sí. Mientras tanto guardá los PDFs en tu Drive/mail y anotá acá el seguimiento.</p>
+        <p class="empty" style="text-align:left;padding:0 0 14px;">Subí el archivo a tu Drive (o donde lo guardes), compartilo y pegá el link acá — así queda accesible desde la ficha del cliente con un clic.</p>
         <div class="table-wrap"><table>
-          <thead><tr><th>Cliente</th><th>Documento</th><th>Estado</th><th>Fecha</th><th></th></tr></thead>
+          <thead><tr><th>Cliente</th><th>Documento</th><th>Estado</th><th>Fecha</th><th>Archivo</th><th></th></tr></thead>
           <tbody id="docRows"></tbody>
         </table></div>
       `;
@@ -1001,13 +1006,14 @@
     const el = document.querySelector('.page[data-page="documentos"]');
     const rows = state.documents.slice().sort((a,b) => (b.date||'').localeCompare(a.date||''));
     const tbody = el.querySelector('#docRows');
-    if (!rows.length){ tbody.innerHTML = `<tr><td colspan="5" class="no-label"><p class="empty">No hay documentos registrados.</p></td></tr>`; return; }
+    if (!rows.length){ tbody.innerHTML = `<tr><td colspan="6" class="no-label"><p class="empty">No hay documentos registrados.</p></td></tr>`; return; }
     tbody.innerHTML = rows.map(d => `
       <tr>
         <td data-label="Cliente">${esc(clientName(d.clientId))}</td>
         <td data-label="Documento">${esc(d.name)}</td>
         <td data-label="Estado"><span class="badge ${d.status==='recibido'?'badge-ok':'badge-warn'}">${d.status==='recibido'?'Recibido':'Pendiente'}</span></td>
         <td data-label="Fecha">${fmtDate(d.date)}</td>
+        <td data-label="Archivo">${d.url ? `<a href="${esc(d.url)}" target="_blank" rel="noopener" class="btn btn-sm btn-outline">Abrir ↗</a>` : '<span class="badge badge-muted">Sin link</span>'}</td>
         <td class="no-label"><div class="row-actions"><button class="icon-btn edit-doc" data-id="${d.id}" title="Editar">✎</button></div></td>
       </tr>`).join('');
     tbody.querySelectorAll('.edit-doc').forEach(b => b.addEventListener('click', () => {
@@ -1026,6 +1032,7 @@
         </select></div>
         <div class="field"><label>Fecha</label><input name="date" type="date" value="${esc(d.date || new Date().toISOString().slice(0,10))}"></div>
       </div>
+      <div class="field"><label>Link al archivo (Drive, mail, etc.)</label><input name="url" type="url" placeholder="https://drive.google.com/…" value="${esc(d.url||'')}"></div>
       <div class="field"><label>Nota</label><textarea name="note">${esc(d.note||'')}</textarea></div>
     `, async data => {
       if (existing){
