@@ -726,6 +726,21 @@
     const mora = paid < expected;
     return { label: `${paid}/${total}${mora ? ' · Mora' : ''}`, cls: mora ? 'badge-danger' : 'badge-warn', mora };
   }
+  function renewPolicy(old){
+    const toISO = d => d.toISOString().slice(0,10);
+    const oldEnd = old.endDate ? new Date(old.endDate + 'T00:00:00') : new Date();
+    const newStart = new Date(oldEnd);
+    newStart.setDate(newStart.getDate() + 1);
+    const newEnd = new Date(newStart);
+    newEnd.setFullYear(newEnd.getFullYear() + 1);
+    openPolicyForm(null, {
+      clientId: old.clientId, ramo: old.ramo, company: old.company,
+      premium: old.premium, commissionPct: old.commissionPct,
+      paymentMethod: old.paymentMethod, installments: old.installments,
+      installmentsPaid: 0, status: 'activa', policyNumber: '',
+      startDate: toISO(newStart), endDate: toISO(newEnd), notes: old.notes || '',
+    });
+  }
   function renderPolizas(){
     const el = document.querySelector('.page[data-page="polizas"]');
     if (!el.dataset.init){
@@ -793,12 +808,16 @@
         <td data-label="Estado"><span class="badge ${s.cls}">${s.label}</span></td>
         <td class="no-label"><div class="row-actions">
           ${canRegisterPayment ? `<button class="icon-btn mark-paid" data-id="${p.id}" title="Registrar pago de cuota">＋</button>` : ''}
+          <button class="icon-btn renew-pol" data-id="${p.id}" title="Renovar póliza">↻</button>
           <button class="icon-btn edit-pol" data-id="${p.id}" title="Editar">✎</button>
         </div></td>
       </tr>`;
     }).join('');
     tbody.querySelectorAll('.edit-pol').forEach(b => b.addEventListener('click', () => {
       const p = state.policies.find(x => x.id === b.dataset.id); if (p) openPolicyForm(p);
+    }));
+    tbody.querySelectorAll('.renew-pol').forEach(b => b.addEventListener('click', () => {
+      const p = state.policies.find(x => x.id === b.dataset.id); if (p) renewPolicy(p);
     }));
     tbody.querySelectorAll('.mark-paid').forEach(b => b.addEventListener('click', async () => {
       const p = state.policies.find(x => x.id === b.dataset.id);
@@ -809,9 +828,9 @@
       toast('Cuota registrada.');
     }));
   }
-  function openPolicyForm(existing){
-    const p = existing || {};
-    openModal(existing ? 'Editar póliza' : 'Nueva póliza', `
+  function openPolicyForm(existing, seed){
+    const p = existing || seed || {};
+    openModal(existing ? 'Editar póliza' : (seed ? 'Renovar póliza' : 'Nueva póliza'), `
       <div class="field"><label>Cliente</label><select name="clientId" required>${clientOptions(p.clientId)}</select></div>
       <div class="field-row">
         <div class="field"><label>Ramo</label><select name="ramo">${ramoOptions(p.ramo)}</select></div>
