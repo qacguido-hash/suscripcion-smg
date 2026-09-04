@@ -398,7 +398,10 @@
         </div>
         <div style="margin-top:20px;">
           <h2 style="font-size:15px;">Documentos (${docsC.length})</h2>
-          ${docsC.length ? docsC.map(d => `<div class="kv"><span>${esc(d.name)} <span class="badge ${d.status==='recibido'?'badge-ok':'badge-warn'}" style="margin-left:6px;">${d.status==='recibido'?'Recibido':'Pendiente'}</span></span>${d.url ? `<a href="${esc(d.url)}" target="_blank" rel="noopener" style="color:var(--blue);font-weight:600;">Abrir ↗</a>` : '<span class="sub">Sin link</span>'}</div>`).join('') : '<p class="sub">Sin documentos registrados.</p>'}
+          ${docsC.length ? docsC.map(d => `<div class="kv"><span>${esc(d.name)} <span class="badge ${d.status==='recibido'?'badge-ok':'badge-warn'}" style="margin-left:6px;">${d.status==='recibido'?'Recibido':'Pendiente'}</span></span>${
+            d.fileData ? `<button type="button" class="btn btn-sm btn-outline drawer-view-file" data-id="${esc(d.id)}">Ver</button>`
+            : d.url ? `<a href="${esc(d.url)}" target="_blank" rel="noopener" style="color:var(--blue);font-weight:600;">Abrir ↗</a>` : '<span class="sub">Sin archivo</span>'
+          }</div>`).join('') : '<p class="sub">Sin documentos registrados.</p>'}
         </div>
         <div style="margin-top:20px;">
           <div style="display:flex;justify-content:space-between;align-items:center;">
@@ -418,6 +421,9 @@
     backdrop.querySelector('#addInterBtn').addEventListener('click', () => {
       openInteractionForm(clientId, () => { backdrop.remove(); openClientDrawer(clientId); });
     });
+    backdrop.querySelectorAll('.drawer-view-file').forEach(b => b.addEventListener('click', () => {
+      const doc = state.documents.find(x => x.id === b.dataset.id); if (doc) viewStoredFile(doc);
+    }));
   }
 
   /* ==================== DASHBOARD ==================== */
@@ -992,7 +998,7 @@
           <div><h1>Documentación</h1><p>Registro de documentos por cliente — pendientes y recibidos</p></div>
           <button class="btn btn-primary" id="newDocBtn">+ Nuevo registro</button>
         </div>
-        <p class="empty" style="text-align:left;padding:0 0 14px;">Subí el archivo a tu Drive (o donde lo guardes), compartilo y pegá el link acá — así queda accesible desde la ficha del cliente con un clic.</p>
+        <p class="empty" style="text-align:left;padding:0 0 14px;">Los archivos livianos (hasta 170 KB — un DNI escaneado, una póliza de pocas páginas) se guardan directo acá. Para los más pesados, subilos a tu Drive y pegá el link.</p>
         <div class="table-wrap"><table>
           <thead><tr><th>Cliente</th><th>Documento</th><th>Estado</th><th>Fecha</th><th>Archivo</th><th></th></tr></thead>
           <tbody id="docRows"></tbody>
@@ -1013,16 +1019,26 @@
         <td data-label="Documento">${esc(d.name)}</td>
         <td data-label="Estado"><span class="badge ${d.status==='recibido'?'badge-ok':'badge-warn'}">${d.status==='recibido'?'Recibido':'Pendiente'}</span></td>
         <td data-label="Fecha">${fmtDate(d.date)}</td>
-        <td data-label="Archivo">${d.url ? `<a href="${esc(d.url)}" target="_blank" rel="noopener" class="btn btn-sm btn-outline">Abrir ↗</a>` : '<span class="badge badge-muted">Sin link</span>'}</td>
+        <td data-label="Archivo">${d.fileData
+          ? `<div class="row-actions"><button class="btn btn-sm btn-outline view-file" data-id="${d.id}">Ver</button><button class="btn btn-sm btn-outline dl-file" data-id="${d.id}">Descargar</button></div>`
+          : d.url ? `<a href="${esc(d.url)}" target="_blank" rel="noopener" class="btn btn-sm btn-outline">Abrir ↗</a>` : '<span class="badge badge-muted">Sin archivo</span>'}</td>
         <td class="no-label"><div class="row-actions"><button class="icon-btn edit-doc" data-id="${d.id}" title="Editar">✎</button></div></td>
       </tr>`).join('');
     tbody.querySelectorAll('.edit-doc').forEach(b => b.addEventListener('click', () => {
       const d = state.documents.find(x => x.id === b.dataset.id); if (d) openDocForm(d);
     }));
+    tbody.querySelectorAll('.view-file').forEach(b => b.addEventListener('click', () => {
+      const d = state.documents.find(x => x.id === b.dataset.id); if (d) viewStoredFile(d);
+    }));
+    tbody.querySelectorAll('.dl-file').forEach(b => b.addEventListener('click', () => {
+      const d = state.documents.find(x => x.id === b.dataset.id); if (d) downloadStoredFile(d);
+    }));
   }
+  const MAX_FILE_BYTES = 170 * 1024;
   function openDocForm(existing){
     const d = existing || {};
-    openModal(existing ? 'Editar documento' : 'Nuevo registro de documento', `
+    let pendingFile = null; // null | 'toolarge' | { name, type, size, base64 }
+    const backdrop = openModal(existing ? 'Editar documento' : 'Nuevo registro de documento', `
       <div class="field"><label>Cliente</label><select name="clientId" required>${clientOptions(d.clientId)}</select></div>
       <div class="field"><label>Documento</label><input name="name" required placeholder="Ej: DNI, póliza firmada, CBU…" value="${esc(d.name||'')}"></div>
       <div class="field-row">
@@ -1032,9 +1048,21 @@
         </select></div>
         <div class="field"><label>Fecha</label><input name="date" type="date" value="${esc(d.date || new Date().toISOString().slice(0,10))}"></div>
       </div>
+      <div class="field">
+        <label>Adjuntar archivo (PDF o imagen, hasta 170 KB)</label>
+        <input type="file" id="docFileInput" accept="application/pdf,image/*">
+        <div id="docFileHint" style="font-size:11.5px;color:var(--muted);margin-top:5px;">${d.fileName ? `Archivo guardado: ${esc(d.fileName)} (${Math.round((d.fileSize||0)/1024)} KB) — elegí otro para reemplazarlo.` : 'Si pesa más de 170 KB no entra acá: comprimilo o usá el link de abajo.'}</div>
+      </div>
       <div class="field"><label>Link al archivo (Drive, mail, etc.)</label><input name="url" type="url" placeholder="https://drive.google.com/…" value="${esc(d.url||'')}"></div>
       <div class="field"><label>Nota</label><textarea name="note">${esc(d.note||'')}</textarea></div>
     `, async data => {
+      if (pendingFile === 'toolarge') throw new Error('El archivo pesa más de 170 KB — comprimilo o usá el link de Drive.');
+      if (pendingFile){
+        data.fileName = pendingFile.name;
+        data.fileType = pendingFile.type;
+        data.fileSize = pendingFile.size;
+        data.fileData = pendingFile.base64;
+      }
       if (existing){
         await db.collection('documents').doc(existing.id).update(data);
         toast('Documento actualizado.');
@@ -1044,6 +1072,49 @@
         toast('Registro creado.');
       }
     }, existing ? { onDelete: async () => { await db.collection('documents').doc(existing.id).delete(); toast('Registro eliminado.'); } } : {});
+
+    const fileInput = backdrop.querySelector('#docFileInput');
+    const hint = backdrop.querySelector('#docFileHint');
+    fileInput.addEventListener('change', () => {
+      const f = fileInput.files[0];
+      if (!f){ pendingFile = null; return; }
+      if (f.size > MAX_FILE_BYTES){
+        pendingFile = 'toolarge';
+        hint.textContent = `Pesa ${Math.round(f.size/1024)} KB — supera el máximo de 170 KB. Comprimilo o usá el link de abajo.`;
+        hint.style.color = 'var(--danger)';
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = () => {
+        pendingFile = { name: f.name, type: f.type, size: f.size, base64: reader.result };
+        hint.textContent = `Listo para guardar: ${f.name} (${Math.round(f.size/1024)} KB).`;
+        hint.style.color = 'var(--ok)';
+      };
+      reader.readAsDataURL(f);
+    });
+  }
+  function dataUrlToBlob(dataUrl){
+    const [header, base64] = dataUrl.split(',');
+    const mime = (header.match(/data:(.*?);base64/) || [,'application/octet-stream'])[1];
+    const bin = atob(base64);
+    const arr = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+    return new Blob([arr], { type: mime });
+  }
+  function viewStoredFile(d){
+    if (!d.fileData) return;
+    const blob = dataUrlToBlob(d.fileData);
+    const url = URL.createObjectURL(blob);
+    window.open(url, '_blank');
+    setTimeout(() => URL.revokeObjectURL(url), 60000);
+  }
+  async function downloadStoredFile(d){
+    if (!d.fileData) return;
+    const downloads = await claude.use('downloads');
+    if (!downloads){ toast('La descarga no está disponible en esta vista.'); return; }
+    try {
+      await downloads.save({ filename: d.fileName || 'documento', data: dataUrlToBlob(d.fileData) });
+    } catch (e) { if (e && e.code !== 'declined') toast('No se pudo descargar el archivo.'); }
   }
 
   /* ==================== SINIESTROS ==================== */
