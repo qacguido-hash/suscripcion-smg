@@ -209,6 +209,8 @@
   const RAMOS_EMPRESAS = ['Seguro de ART','Seguro de Caución (empresa)','Todo Riesgo Operativo','Responsabilidad Civil','Seguro Técnico','Vida Colectivo','Accidentes Personales (empresa)','Integral de Comercio'];
   const RAMOS_ALL = RAMOS_PERSONAS.concat(RAMOS_EMPRESAS);
   const COMPANIES = ['Federación Patronal','Swiss Medical','Zurich','Prevención ART','Allianz','Sancor Seguros','Triunfo Seguros','Gestión Seguros','Tutelar','Crédito y Caución','Otra'];
+  const PAYMENT_METHODS = ['Débito automático','Tarjeta de crédito','Transferencia','Efectivo','Otro'];
+  const RMASD_SPLIT_PCT = 50;
 
   const TABS = [
     { key:'dashboard', label:'Panel' },
@@ -722,6 +724,10 @@
         </select></div>
       </div>
       <div class="field-row">
+        <div class="field"><label>Medio de pago</label><select name="paymentMethod">${PAYMENT_METHODS.map(m => `<option value="${esc(m)}" ${p.paymentMethod===m?'selected':''}>${esc(m)}</option>`).join('')}</select></div>
+        <div class="field"><label>Cantidad de cuotas</label><input name="installments" type="number" min="1" step="1" value="${esc(p.installments||'1')}"></div>
+      </div>
+      <div class="field-row">
         <div class="field"><label>Inicio de vigencia</label><input name="startDate" type="date" value="${esc(p.startDate||'')}"></div>
         <div class="field"><label>Vencimiento</label><input name="endDate" type="date" value="${esc(p.endDate||'')}"></div>
       </div>
@@ -730,6 +736,7 @@
       data.clientName = clientName(data.clientId);
       data.premium = Number(data.premium) || 0;
       data.commissionPct = Number(data.commissionPct) || 0;
+      data.installments = Number(data.installments) || 1;
       if (existing){
         await db.collection('policies').doc(existing.id).update(data);
         toast('Póliza actualizada.');
@@ -1201,6 +1208,8 @@
     const el = document.querySelector('.page[data-page="comisiones"]');
     const active = state.policies.filter(p => p.status !== 'cancelada');
     const totalComm = active.reduce((s,p) => s + (Number(p.premium)||0) * (Number(p.commissionPct)||0)/100, 0);
+    const rmasdShare = totalComm * RMASD_SPLIT_PCT / 100;
+    const myShare = totalComm - rmasdShare;
     const byCompany = {};
     active.forEach(p => {
       const c = (Number(p.premium)||0) * (Number(p.commissionPct)||0)/100;
@@ -1208,19 +1217,23 @@
     });
     const rows = Object.entries(byCompany).sort((a,b)=>b[1]-a[1]);
     el.innerHTML = `
-      <div class="page-head"><div><h1>Comisiones</h1><p>Estimado según prima y % de comisión cargado en cada póliza</p></div></div>
+      <div class="page-head"><div><h1>Comisiones</h1><p>Estimado según prima y % de comisión cargado en cada póliza. Se reparte ${RMASD_SPLIT_PCT}% para RMASD y ${100-RMASD_SPLIT_PCT}% para vos.</p></div></div>
       <div class="stat-grid">
-        <div class="stat-card"><b>${fmtMoney(totalComm)}</b><span>Comisión estimada total</span></div>
+        <div class="stat-card"><b>${fmtMoney(totalComm)}</b><span>Comisión total</span></div>
+        <div class="stat-card"><b>${fmtMoney(rmasdShare)}</b><span>RMASD (${RMASD_SPLIT_PCT}%)</span></div>
+        <div class="stat-card"><b>${fmtMoney(myShare)}</b><span>Tu comisión (${100-RMASD_SPLIT_PCT}%)</span></div>
         <div class="stat-card"><b>${active.length}</b><span>Pólizas activas</span></div>
       </div>
       <div class="table-wrap"><table>
-        <thead><tr><th>Aseguradora</th><th>Pólizas</th><th>Prima total</th><th>Comisión estimada</th></tr></thead>
+        <thead><tr><th>Aseguradora</th><th>Pólizas</th><th>Prima total</th><th>Comisión total</th><th>RMASD (${RMASD_SPLIT_PCT}%)</th><th>Tu comisión (${100-RMASD_SPLIT_PCT}%)</th></tr></thead>
         <tbody>
           ${rows.length ? rows.map(([name,val]) => {
             const n = active.filter(p => p.company === name).length;
             const prem = active.filter(p => p.company === name).reduce((s,p)=>s+(Number(p.premium)||0),0);
-            return `<tr><td data-label="Aseguradora">${esc(name)}</td><td data-label="Pólizas">${n}</td><td data-label="Prima total">${fmtMoney(prem)}</td><td data-label="Comisión">${fmtMoney(val)}</td></tr>`;
-          }).join('') : '<tr><td colspan="4" class="no-label"><p class="empty">Cargá el % de comisión en cada póliza para ver el estimado.</p></td></tr>'}
+            const rmasd = val * RMASD_SPLIT_PCT / 100;
+            const mine = val - rmasd;
+            return `<tr><td data-label="Aseguradora">${esc(name)}</td><td data-label="Pólizas">${n}</td><td data-label="Prima total">${fmtMoney(prem)}</td><td data-label="Comisión total">${fmtMoney(val)}</td><td data-label="RMASD">${fmtMoney(rmasd)}</td><td data-label="Tu comisión">${fmtMoney(mine)}</td></tr>`;
+          }).join('') : '<tr><td colspan="6" class="no-label"><p class="empty">Cargá el % de comisión en cada póliza para ver el estimado.</p></td></tr>'}
         </tbody>
       </table></div>
     `;
