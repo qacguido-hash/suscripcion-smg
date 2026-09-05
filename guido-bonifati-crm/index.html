@@ -1744,7 +1744,7 @@
           <div><h1>Documentación</h1><p>Registro de documentos por cliente — pendientes y recibidos</p></div>
           <button class="btn btn-primary" id="newDocBtn">+ Nuevo registro</button>
         </div>
-        <p class="empty" style="text-align:left;padding:0 0 14px;">Cada cliente tiene 5 MB de espacio para guardar documentos acá (repartibles en varios archivos: DNI, póliza firmada, CBU, etc.). Para archivos más pesados, subilos a tu Drive y pegá el link.</p>
+        <p class="empty" style="text-align:left;padding:0 0 14px;">Cada cliente tiene 15 MB de espacio para guardar documentos acá (repartibles en varios archivos: DNI, póliza firmada, CBU, etc.). Para archivos más pesados, subilos a tu Drive y pegá el link.</p>
         <div class="table-wrap"><table>
           <thead><tr><th>Cliente</th><th>Documento</th><th>Estado</th><th>Fecha</th><th>Archivo</th><th></th></tr></thead>
           <tbody id="docRows"></tbody>
@@ -1780,7 +1780,7 @@
       const d = state.documents.find(x => x.id === b.dataset.id); if (d) downloadStoredFile(d);
     }));
   }
-  const CLIENT_STORAGE_BUDGET = 5 * 1024 * 1024;
+  const CLIENT_STORAGE_BUDGET = 15 * 1024 * 1024;
   const MAX_FILE_BYTES = CLIENT_STORAGE_BUDGET;
   const CHUNK_B64_CHARS = 250000;
   function clientStorageUsed(clientId, excludeDocId){
@@ -1826,17 +1826,17 @@
       <div class="field">
         <label>Adjuntar archivo (PDF o imagen)</label>
         <input type="file" id="docFileInput" accept="application/pdf,image/*">
-        <div id="docFileHint" style="font-size:11.5px;color:var(--muted);margin-top:5px;">${d.fileName ? `Archivo guardado: ${esc(d.fileName)} (${Math.round((d.fileSize||0)/1024)} KB) — elegí otro para reemplazarlo.` : 'Cada cliente tiene 5 MB de espacio en total, repartibles en varios archivos.'}</div>
+        <div id="docFileHint" style="font-size:11.5px;color:var(--muted);margin-top:5px;">${d.fileName ? `Archivo guardado: ${esc(d.fileName)} (${Math.round((d.fileSize||0)/1024)} KB) — elegí otro para reemplazarlo.` : 'Cada cliente tiene 15 MB de espacio en total, repartibles en varios archivos.'}</div>
       </div>
       <div class="field"><label>Link al archivo (Drive, mail, etc.)</label><input name="url" type="url" placeholder="https://drive.google.com/…" value="${esc(d.url||'')}"></div>
       <div class="field"><label>Nota</label><textarea name="note">${esc(d.note||'')}</textarea></div>
     `, async data => {
-      if (pendingFile === 'toolarge') throw new Error('El archivo pesa más de 5 MB — comprimilo o usá el link de Drive.');
+      if (pendingFile === 'toolarge') throw new Error('El archivo pesa más de 15 MB — comprimilo o usá el link de Drive.');
       if (pendingFile && pendingFile !== 'toolarge'){
         const used = clientStorageUsed(data.clientId, existing ? existing.id : null);
         if (used + pendingFile.size > CLIENT_STORAGE_BUDGET){
           const usedMb = (used/1024/1024).toFixed(2), fileMb = (pendingFile.size/1024/1024).toFixed(2);
-          throw new Error(`Este cliente ya usa ${usedMb} MB de los 5 MB disponibles — este archivo (${fileMb} MB) no entra. Borrá otro archivo de este cliente o subí este a Drive.`);
+          throw new Error(`Este cliente ya usa ${usedMb} MB de los 15 MB disponibles — este archivo (${fileMb} MB) no entra. Borrá otro archivo de este cliente o subí este a Drive.`);
         }
       }
       const fileMeta = pendingFile ? { fileName: pendingFile.name, fileType: pendingFile.type, fileSize: pendingFile.size } : null;
@@ -1867,7 +1867,7 @@
     function updateStorageHint(){
       const used = clientStorageUsed(clientSelect.value, existing ? existing.id : null);
       const usedMb = (used/1024/1024).toFixed(2);
-      storageHint.textContent = `Espacio usado por este cliente: ${usedMb} MB de 5 MB.`;
+      storageHint.textContent = `Espacio usado por este cliente: ${usedMb} MB de 15 MB.`;
       storageHint.style.color = used >= CLIENT_STORAGE_BUDGET ? 'var(--danger)' : 'var(--muted)';
     }
     updateStorageHint();
@@ -1880,14 +1880,14 @@
       if (!f){ pendingFile = null; return; }
       if (f.size > MAX_FILE_BYTES){
         pendingFile = 'toolarge';
-        hint.textContent = `Pesa ${(f.size/1024/1024).toFixed(1)} MB — supera el máximo de 5 MB. Comprimilo o usá el link de abajo.`;
+        hint.textContent = `Pesa ${(f.size/1024/1024).toFixed(1)} MB — supera el máximo de 15 MB. Comprimilo o usá el link de abajo.`;
         hint.style.color = 'var(--danger)';
         return;
       }
       const used = clientStorageUsed(clientSelect.value, existing ? existing.id : null);
       if (used + f.size > CLIENT_STORAGE_BUDGET){
         pendingFile = 'toolarge';
-        hint.textContent = `Este cliente ya usa ${(used/1024/1024).toFixed(2)} MB de 5 MB — este archivo (${(f.size/1024/1024).toFixed(2)} MB) no entra.`;
+        hint.textContent = `Este cliente ya usa ${(used/1024/1024).toFixed(2)} MB de 15 MB — este archivo (${(f.size/1024/1024).toFixed(2)} MB) no entra.`;
         hint.style.color = 'var(--danger)';
         return;
       }
