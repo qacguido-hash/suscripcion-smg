@@ -300,6 +300,9 @@
     { key:'documentos', label:'Documentos' },
     { key:'siniestros', label:'Siniestros' },
     { key:'comisiones', label:'Comisiones' },
+    { key:'analisis', label:'Análisis' },
+    { key:'aseguradoras', label:'Aseguradoras' },
+    { key:'argumentario', label:'Argumentario' },
   ];
 
   app.innerHTML = `
@@ -354,12 +357,13 @@
 
   /* ---------- State ---------- */
   const state = {
-    clients: [], policies: [], quotes: [], tasks: [], interactions: [], documents: [], claims: [],
+    clients: [], policies: [], quotes: [], tasks: [], interactions: [], documents: [], claims: [], insurers: [],
   };
   let db = null;
   let currentTab = 'dashboard';
   let calMonth = new Date(); calMonth.setDate(1);
   let dashPaymentFilter = '';
+  let goals = { monthlyPremiumGoal: 0, monthlyPolicyGoal: 0 };
 
   function clientName(id){
     const c = state.clients.find(c => c.id === id);
@@ -389,6 +393,9 @@
     else if (currentTab === 'documentos') renderDocumentos();
     else if (currentTab === 'siniestros') renderSiniestros();
     else if (currentTab === 'comisiones') renderComisiones();
+    else if (currentTab === 'analisis') renderAnalisis();
+    else if (currentTab === 'aseguradoras') renderAseguradoras();
+    else if (currentTab === 'argumentario') renderArgumentario();
   }
   function updateNavAlerts(){
     const active = state.policies.filter(p => p.status !== 'cancelada');
@@ -571,6 +578,12 @@
     cancelledWithReason.forEach(p => { byCancelReason[p.cancellationReason] = (byCancelReason[p.cancellationReason]||0) + 1; });
     const cancelReasonRows = Object.entries(byCancelReason).sort((a,b)=>b[1]-a[1]);
 
+    const thisMonthKey = new Date().toISOString().slice(0,7);
+    const newThisMonth = state.policies.filter(p => (p.createdAt||'').slice(0,7) === thisMonthKey);
+    const premiumThisMonth = newThisMonth.filter(p => p.currency !== 'USD').reduce((s,p)=>s+(Number(p.premium)||0),0);
+    const premiumGoalPct = goals.monthlyPremiumGoal ? Math.min(100, Math.round(premiumThisMonth/goals.monthlyPremiumGoal*100)) : 0;
+    const policyGoalPct = goals.monthlyPolicyGoal ? Math.min(100, Math.round(newThisMonth.length/goals.monthlyPolicyGoal*100)) : 0;
+
     function companyRowsFor(cur){
       const map = {};
       activePolicies.filter(p => (p.currency === 'USD' ? 'USD' : 'ARS') === cur)
@@ -614,6 +627,22 @@
         <button class="btn btn-outline" id="exportBtn">Exportar respaldo (JSON)</button>
       </div>
       ${(overdue.length || inArrears.length) ? `<div class="alert-banner">⚠️ ${overdue.length ? `${overdue.length} póliza${overdue.length===1?'':'s'} vencida${overdue.length===1?'':'s'}` : ''}${overdue.length && inArrears.length ? ' · ' : ''}${inArrears.length ? `${inArrears.length} póliza${inArrears.length===1?'':'s'} con cuotas en mora` : ''} — revisá Pólizas para regularizar.</div>` : ''}
+      <div class="panel" style="margin-bottom:18px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <h2>Meta del mes</h2>
+          <button class="btn btn-sm btn-outline" id="editGoalsBtn">Editar meta</button>
+        </div>
+        ${(goals.monthlyPremiumGoal || goals.monthlyPolicyGoal) ? `
+          ${goals.monthlyPremiumGoal ? `<div style="margin-top:8px;">
+            <div class="kv" style="padding:2px 0;"><span>Prima nueva (ARS)</span><span>${fmtMoney(premiumThisMonth)} / ${fmtMoney(goals.monthlyPremiumGoal)}</span></div>
+            <span class="bar-track" style="display:block;"><span class="bar-fill" style="width:${premiumGoalPct}%"></span></span>
+          </div>` : ''}
+          ${goals.monthlyPolicyGoal ? `<div style="margin-top:10px;">
+            <div class="kv" style="padding:2px 0;"><span>Pólizas nuevas</span><span>${newThisMonth.length} / ${goals.monthlyPolicyGoal}</span></div>
+            <span class="bar-track" style="display:block;"><span class="bar-fill" style="width:${policyGoalPct}%;background:var(--yellow-deep);"></span></span>
+          </div>` : ''}
+        ` : '<p class="empty">Todavía no cargaste una meta mensual.</p>'}
+      </div>
       <div class="stat-grid">
         <div class="stat-card"><b>${state.clients.length}</b><span>Clientes</span></div>
         <div class="stat-card"><b>${activePolicies.length}</b><span>Pólizas vigentes</span></div>
@@ -700,7 +729,18 @@
       </div>
     `;
     el.querySelector('#exportBtn').addEventListener('click', exportBackup);
+    el.querySelector('#editGoalsBtn').addEventListener('click', openGoalsForm);
     el.querySelector('#dashPaymentFilter').addEventListener('input', e => { dashPaymentFilter = e.target.value; renderDashboard(); });
+  }
+  function openGoalsForm(){
+    openModal('Meta del mes', `
+      <div class="field"><label>Meta de prima nueva (ARS)</label><input name="monthlyPremiumGoal" type="number" step="1" value="${esc(goals.monthlyPremiumGoal||'')}"></div>
+      <div class="field"><label>Meta de cantidad de pólizas nuevas</label><input name="monthlyPolicyGoal" type="number" step="1" value="${esc(goals.monthlyPolicyGoal||'')}"></div>
+    `, async data => {
+      const payload = { monthlyPremiumGoal: Number(data.monthlyPremiumGoal)||0, monthlyPolicyGoal: Number(data.monthlyPolicyGoal)||0 };
+      await db.doc('settings/goals').set(payload);
+      toast('Meta actualizada.');
+    });
   }
 
   async function exportBackup(){
@@ -708,6 +748,7 @@
       exportedAt: new Date().toISOString(),
       clients: state.clients, policies: state.policies, quotes: state.quotes,
       tasks: state.tasks, interactions: state.interactions, documents: state.documents, claims: state.claims,
+      insurers: state.insurers, goals,
     };
     const json = JSON.stringify(dump, null, 2);
     const downloads = await claude.use('downloads');
@@ -739,6 +780,143 @@
     } catch (e) { if (e && e.code !== 'declined') toast('No se pudo exportar el CSV.'); }
   }
 
+  function parseCsv(text){
+    text = text.replace(/^﻿/, '').replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+    const rows = [];
+    let row = [], field = '', inQuotes = false;
+    for (let i = 0; i < text.length; i++){
+      const c = text[i];
+      if (inQuotes){
+        if (c === '"'){
+          if (text[i+1] === '"'){ field += '"'; i++; }
+          else inQuotes = false;
+        } else field += c;
+      } else if (c === '"'){
+        inQuotes = true;
+      } else if (c === ','){
+        row.push(field); field = '';
+      } else if (c === '\n'){
+        row.push(field); rows.push(row); row = []; field = '';
+      } else {
+        field += c;
+      }
+    }
+    if (field.length || row.length){ row.push(field); rows.push(row); }
+    return rows.filter(r => !(r.length === 1 && r[0] === ''));
+  }
+  function openImportClientsForm(){
+    const backdrop = openModal('Importar clientes (CSV)', `
+      <p class="sub" style="margin-bottom:10px;">Columnas esperadas (en cualquier orden): Nombre, Tipo, DNI/CUIT, Email, Teléfono, Dirección, Localidad, Cumpleaños (AAAA-MM-DD), Etiquetas (separadas por ";"), Notas.</p>
+      <div class="field"><input type="file" id="importFile" accept=".csv,text/csv"></div>
+      <p id="importSummary" class="sub" style="margin-top:10px;"></p>
+    `, async () => {}, { submitLabel: 'Cerrar' });
+    const summary = backdrop.querySelector('#importSummary');
+    backdrop.querySelector('#importFile').addEventListener('change', async e => {
+      const file = e.target.files[0];
+      if (!file) return;
+      summary.textContent = 'Importando…';
+      try {
+        const text = await file.text();
+        const rows = parseCsv(text);
+        if (!rows.length){ summary.textContent = 'El archivo está vacío.'; return; }
+        const header = rows[0].map(h => h.trim().toLowerCase());
+        const idx = name => header.indexOf(name);
+        const iName = idx('nombre'), iType = idx('tipo');
+        const iDoc = idx('dni/cuit') >= 0 ? idx('dni/cuit') : idx('docid');
+        const iEmail = idx('email');
+        const iPhone = idx('teléfono') >= 0 ? idx('teléfono') : idx('telefono');
+        const iAddr = idx('dirección') >= 0 ? idx('dirección') : idx('direccion');
+        const iLocality = idx('localidad');
+        const iBday = idx('cumpleaños') >= 0 ? idx('cumpleaños') : idx('cumpleanos');
+        const iTags = idx('etiquetas'), iNotes = idx('notas');
+        if (iName < 0){ summary.textContent = 'Falta la columna "Nombre".'; return; }
+        let created = 0, skipped = 0;
+        for (let i = 1; i < rows.length; i++){
+          const r = rows[i];
+          const name = (r[iName]||'').trim();
+          if (!name) continue;
+          const docId = iDoc >= 0 ? (r[iDoc]||'').trim() : '';
+          const exists = state.clients.some(c => c.name.toLowerCase() === name.toLowerCase() && (c.docId||'') === docId);
+          if (exists){ skipped++; continue; }
+          const data = {
+            name, type: iType >= 0 && (r[iType]||'').trim().toLowerCase() === 'empresa' ? 'empresa' : 'persona',
+            docId, email: iEmail>=0?(r[iEmail]||'').trim():'', phone: iPhone>=0?(r[iPhone]||'').trim():'',
+            address: iAddr>=0?(r[iAddr]||'').trim():'', locality: iLocality>=0?(r[iLocality]||'').trim():'',
+            birthday: iBday>=0?(r[iBday]||'').trim():'',
+            tags: iTags>=0 ? (r[iTags]||'').split(';').map(s=>s.trim()).filter(Boolean) : [],
+            notes: iNotes>=0?(r[iNotes]||'').trim():'', createdAt: new Date().toISOString(),
+          };
+          await db.collection('clients').add(data);
+          created++;
+        }
+        summary.textContent = `Listo: ${created} clientes importados, ${skipped} omitidos (ya existían).`;
+        toast('Importación de clientes finalizada.');
+      } catch (err){
+        summary.textContent = 'Error al importar: ' + (err && err.message ? err.message : 'revisá el archivo.');
+      }
+    });
+  }
+  function openImportPoliciesForm(){
+    const backdrop = openModal('Importar pólizas (CSV)', `
+      <p class="sub" style="margin-bottom:10px;">Columnas esperadas (en cualquier orden): Cliente, Ramo, Aseguradora, N° póliza, Prima, Moneda, Comisión %, Medio de pago, Cuotas, Cuotas pagadas, Estado, Inicio de vigencia, Vencimiento (fechas en AAAA-MM-DD). Si el cliente no existe todavía, se crea automáticamente solo con el nombre.</p>
+      <div class="field"><input type="file" id="importFile" accept=".csv,text/csv"></div>
+      <p id="importSummary" class="sub" style="margin-top:10px;"></p>
+    `, async () => {}, { submitLabel: 'Cerrar' });
+    const summary = backdrop.querySelector('#importSummary');
+    backdrop.querySelector('#importFile').addEventListener('change', async e => {
+      const file = e.target.files[0];
+      if (!file) return;
+      summary.textContent = 'Importando…';
+      try {
+        const text = await file.text();
+        const rows = parseCsv(text);
+        if (!rows.length){ summary.textContent = 'El archivo está vacío.'; return; }
+        const header = rows[0].map(h => h.trim().toLowerCase());
+        const idx = name => header.indexOf(name);
+        const iClient = idx('cliente'), iRamo = idx('ramo'), iCompany = idx('aseguradora');
+        const iNum = idx('n° póliza') >= 0 ? idx('n° póliza') : idx('numero de poliza');
+        const iPremium = idx('prima'), iCurrency = idx('moneda');
+        const iComm = idx('comisión %') >= 0 ? idx('comisión %') : idx('comision %');
+        const iMethod = idx('medio de pago'), iInst = idx('cuotas'), iInstPaid = idx('cuotas pagadas');
+        const iStatus = idx('estado'), iStart = idx('inicio de vigencia'), iEnd = idx('vencimiento');
+        if (iClient < 0){ summary.textContent = 'Falta la columna "Cliente".'; return; }
+        let created = 0, clientsCreated = 0;
+        for (let i = 1; i < rows.length; i++){
+          const r = rows[i];
+          const clientNameVal = (r[iClient]||'').trim();
+          if (!clientNameVal) continue;
+          let client = state.clients.find(c => c.name.toLowerCase() === clientNameVal.toLowerCase());
+          if (!client){
+            const ref = await db.collection('clients').add({ name: clientNameVal, type:'persona', createdAt: new Date().toISOString() });
+            client = { id: ref.id, name: clientNameVal };
+            state.clients.push(client);
+            clientsCreated++;
+          }
+          const data = {
+            clientId: client.id, clientName: client.name,
+            ramo: iRamo>=0?(r[iRamo]||'').trim():'', company: iCompany>=0?(r[iCompany]||'').trim():'',
+            policyNumber: iNum>=0?(r[iNum]||'').trim():'',
+            premium: iPremium>=0?Number(r[iPremium])||0:0,
+            currency: iCurrency>=0 && (r[iCurrency]||'').trim().toUpperCase()==='USD' ? 'USD' : 'ARS',
+            commissionPct: iComm>=0?Number(r[iComm])||0:0,
+            paymentMethod: iMethod>=0?(r[iMethod]||'').trim():'',
+            installments: iInst>=0?Math.max(1,Number(r[iInst])||1):1,
+            installmentsPaid: iInstPaid>=0?Math.max(0,Number(r[iInstPaid])||0):0,
+            status: iStatus>=0 && /cancel/i.test(r[iStatus]||'') ? 'cancelada' : 'activa',
+            startDate: iStart>=0?(r[iStart]||'').trim():'', endDate: iEnd>=0?(r[iEnd]||'').trim():'',
+            createdAt: new Date().toISOString(),
+          };
+          await db.collection('policies').add(data);
+          created++;
+        }
+        summary.textContent = `Listo: ${created} pólizas importadas${clientsCreated?`, ${clientsCreated} clientes nuevos creados automáticamente`:''}.`;
+        toast('Importación de pólizas finalizada.');
+      } catch (err){
+        summary.textContent = 'Error al importar: ' + (err && err.message ? err.message : 'revisá el archivo.');
+      }
+    });
+  }
+
   /* ==================== CLIENTES ==================== */
   function renderClientes(){
     const el = document.querySelector('.page[data-page="clientes"]');
@@ -747,7 +925,10 @@
       el.innerHTML = `
         <div class="page-head">
           <div><h1>Clientes</h1><p>Personas y empresas en tu cartera</p></div>
-          <button class="btn btn-primary" id="newClientBtn">+ Nuevo cliente</button>
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn-outline" id="importClientsBtn">Importar CSV</button>
+            <button class="btn btn-primary" id="newClientBtn">+ Nuevo cliente</button>
+          </div>
         </div>
         <div class="toolbar">
           <input type="search" id="clientSearch" placeholder="Buscar por nombre, email o teléfono…" style="min-width:260px;">
@@ -759,6 +940,7 @@
         </table></div>
       `;
       el.querySelector('#newClientBtn').addEventListener('click', () => openClientForm());
+      el.querySelector('#importClientsBtn').addEventListener('click', () => openImportClientsForm());
       el.querySelector('#clientSearch').addEventListener('input', () => renderClientRows());
       el.querySelector('#clientTagFilter').addEventListener('input', () => renderClientRows());
     }
@@ -815,6 +997,7 @@
         <div class="field"><label>Dirección</label><input name="address" value="${esc(c.address||'')}"></div>
         <div class="field"><label>Cumpleaños</label><input name="birthday" type="date" value="${esc(c.birthday||'')}"></div>
       </div>
+      <div class="field"><label>Localidad</label><input name="locality" placeholder="Ej: Mar del Plata" value="${esc(c.locality||'')}"></div>
       <div class="field"><label>Etiquetas</label><input name="tags" placeholder="VIP, Referido, Riesgo de fuga…" value="${esc((c.tags||[]).join(', '))}"></div>
       <div class="field"><label>Notas</label><textarea name="notes">${esc(c.notes||'')}</textarea></div>
     `, async data => {
@@ -908,7 +1091,8 @@
       el.innerHTML = `
         <div class="page-head">
           <div><h1>Pólizas y cartera</h1><p>Todas las pólizas activas y su estado</p></div>
-          <div style="display:flex;gap:8px;">
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn btn-outline" id="importPolCsvBtn">Importar CSV</button>
             <button class="btn btn-outline" id="exportPolCsvBtn">Exportar CSV</button>
             <button class="btn btn-primary" id="newPolBtn">+ Nueva póliza</button>
           </div>
@@ -929,6 +1113,7 @@
       `;
       el.querySelector('#newPolBtn').addEventListener('click', () => openPolicyForm());
       el.querySelector('#exportPolCsvBtn').addEventListener('click', exportPolizasCSV);
+      el.querySelector('#importPolCsvBtn').addEventListener('click', () => openImportPoliciesForm());
       ['polSearch','polCompanyFilter','polStatusFilter'].forEach(id => el.querySelector('#'+id).addEventListener('input', renderPolRows));
     }
     renderPolRows();
@@ -1065,6 +1250,9 @@
       data.commissionPct = Number(data.commissionPct) || 0;
       data.installments = Number(data.installments) || 1;
       data.installmentsPaid = Math.min(data.installments, Math.max(0, Number(data.installmentsPaid) || 0));
+      if (existing && data.status === 'cancelada' && existing.status !== 'cancelada'){
+        data.cancelledAt = new Date().toISOString();
+      }
       if (existing){
         await db.collection('policies').doc(existing.id).update(data);
         toast('Póliza actualizada.');
@@ -1741,11 +1929,249 @@
     `;
   }
 
+  /* ==================== ANÁLISIS ==================== */
+  function renderAnalisis(){
+    const el = document.querySelector('.page[data-page="analisis"]');
+    const active = state.policies.filter(p => p.status !== 'cancelada');
+
+    function avgBy(keyFn){
+      const rows = active.filter(p => p.currency !== 'USD');
+      const map = {};
+      rows.forEach(p => {
+        const k = keyFn(p) || '—';
+        if (!map[k]) map[k] = { sum:0, n:0 };
+        map[k].sum += Number(p.premium)||0; map[k].n++;
+      });
+      return Object.entries(map).map(([k,v]) => [k, v.n ? v.sum/v.n : 0, v.n]).sort((a,b)=>b[1]-a[1]);
+    }
+    const avgByRamo = avgBy(p => p.ramo);
+    const avgByCompany = avgBy(p => p.company);
+    const avgByClientType = avgBy(p => { const c = state.clients.find(x=>x.id===p.clientId); return c && c.type === 'empresa' ? 'Empresa' : 'Persona'; });
+
+    const premiumByCompany = {};
+    active.filter(p => p.currency !== 'USD').forEach(p => { premiumByCompany[p.company] = (premiumByCompany[p.company]||0) + (Number(p.premium)||0); });
+    const totalArs = Object.values(premiumByCompany).reduce((s,v)=>s+v,0);
+    const top3 = Object.entries(premiumByCompany).sort((a,b)=>b[1]-a[1]).slice(0,3);
+    const top3Sum = top3.reduce((s,[,v])=>s+v,0);
+    const top3Pct = totalArs ? Math.round(top3Sum/totalArs*100) : 0;
+
+    const now = new Date();
+    const clientAges = state.clients.map(c => {
+      const pols = state.policies.filter(p => p.clientId === c.id);
+      const dates = pols.map(p => p.startDate).filter(Boolean).sort();
+      const ref = dates.length ? dates[0] : (c.createdAt ? c.createdAt.slice(0,10) : null);
+      if (!ref) return null;
+      const d = new Date(ref.length === 10 ? ref + 'T00:00:00' : ref);
+      if (isNaN(d)) return null;
+      return (now - d) / (365.25*24*3600*1000);
+    }).filter(x => x !== null);
+    const avgAge = clientAges.length ? clientAges.reduce((s,v)=>s+v,0)/clientAges.length : 0;
+    const pctOver = years => clientAges.length ? Math.round(clientAges.filter(a=>a>=years).length/clientAges.length*100) : 0;
+
+    const months = [];
+    for (let i = 5; i >= 0; i--){
+      const d = new Date(now.getFullYear(), now.getMonth()-i, 1);
+      months.push({ key: `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`, label: d.toLocaleDateString('es-AR',{month:'short',year:'2-digit'}) });
+    }
+    const monthlyData = months.map(m => {
+      const nuevas = state.policies.filter(p => (p.createdAt||'').slice(0,7) === m.key);
+      const canceladas = state.policies.filter(p => (p.cancelledAt||'').slice(0,7) === m.key);
+      const primaEmitida = nuevas.filter(p=>p.currency!=='USD').reduce((s,p)=>s+(Number(p.premium)||0),0);
+      return Object.assign({}, m, { nuevas: nuevas.length, canceladas: canceladas.length, primaEmitida });
+    });
+
+    const byLocality = {};
+    state.clients.forEach(c => { if (c.locality) byLocality[c.locality] = (byLocality[c.locality]||0)+1; });
+    const localityRows = Object.entries(byLocality).sort((a,b)=>b[1]-a[1]);
+
+    function avgTable(title, rows){
+      const max = rows.length ? rows[0][1] : 1;
+      return `<div class="panel" style="flex:1;min-width:220px;">
+        <h2>${title}</h2>
+        ${rows.length ? rows.map(([name,avg,n]) => `<div class="bar-row"><span class="label">${esc(name)}</span><span class="bar-track"><span class="bar-fill" style="width:${Math.round(avg/max*100)}%"></span></span><span class="val">${fmtMoney(avg)} (${n})</span></div>`).join('') : '<p class="empty">Sin datos.</p>'}
+      </div>`;
+    }
+
+    el.innerHTML = `
+      <div class="page-head"><div><h1>Análisis y control de gestión</h1><p>Métricas de cartera, concentración y evolución mensual</p></div></div>
+      <div style="display:flex;gap:14px;flex-wrap:wrap;margin-bottom:14px;">
+        ${avgTable('Ticket promedio por ramo (ARS)', avgByRamo)}
+        ${avgTable('Ticket promedio por aseguradora (ARS)', avgByCompany)}
+        ${avgTable('Ticket promedio: persona vs empresa (ARS)', avgByClientType)}
+      </div>
+      <div class="panel" style="margin-bottom:14px;">
+        <h2>Concentración de cartera (ARS)</h2>
+        <div class="stat-grid" style="margin-bottom:8px;">
+          <div class="stat-card"><b style="${top3Pct>60?'color:var(--danger);':''}">${top3Pct}%</b><span>Prima en top 3 aseguradoras</span></div>
+        </div>
+        ${top3Pct > 60 ? `<p class="sub" style="color:var(--danger);margin-bottom:8px;">⚠️ Más del 60% de tu cartera depende de pocas aseguradoras.</p>` : ''}
+        ${top3.map(([name,val]) => `<div class="kv"><span>${esc(name)}</span><span>${fmtMoney(val)} (${totalArs?Math.round(val/totalArs*100):0}%)</span></div>`).join('')}
+      </div>
+      <div class="panel" style="margin-bottom:14px;">
+        <h2>Antigüedad de cartera</h2>
+        <div class="stat-grid">
+          <div class="stat-card"><b>${avgAge.toFixed(1)}</b><span>Años promedio</span></div>
+          <div class="stat-card"><b>${pctOver(1)}%</b><span>Más de 1 año</span></div>
+          <div class="stat-card"><b>${pctOver(2)}%</b><span>Más de 2 años</span></div>
+          <div class="stat-card"><b>${pctOver(3)}%</b><span>Más de 3 años</span></div>
+        </div>
+      </div>
+      <div class="panel" style="margin-bottom:14px;">
+        <h2>Comparativo mensual (últimos 6 meses)</h2>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Mes</th><th>Prima emitida (ARS)</th><th>Pólizas nuevas</th><th>Cancelaciones</th></tr></thead>
+          <tbody>${monthlyData.map(m => `<tr><td data-label="Mes">${esc(m.label)}</td><td data-label="Prima emitida">${fmtMoney(m.primaEmitida)}</td><td data-label="Nuevas">${m.nuevas}</td><td data-label="Cancelaciones">${m.canceladas}</td></tr>`).join('')}</tbody>
+        </table></div>
+      </div>
+      <div class="panel">
+        <h2>Distribución por localidad</h2>
+        <p class="sub" style="margin-bottom:8px;">Cargá la localidad en cada cliente para ver esta distribución. No es un mapa geográfico real: dibujar un mapa con calles requeriría un servicio externo de mapas que este CRM no puede llamar (por seguridad, no hace pedidos de red a servicios de terceros).</p>
+        ${localityRows.length ? localityRows.map(([name,val]) => `<div class="bar-row"><span class="label">${esc(name)}</span><span class="bar-track"><span class="bar-fill" style="width:${Math.round(val/(localityRows[0][1]||1)*100)}%"></span></span><span class="val">${val}</span></div>`).join('') : '<p class="empty">Todavía no cargaste localidades.</p>'}
+      </div>
+    `;
+  }
+
+  /* ==================== ASEGURADORAS ==================== */
+  const INSURER_ROLES = [
+    { key:'accountExec', label:'Ejecutivo de cuentas' },
+    { key:'underwriter', label:'Suscriptor' },
+    { key:'liquidations', label:'Liquidaciones' },
+    { key:'incidents', label:'Siniestros' },
+  ];
+  function renderAseguradoras(){
+    const el = document.querySelector('.page[data-page="aseguradoras"]');
+    el.innerHTML = `
+      <div class="page-head"><div><h1>Aseguradoras</h1><p>Contactos clave y reclamos internos por compañía</p></div></div>
+      <div class="card-list" id="insurerList"></div>
+    `;
+    const list = el.querySelector('#insurerList');
+    list.innerHTML = COMPANIES.filter(c => c !== 'Otra').map(company => {
+      const rec = state.insurers.find(i => i.company === company);
+      const contacts = (rec && rec.contacts) || {};
+      const claims = (rec && rec.internalClaims) || [];
+      const openClaims = claims.filter(c => c.status !== 'resuelto');
+      const closedCount = claims.length - openClaims.length;
+      const contactRows = INSURER_ROLES.map(r => {
+        const v = contacts[r.key];
+        if (!v || (!v.name && !v.email && !v.phone)) return '';
+        return `<div class="kv"><span>${r.label}</span><span>${esc(v.name||'—')} · ${esc(v.phone||'—')} · ${esc(v.email||'—')}</span></div>`;
+      }).join('');
+      return `<div class="item-card">
+        <div class="top-row"><h3>${esc(company)}</h3><button class="btn btn-sm btn-outline edit-contacts" data-company="${esc(company)}">Editar contactos</button></div>
+        ${contactRows || '<p class="sub">Sin contactos cargados.</p>'}
+        ${rec && rec.hours ? `<div class="kv"><span>Horario de atención</span><span>${esc(rec.hours)}</span></div>` : ''}
+        <div style="margin-top:10px;display:flex;justify-content:space-between;align-items:center;">
+          <b style="font-size:12.5px;">Reclamos internos (${openClaims.length} abiertos)</b>
+          <button class="btn btn-sm btn-outline new-claim" data-company="${esc(company)}">+ Nuevo reclamo</button>
+        </div>
+        ${openClaims.map(c => `<div class="kv" style="font-size:12.5px;">
+          <span>${esc(c.reason)}</span>
+          <span style="display:flex;align-items:center;gap:6px;">
+            <span class="badge badge-danger">${-daysUntil(c.openedAt)} días abierto</span>
+            <button class="icon-btn resolve-claim" data-company="${esc(company)}" data-claim="${esc(c.id)}" title="Marcar resuelto">✓</button>
+          </span>
+        </div>`).join('')}
+        ${closedCount ? `<p class="sub" style="margin-top:4px;">${closedCount} reclamo(s) resuelto(s).</p>` : ''}
+      </div>`;
+    }).join('');
+    list.querySelectorAll('.edit-contacts').forEach(b => b.addEventListener('click', () => openInsurerContactsForm(b.dataset.company)));
+    list.querySelectorAll('.new-claim').forEach(b => b.addEventListener('click', () => openInsurerClaimForm(b.dataset.company)));
+    list.querySelectorAll('.resolve-claim').forEach(b => b.addEventListener('click', () => resolveInsurerClaim(b.dataset.company, b.dataset.claim)));
+  }
+  function openInsurerContactsForm(company){
+    const existing = state.insurers.find(i => i.company === company);
+    const contacts = (existing && existing.contacts) || {};
+    const fieldsHtml = INSURER_ROLES.map(r => `
+      <div class="field" style="margin-top:8px;"><label style="font-weight:700;">${r.label}</label></div>
+      <div class="field-row">
+        <div class="field"><label>Nombre</label><input name="name_${r.key}" value="${esc((contacts[r.key]||{}).name||'')}"></div>
+        <div class="field"><label>Teléfono</label><input name="phone_${r.key}" value="${esc((contacts[r.key]||{}).phone||'')}"></div>
+      </div>
+      <div class="field"><label>Email</label><input name="email_${r.key}" type="email" value="${esc((contacts[r.key]||{}).email||'')}"></div>
+    `).join('');
+    openModal(`Contactos — ${company}`, `
+      ${fieldsHtml}
+      <div class="field" style="margin-top:8px;"><label>Horario de atención</label><input name="hours" value="${esc((existing&&existing.hours)||'')}"></div>
+    `, async data => {
+      const newContacts = {};
+      INSURER_ROLES.forEach(r => { newContacts[r.key] = { name: data['name_'+r.key]||'', phone: data['phone_'+r.key]||'', email: data['email_'+r.key]||'' }; });
+      const payload = { company, contacts: newContacts, hours: data.hours||'' };
+      if (existing){
+        await db.collection('insurers').doc(existing.id).update(payload);
+      } else {
+        payload.internalClaims = [];
+        await db.collection('insurers').add(payload);
+      }
+      toast('Contactos actualizados.');
+    });
+  }
+  function openInsurerClaimForm(company){
+    openModal(`Nuevo reclamo — ${company}`, `
+      <div class="field"><label>Motivo</label><textarea name="reason" required placeholder="Ej: pedí endoso hace 12 días y no contestan"></textarea></div>
+    `, async data => {
+      const existing = state.insurers.find(i => i.company === company);
+      const claim = { id: uid(), reason: data.reason, openedAt: new Date().toISOString().slice(0,10), status: 'abierto' };
+      if (existing){
+        const claims = (existing.internalClaims||[]).concat([claim]);
+        await db.collection('insurers').doc(existing.id).update({ internalClaims: claims });
+      } else {
+        await db.collection('insurers').add({ company, contacts:{}, hours:'', internalClaims:[claim] });
+      }
+      toast('Reclamo registrado.');
+    });
+  }
+  async function resolveInsurerClaim(company, claimId){
+    const existing = state.insurers.find(i => i.company === company);
+    if (!existing) return;
+    const claims = (existing.internalClaims||[]).map(c => c.id === claimId ? Object.assign({}, c, { status:'resuelto', closedAt: new Date().toISOString().slice(0,10) }) : c);
+    await db.collection('insurers').doc(existing.id).update({ internalClaims: claims });
+    toast('Reclamo marcado como resuelto.');
+  }
+
+  /* ==================== ARGUMENTARIO ==================== */
+  const SALES_SCRIPTS = [
+    { tema:'Objeción: "Es muy caro"', texto:'Comparar el costo de la cuota contra el costo real de no tener cobertura (reparación, juicio, pérdida total). Ofrecer ajustar la suma asegurada o las cuotas antes que bajar la cobertura a lo mínimo. Preguntar "¿comparado con qué te parece caro?" para entender si es una objeción de precio real o de percepción.' },
+    { tema:'Objeción: "Ya tengo con otro"', texto:'Preguntar cuándo vence esa póliza y anotar la fecha como tarea de seguimiento. Ofrecer una cotización comparativa sin compromiso 30 días antes del vencimiento. Nunca desacreditar a la otra compañía; enfocarse en tu atención personalizada y tiempos de respuesta.' },
+    { tema:'Objeción: "No lo uso" (auto/moto de poco uso)', texto:'Aclarar que el riesgo no depende de cuánto uses el vehículo sino de terceros y de eventos como robo o granizo. Si la aseguradora lo ofrece, mencionar pólizas de uso limitado con prima reducida como alternativa intermedia.' },
+    { tema:'Objeción: "Lo voy a pensar"', texto:'Es casi siempre una objeción tapando otra (precio, desconfianza, no decide solo). Preguntar directamente "¿hay algo puntual que te genere dudas?". Ofrecer mandar un resumen por escrito (PDF de cotización) y fijar fecha concreta de seguimiento, nunca dejarlo abierto.' },
+    { tema:'Objeción: "No tengo tiempo ahora"', texto:'Ofrecer un resumen corto por WhatsApp con los 3 puntos clave (cobertura, precio, vigencia) en vez de insistir con una llamada larga. Proponer un horario alternativo concreto, no "cuando puedas".' },
+    { tema:'Ramo: Auto', texto:'Enfatizar asistencia en ruta 24hs, cobertura de terceros (lo que te puede reclamar otro, no solo tu auto) y franquicias claras. Buen momento para ofrecer combinado familiar si todavía no lo tiene.' },
+    { tema:'Ramo: Vida', texto:'Hablar en términos de tranquilidad familiar y continuidad económica, no de "por si te morís". Mencionar la baja burocracia de alta y, si aplica, el beneficio impositivo. Ideal para cross-sell con clientes con hijos o hipoteca.' },
+    { tema:'Ramo: ART (empresas)', texto:'Es una obligación legal, no una opción: remarcar el riesgo de multas e inspecciones sin cobertura vigente. Preguntar por la cantidad de empleados para dimensionar la cotización rápido.' },
+    { tema:'Ramo: Seguro de Retiro', texto:'Posicionar como ahorro sistemático con beneficio impositivo, complementario a la jubilación, no como un gasto. Funciona bien con clientes mayores de 45 sin retiro contratado (ver sugerencias de cross-sell en la ficha del cliente).' },
+    { tema:'Cierre general', texto:'Resumir en una frase la cobertura + el precio + la próxima acción concreta ("Te mando la póliza para firmar hoy y arranca el lunes"). Un cierre débil típico es terminar la charla sin una fecha o acción definida.' },
+  ];
+  function renderArgumentario(){
+    const el = document.querySelector('.page[data-page="argumentario"]');
+    if (!el.dataset.init){
+      el.dataset.init = '1';
+      el.innerHTML = `
+        <div class="page-head"><div><h1>Argumentario de ventas</h1><p>Respuestas a objeciones frecuentes y puntos clave por ramo</p></div></div>
+        <div class="toolbar"><input type="search" id="argSearch" placeholder="Buscar por palabra clave…" style="min-width:260px;"></div>
+        <div class="card-list" id="argList"></div>
+      `;
+      el.querySelector('#argSearch').addEventListener('input', renderArgList);
+    }
+    renderArgList();
+  }
+  function renderArgList(){
+    const el = document.querySelector('.page[data-page="argumentario"]');
+    const q = (el.querySelector('#argSearch').value||'').toLowerCase();
+    const rows = SALES_SCRIPTS.filter(s => !q || s.tema.toLowerCase().includes(q) || s.texto.toLowerCase().includes(q));
+    const list = el.querySelector('#argList');
+    list.innerHTML = rows.length ? rows.map(s => `
+      <div class="item-card">
+        <h3>${esc(s.tema)}</h3>
+        <p style="margin-top:6px;">${esc(s.texto)}</p>
+      </div>`).join('') : '<p class="empty">Sin resultados para esa búsqueda.</p>';
+  }
+
   /* ---------- DB wiring ---------- */
   function subscribeAll(){
     const cols = [
       ['clients','clients'], ['policies','policies'], ['quotes','quotes'],
       ['tasks','tasks'], ['interactions','interactions'], ['documents','documents'], ['claims','claims'],
+      ['insurers','insurers'],
     ];
     cols.forEach(([path, key]) => {
       db.collection(path).onSnapshot(snap => {
@@ -1756,6 +2182,10 @@
         setSyncStatus('off', 'Sin conexión');
       });
     });
+    db.doc('settings/goals').onSnapshot(snap => {
+      goals = Object.assign({ monthlyPremiumGoal:0, monthlyPolicyGoal:0 }, snap.exists ? snap.data() : {});
+      renderCurrentTab();
+    }, err => console.error('goals', err));
   }
   function setSyncStatus(cls, label){
     document.getElementById('syncDot').className = 'sync-dot ' + cls;
