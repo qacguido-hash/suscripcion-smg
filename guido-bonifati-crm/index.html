@@ -463,7 +463,6 @@
       </form>`;
     document.body.appendChild(backdrop);
     const form = backdrop.querySelector('form');
-    backdrop.addEventListener('click', e => { if (e.target === backdrop) backdrop.remove(); });
     form.querySelector('[data-act="cancel"]').addEventListener('click', () => backdrop.remove());
     if (opts.onDelete){
       form.querySelector('[data-act="del"]').addEventListener('click', async () => {
