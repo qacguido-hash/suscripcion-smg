@@ -85,6 +85,9 @@
   }
   nav.tabs button:hover{background:var(--surface);color:var(--text);}
   nav.tabs button.active{background:var(--blue);color:#fff;}
+  nav.tabs button{position:relative;}
+  .tab-badge{position:absolute;top:2px;right:2px;background:var(--danger);color:#fff;font-size:9px;font-weight:700;line-height:1;border-radius:8px;padding:2px 4px;min-width:14px;text-align:center;}
+  .alert-banner{display:flex;align-items:center;gap:10px;background:var(--danger-bg);color:var(--danger);border:1px solid var(--danger);border-radius:var(--radius);padding:11px 16px;margin-bottom:18px;font-size:13px;font-weight:600;flex-wrap:wrap;}
   .sync-dot{width:8px;height:8px;border-radius:50%;background:var(--muted);flex-shrink:0;}
   .sync-dot.ok{background:var(--ok);}
   .sync-dot.off{background:var(--danger);}
@@ -284,7 +287,7 @@
   `;
 
   const tabsEl = document.getElementById('tabs');
-  tabsEl.innerHTML = TABS.map(t => `<button data-tab="${t.key}">${t.label}</button>`).join('');
+  tabsEl.innerHTML = TABS.map(t => `<button data-tab="${t.key}">${t.label}<span class="tab-badge" data-badge="${t.key}" hidden></span></button>`).join('');
   const mainEl = document.getElementById('main');
   mainEl.innerHTML = TABS.map(t => `<section class="page" data-page="${t.key}"></section>`).join('');
 
@@ -323,6 +326,7 @@
   let db = null;
   let currentTab = 'dashboard';
   let calMonth = new Date(); calMonth.setDate(1);
+  let dashPaymentFilter = '';
 
   function clientName(id){
     const c = state.clients.find(c => c.id === id);
@@ -343,6 +347,7 @@
   });
 
   function renderCurrentTab(){
+    updateNavAlerts();
     if (currentTab === 'dashboard') renderDashboard();
     else if (currentTab === 'clientes') renderClientes();
     else if (currentTab === 'polizas') renderPolizas();
@@ -351,6 +356,19 @@
     else if (currentTab === 'documentos') renderDocumentos();
     else if (currentTab === 'siniestros') renderSiniestros();
     else if (currentTab === 'comisiones') renderComisiones();
+  }
+  function updateNavAlerts(){
+    const active = state.policies.filter(p => p.status !== 'cancelada');
+    const critical = active.filter(p => {
+      const d = daysUntil(p.endDate);
+      return (d !== null && d < 0) || installmentStatus(p).mora;
+    }).length;
+    ['dashboard','polizas'].forEach(key => {
+      const badge = tabsEl.querySelector(`[data-badge="${key}"]`);
+      if (!badge) return;
+      if (critical > 0){ badge.textContent = critical > 9 ? '9+' : String(critical); badge.hidden = false; }
+      else badge.hidden = true;
+    });
   }
 
   /* ---------- Modal ---------- */
@@ -515,6 +533,14 @@
 
     const upcomingTasks = openTasks.slice().sort((a,b)=>(a.dueDate||'9999').localeCompare(b.dueDate||'9999')).slice(0,6);
 
+    const now = new Date();
+    const dueThisMonth = activePolicies.filter(p => {
+      const due = nextInstallmentDueDate(p);
+      if (!due || due.getFullYear() !== now.getFullYear() || due.getMonth() !== now.getMonth()) return false;
+      if (dashPaymentFilter && p.paymentMethod !== dashPaymentFilter) return false;
+      return true;
+    });
+
     el.innerHTML = `
       <div class="page-head">
         <div>
@@ -523,6 +549,7 @@
         </div>
         <button class="btn btn-outline" id="exportBtn">Exportar respaldo (JSON)</button>
       </div>
+      ${(overdue.length || inArrears.length) ? `<div class="alert-banner">⚠️ ${overdue.length ? `${overdue.length} póliza${overdue.length===1?'':'s'} vencida${overdue.length===1?'':'s'}` : ''}${overdue.length && inArrears.length ? ' · ' : ''}${inArrears.length ? `${inArrears.length} póliza${inArrears.length===1?'':'s'} con cuotas en mora` : ''} — revisá Pólizas para regularizar.</div>` : ''}
       <div class="stat-grid">
         <div class="stat-card"><b>${state.clients.length}</b><span>Clientes</span></div>
         <div class="stat-card"><b>${activePolicies.length}</b><span>Pólizas vigentes</span></div>
@@ -580,10 +607,28 @@
                 <span class="badge badge-muted">${fmtDate(t.dueDate)}</span>
               </div>`).join('') : '<p class="empty">No tenés tareas pendientes.</p>'}
           </div>
+          <div class="panel">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:6px;">
+              <h2 style="margin:0;">Cuotas a cobrar este mes</h2>
+              <select id="dashPaymentFilter" style="font-size:12px;padding:4px 6px;">
+                <option value="">Todos los medios</option>
+                ${PAYMENT_METHODS.map(m => `<option value="${esc(m)}" ${dashPaymentFilter===m?'selected':''}>${esc(m)}</option>`).join('')}
+              </select>
+            </div>
+            ${dueThisMonth.length ? dueThisMonth.map(p => {
+              const total = Number(p.installments)||1;
+              const cuotaNum = (Number(p.installmentsPaid)||0) + 1;
+              return `<div class="kv" style="border-bottom:1px solid var(--border);padding:8px 0;display:flex;justify-content:space-between;font-size:13px;">
+                <span>${esc(clientName(p.clientId))} · ${esc(p.ramo)} · ${esc(p.paymentMethod||'—')}</span>
+                <span class="badge badge-warn">Cuota ${cuotaNum}/${total} · ${fmtMoney((Number(p.premium)||0)/total, p.currency)}</span>
+              </div>`;
+            }).join('') : '<p class="empty">Sin cuotas para cobrar este mes.</p>'}
+          </div>
         </div>
       </div>
     `;
     el.querySelector('#exportBtn').addEventListener('click', exportBackup);
+    el.querySelector('#dashPaymentFilter').addEventListener('input', e => { dashPaymentFilter = e.target.value; renderDashboard(); });
   }
 
   async function exportBackup(){
@@ -760,6 +805,15 @@
     const mora = paid < expected;
     return { label: `${paid}/${total}${mora ? ' · Mora' : ''}`, cls: mora ? 'badge-danger' : 'badge-warn', mora };
   }
+  function nextInstallmentDueDate(p){
+    const total = Number(p.installments)||1;
+    const paid = Number(p.installmentsPaid)||0;
+    if (paid >= total || !p.startDate) return null;
+    const start = new Date(p.startDate + 'T00:00:00');
+    const due = new Date(start);
+    due.setMonth(due.getMonth() + paid);
+    return due;
+  }
   function renewPolicy(old){
     const toISO = d => d.toISOString().slice(0,10);
     const oldEnd = old.endDate ? new Date(old.endDate + 'T00:00:00') : new Date();
@@ -853,18 +907,41 @@
     tbody.querySelectorAll('.renew-pol').forEach(b => b.addEventListener('click', () => {
       const p = state.policies.find(x => x.id === b.dataset.id); if (p) renewPolicy(p);
     }));
-    tbody.querySelectorAll('.mark-paid').forEach(b => b.addEventListener('click', async () => {
+    tbody.querySelectorAll('.mark-paid').forEach(b => b.addEventListener('click', () => {
       const p = state.policies.find(x => x.id === b.dataset.id);
-      if (!p) return;
-      const total = Number(p.installments)||1;
-      const paid = Math.min(total, (Number(p.installmentsPaid)||0) + 1);
-      await db.collection('policies').doc(p.id).update({ installmentsPaid: paid });
-      toast('Cuota registrada.');
+      if (p) openRegisterPaymentForm(p);
     }));
+  }
+  function openRegisterPaymentForm(p){
+    const total = Number(p.installments)||1;
+    const nextNum = Math.min(total, (Number(p.installmentsPaid)||0) + 1);
+    const suggestedAmount = ((Number(p.premium)||0) / total).toFixed(2);
+    openModal(`Registrar pago — ${p.ramo||'Póliza'}`, `
+      <div class="field-row">
+        <div class="field"><label>Fecha de pago</label><input name="date" type="date" value="${new Date().toISOString().slice(0,10)}"></div>
+        <div class="field"><label>N° de cuota</label><input name="installmentNumber" type="number" min="1" max="${total}" value="${nextNum}"></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>Monto</label><input name="amount" type="number" step="0.01" value="${suggestedAmount}"></div>
+        <div class="field"><label>Medio de pago</label><select name="method">${PAYMENT_METHODS.map(m => `<option value="${esc(m)}" ${p.paymentMethod===m?'selected':''}>${esc(m)}</option>`).join('')}</select></div>
+      </div>
+      <div class="field"><label>Nota</label><input name="note" placeholder="Opcional"></div>
+    `, async data => {
+      const entry = {
+        date: data.date, amount: Number(data.amount)||0, currency: p.currency||'ARS',
+        method: data.method, installmentNumber: Math.min(total, Math.max(1, Number(data.installmentNumber)||nextNum)),
+        note: data.note||'',
+      };
+      const history = (p.paymentHistory||[]).concat([entry]);
+      const paid = Math.min(total, Math.max(Number(p.installmentsPaid)||0, entry.installmentNumber));
+      await db.collection('policies').doc(p.id).update({ paymentHistory: history, installmentsPaid: paid });
+      toast('Pago registrado.');
+    });
   }
   function openPolicyForm(existing, seed){
     const p = existing || seed || {};
-    openModal(existing ? 'Editar póliza' : (seed ? 'Renovar póliza' : 'Nueva póliza'), `
+    const title = existing ? 'Editar póliza' : (seed && seed.sourceQuoteId ? 'Nueva póliza (desde cotización)' : (seed ? 'Renovar póliza' : 'Nueva póliza'));
+    openModal(title, `
       <div class="field"><label>Cliente</label><select name="clientId" required>${clientOptions(p.clientId)}</select></div>
       <div class="field-row">
         <div class="field"><label>Ramo</label><select name="ramo">${ramoOptions(p.ramo)}</select></div>
@@ -893,6 +970,14 @@
         <div class="field"><label>Inicio de vigencia</label><input name="startDate" type="date" value="${esc(p.startDate||'')}"></div>
         <div class="field"><label>Vencimiento</label><input name="endDate" type="date" value="${esc(p.endDate||'')}"></div>
       </div>
+      ${(p.paymentHistory||[]).length ? `<div class="field">
+        <label>Historial de pagos (${p.paymentHistory.length})</label>
+        <div style="max-height:160px;overflow-y:auto;border:1px solid var(--border);border-radius:8px;padding:8px;">
+          ${p.paymentHistory.slice().sort((a,b)=>(b.date||'').localeCompare(a.date||'')).map(h => `
+            <div class="kv" style="font-size:12.5px;"><span>Cuota ${h.installmentNumber||'—'} · ${fmtDate(h.date)} · ${esc(h.method||'—')}${h.note?' · '+esc(h.note):''}</span><span>${fmtMoney(h.amount, h.currency||p.currency)}</span></div>
+          `).join('')}
+        </div>
+      </div>` : ''}
       <div class="field"><label>Notas</label><textarea name="notes">${esc(p.notes||'')}</textarea></div>
     `, async data => {
       data.clientName = clientName(data.clientId);
@@ -905,13 +990,17 @@
         toast('Póliza actualizada.');
       } else {
         data.createdAt = new Date().toISOString();
-        await db.collection('policies').add(data);
+        const ref = await db.collection('policies').add(data);
+        if (seed && seed.sourceQuoteId){
+          await db.collection('quotes').doc(seed.sourceQuoteId).update({ convertedToPolicyId: ref.id });
+        }
         toast('Póliza creada.');
       }
     }, existing ? { onDelete: async () => { await db.collection('policies').doc(existing.id).delete(); toast('Póliza eliminada.'); } } : {});
   }
 
   /* ==================== COTIZACIONES ==================== */
+  const REJECTION_REASONS = ['Precio','Cobertura','Competencia','No le interesa','Otro'];
   function renderCotizaciones(){
     const el = document.querySelector('.page[data-page="cotizaciones"]');
     if (!el.dataset.init){
@@ -921,6 +1010,7 @@
           <div><h1>Cotizaciones</h1><p>Seguimiento de propuestas enviadas a clientes</p></div>
           <button class="btn btn-primary" id="newQuoteBtn">+ Nueva cotización</button>
         </div>
+        <div id="quoteConversionPanel"></div>
         <div class="toolbar">
           <select id="quoteStatusFilter">
             <option value="">Todos los estados</option>
@@ -933,7 +1023,54 @@
       el.querySelector('#newQuoteBtn').addEventListener('click', () => openQuoteForm());
       el.querySelector('#quoteStatusFilter').addEventListener('input', renderQuoteList);
     }
+    renderConversionRanking();
     renderQuoteList();
+  }
+  function renderConversionRanking(){
+    const el = document.querySelector('.page[data-page="cotizaciones"]');
+    const panel = el.querySelector('#quoteConversionPanel');
+    const decided = state.quotes.filter(q => q.status === 'aceptada' || q.status === 'rechazada');
+    if (!decided.length){ panel.innerHTML = ''; return; }
+    function rankBy(field){
+      const map = {};
+      decided.forEach(q => {
+        const key = q[field] || '—';
+        if (!map[key]) map[key] = { total:0, aceptadas:0 };
+        map[key].total++;
+        if (q.status === 'aceptada') map[key].aceptadas++;
+      });
+      return Object.entries(map).sort((a,b) => b[1].total - a[1].total);
+    }
+    const totalAceptadas = decided.filter(q => q.status === 'aceptada').length;
+    const overallPct = Math.round(totalAceptadas / decided.length * 100);
+    function rankTable(title, rows){
+      return `
+        <div class="panel" style="flex:1;min-width:240px;">
+          <h2>${title}</h2>
+          ${rows.map(([name,d]) => {
+            const pct = Math.round(d.aceptadas / d.total * 100);
+            return `<div class="bar-row">
+              <span class="label">${esc(name)}</span>
+              <span class="bar-track"><span class="bar-fill" style="width:${pct}%"></span></span>
+              <span class="val">${pct}% (${d.aceptadas}/${d.total})</span>
+            </div>`;
+          }).join('')}
+        </div>`;
+    }
+    panel.innerHTML = `
+      <div class="panel" style="margin-bottom:14px;">
+        <h2>Conversión de cotizaciones</h2>
+        <div class="stat-grid" style="margin-bottom:10px;">
+          <div class="stat-card"><b>${overallPct}%</b><span>Conversión general</span></div>
+          <div class="stat-card"><b>${totalAceptadas}</b><span>Aceptadas</span></div>
+          <div class="stat-card"><b>${decided.length - totalAceptadas}</b><span>Rechazadas</span></div>
+        </div>
+        <div style="display:flex;gap:14px;flex-wrap:wrap;">
+          ${rankTable('Por ramo', rankBy('ramo'))}
+          ${rankTable('Por aseguradora', rankBy('company'))}
+        </div>
+      </div>
+    `;
   }
   const QUOTE_BADGE = { pendiente:'badge-muted', enviada:'badge-warn', aceptada:'badge-ok', rechazada:'badge-danger' };
   function renderQuoteList(){
@@ -943,6 +1080,7 @@
     if (f) rows = rows.filter(q => q.status === f);
     const list = el.querySelector('#quoteList');
     if (!rows.length){ list.innerHTML = '<p class="empty">No hay cotizaciones cargadas.</p>'; return; }
+    const today = new Date().toISOString().slice(0,10);
     list.innerHTML = rows.map(q => `
       <div class="item-card">
         <div class="top-row">
@@ -953,9 +1091,14 @@
           <span class="badge ${QUOTE_BADGE[q.status]||'badge-muted'}">${esc(q.status)}</span>
         </div>
         <p style="margin-top:6px;">${esc(q.coverageNotes||'')}</p>
+        ${q.status === 'rechazada' && q.rejectionReason ? `<p class="sub" style="margin-top:4px;">Motivo de rechazo: <b>${esc(q.rejectionReason)}</b></p>` : ''}
+        ${q.nextContactDate ? `<p class="sub" style="margin-top:4px;">Próximo contacto: <span class="badge ${q.nextContactDate<=today?'badge-warn':'badge-muted'}">${fmtDate(q.nextContactDate)}</span></p>` : ''}
         <div class="meta">
           <button class="btn btn-sm btn-outline pdf-quote" data-id="${q.id}">Generar PDF</button>
           <button class="btn btn-sm btn-outline edit-quote" data-id="${q.id}">Editar</button>
+          ${q.status === 'aceptada' ? (q.convertedToPolicyId
+            ? `<span class="badge badge-ok">Convertida a póliza ✓</span>`
+            : `<button class="btn btn-sm btn-primary convert-quote" data-id="${q.id}">Convertir en póliza</button>`) : ''}
         </div>
       </div>`).join('');
     list.querySelectorAll('.edit-quote').forEach(b => b.addEventListener('click', () => {
@@ -964,6 +1107,16 @@
     list.querySelectorAll('.pdf-quote').forEach(b => b.addEventListener('click', () => {
       const q = state.quotes.find(x => x.id === b.dataset.id); if (q) generateQuotePdf(q);
     }));
+    list.querySelectorAll('.convert-quote').forEach(b => b.addEventListener('click', () => {
+      const q = state.quotes.find(x => x.id === b.dataset.id); if (q) convertQuoteToPolicy(q);
+    }));
+  }
+  function convertQuoteToPolicy(q){
+    openPolicyForm(null, {
+      clientId: q.clientId, ramo: q.ramo, company: q.company,
+      premium: q.premium, currency: 'ARS', status: 'activa',
+      notes: q.coverageNotes || '', sourceQuoteId: q.id,
+    });
   }
   function openQuoteForm(existing){
     const q = existing || {};
@@ -980,6 +1133,13 @@
           <option value="enviada" ${q.status==='enviada'?'selected':''}>Enviada</option>
           <option value="aceptada" ${q.status==='aceptada'?'selected':''}>Aceptada</option>
           <option value="rechazada" ${q.status==='rechazada'?'selected':''}>Rechazada</option>
+        </select></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>Próximo contacto</label><input name="nextContactDate" type="date" value="${esc(q.nextContactDate||'')}"></div>
+        <div class="field"><label>Motivo de rechazo (si aplica)</label><select name="rejectionReason">
+          <option value="">—</option>
+          ${REJECTION_REASONS.map(r => `<option value="${esc(r)}" ${q.rejectionReason===r?'selected':''}>${esc(r)}</option>`).join('')}
         </select></div>
       </div>
       <div class="field"><label>Detalle de cobertura</label><textarea name="coverageNotes">${esc(q.coverageNotes||'')}</textarea></div>
