@@ -66,22 +66,27 @@
   input,select,textarea{font-family:var(--font);}
   [hidden]{display:none!important;}
 
-  /* Layout */
-  #app{min-height:100vh;display:flex;flex-direction:column;}
+  /* Layout: sidebar + main */
+  #app{min-height:100vh;}
+  .app-shell{display:flex;min-height:100vh;}
+  .main-col{flex:1;display:flex;flex-direction:column;min-width:0;}
+  .mobile-topbar{display:none;}
+  .sidebar-backdrop{display:none;}
   header.top{
-    position:sticky;top:0;z-index:40;background:#fff;border-bottom:1px solid var(--border);
+    width:230px;flex-shrink:0;position:sticky;top:0;height:100vh;z-index:40;
+    background:#fff;border-right:1px solid var(--border);overflow-y:auto;
   }
-  .top-inner{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;max-width:1400px;margin:0 auto;gap:16px;}
-  .brand{display:flex;align-items:center;gap:10px;flex-shrink:0;}
-  .brand-mark{width:34px;height:34px;border-radius:50%;background:linear-gradient(160deg,var(--gray),var(--blue));color:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--font-cond);font-weight:600;font-size:14px;}
+  .top-inner{display:flex;flex-direction:column;align-items:stretch;gap:18px;padding:20px 14px;height:100%;}
+  .brand{display:flex;align-items:center;gap:10px;flex-shrink:0;padding:0 4px;}
+  .brand-mark{width:34px;height:34px;border-radius:50%;background:linear-gradient(160deg,var(--gray),var(--blue));color:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--font-cond);font-weight:600;font-size:14px;flex-shrink:0;}
   .brand-text{display:flex;flex-direction:column;line-height:1.1;}
   .brand-name{font-family:var(--font-cond);font-weight:600;font-size:17px;color:var(--blue);}
   .brand-tag{font-size:9px;font-weight:700;letter-spacing:1.5px;color:var(--yellow-deep);}
-  nav.tabs{display:flex;gap:4px;overflow-x:auto;flex:1;scrollbar-width:none;}
+  nav.tabs{display:flex;flex-direction:column;gap:2px;overflow-x:visible;flex:1;scrollbar-width:none;}
   nav.tabs::-webkit-scrollbar{display:none;}
   nav.tabs button{
-    background:none;border:none;padding:9px 13px;border-radius:6px;font-size:13px;font-weight:600;
-    color:var(--muted);white-space:nowrap;transition:background .15s,color .15s;
+    background:none;border:none;padding:10px 12px;border-radius:6px;font-size:13px;font-weight:600;
+    color:var(--muted);white-space:nowrap;transition:background .15s,color .15s;text-align:left;
   }
   nav.tabs button:hover{background:var(--surface);color:var(--text);}
   nav.tabs button.active{background:var(--blue);color:#fff;}
@@ -91,9 +96,9 @@
   .sync-dot{width:8px;height:8px;border-radius:50%;background:var(--muted);flex-shrink:0;}
   .sync-dot.ok{background:var(--ok);}
   .sync-dot.off{background:var(--danger);}
-  .sync-wrap{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted);flex-shrink:0;}
+  .sync-wrap{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted);flex-shrink:0;padding:0 4px;}
 
-  main{flex:1;max-width:1400px;margin:0 auto;padding:24px 20px 80px;width:100%;}
+  main{flex:1;max-width:1400px;margin:0 auto;padding:24px 32px 80px;width:100%;}
   .page{display:none;}
   .page.active{display:block;}
   .page-head{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:20px;flex-wrap:wrap;}
@@ -226,9 +231,18 @@
   .login-box h1{font-family:var(--font-cond);font-size:20px;color:var(--blue);margin-bottom:4px;}
   .login-box p{font-size:13px;color:var(--muted);margin-bottom:18px;}
 
+  @media (max-width:900px){
+    header.top{position:fixed;top:0;left:-250px;width:230px;height:100vh;transition:left .2s ease;box-shadow:none;}
+    header.top.open{left:0;box-shadow:8px 0 28px rgba(20,25,35,0.18);}
+    .sidebar-backdrop{display:block;position:fixed;inset:0;background:rgba(20,25,35,0.4);z-index:39;}
+    .sidebar-backdrop[hidden]{display:none;}
+    .mobile-topbar{
+      display:flex;align-items:center;gap:12px;padding:12px 16px;background:#fff;
+      border-bottom:1px solid var(--border);position:sticky;top:0;z-index:20;
+    }
+    .mobile-topbar .icon-btn{width:34px;height:34px;font-size:16px;}
+  }
   @media (max-width:720px){
-    .top-inner{flex-wrap:wrap;}
-    nav.tabs{order:3;width:100%;border-top:1px solid var(--border);padding-top:8px;}
     main{padding:18px 14px 90px;}
     thead{display:none;}
     table,tbody,tr,td{display:block;width:100%;}
@@ -306,21 +320,39 @@
   ];
 
   app.innerHTML = `
-    <header class="top">
-      <div class="top-inner">
-        <div class="brand">
-          <div class="brand-mark">GB</div>
-          <div class="brand-text">
-            <span class="brand-name">Guido Bonifati</span>
-            <span class="brand-tag">CRM</span>
+    <div class="app-shell">
+      <header class="top" id="sidebar">
+        <div class="top-inner">
+          <div class="brand">
+            <div class="brand-mark">GB</div>
+            <div class="brand-text">
+              <span class="brand-name">Guido Bonifati</span>
+              <span class="brand-tag">CRM</span>
+            </div>
           </div>
+          <nav class="tabs" id="tabs"></nav>
+          <div class="sync-wrap"><span class="sync-dot" id="syncDot"></span><span id="syncLabel">Conectando…</span></div>
         </div>
-        <nav class="tabs" id="tabs"></nav>
-        <div class="sync-wrap"><span class="sync-dot" id="syncDot"></span><span id="syncLabel">Conectando…</span></div>
+      </header>
+      <div class="sidebar-backdrop" id="sidebarBackdrop" hidden></div>
+      <div class="main-col">
+        <div class="mobile-topbar">
+          <button class="icon-btn" id="hamburgerBtn" aria-label="Abrir menú">☰</button>
+          <span class="brand-name" style="font-size:14px;">Guido Bonifati — CRM</span>
+        </div>
+        <main id="main"></main>
       </div>
-    </header>
-    <main id="main"></main>
+    </div>
   `;
+
+  const sidebarEl = document.getElementById('sidebar');
+  const sidebarBackdropEl = document.getElementById('sidebarBackdrop');
+  function closeSidebar(){ sidebarEl.classList.remove('open'); sidebarBackdropEl.hidden = true; }
+  document.getElementById('hamburgerBtn').addEventListener('click', () => {
+    sidebarEl.classList.add('open');
+    sidebarBackdropEl.hidden = false;
+  });
+  sidebarBackdropEl.addEventListener('click', closeSidebar);
 
   const tabsEl = document.getElementById('tabs');
   tabsEl.innerHTML = TABS.map(t => `<button data-tab="${t.key}">${t.label}<span class="tab-badge" data-badge="${t.key}" hidden></span></button>`).join('');
@@ -380,7 +412,7 @@
   }
   tabsEl.addEventListener('click', e => {
     const b = e.target.closest('button[data-tab]');
-    if (b) showTab(b.dataset.tab);
+    if (b){ showTab(b.dataset.tab); closeSidebar(); }
   });
 
   function renderCurrentTab(){
