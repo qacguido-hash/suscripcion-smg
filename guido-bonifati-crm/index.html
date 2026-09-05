@@ -257,6 +257,39 @@
   const CURRENCIES = ['ARS','USD'];
   const CURRENCY_LABEL = { ARS:'Pesos (ARS)', USD:'Dólares (USD)' };
   const RMASD_SPLIT_PCT = 50;
+  const CANCELLATION_REASONS = ['Precio','Servicio','Competencia','Mudanza','Otro'];
+  const RAMO_EXTRA_FIELDS = {
+    'Seguro de Auto': [
+      { name:'vehiclePlate', label:'Patente' },
+      { name:'vehicleBrand', label:'Marca / modelo' },
+      { name:'vehicleYear', label:'Año', type:'number' },
+      { name:'vehicleUse', label:'Uso (particular/comercial)' },
+    ],
+    'Seguro de Moto': [
+      { name:'vehiclePlate', label:'Patente' },
+      { name:'vehicleBrand', label:'Marca / modelo' },
+      { name:'vehicleYear', label:'Año', type:'number' },
+      { name:'vehicleUse', label:'Uso (particular/comercial)' },
+    ],
+    'Seguro de Vida': [
+      { name:'sumInsured', label:'Suma asegurada', type:'number' },
+      { name:'beneficiaries', label:'Beneficiarios' },
+    ],
+    'Seguro de ART': [
+      { name:'companyCuit', label:'CUIT de la empresa' },
+      { name:'employeeCount', label:'Cantidad de empleados', type:'number' },
+    ],
+  };
+  function ramoExtraFieldsHtml(ramo, vals){
+    vals = vals || {};
+    const defs = RAMO_EXTRA_FIELDS[ramo] || [];
+    let html = '';
+    for (let i = 0; i < defs.length; i += 2){
+      const pair = defs.slice(i, i+2);
+      html += `<div class="field-row">${pair.map(f => `<div class="field"><label>${f.label}</label><input name="${f.name}" type="${f.type||'text'}" value="${esc(vals[f.name]||'')}"></div>`).join('')}${pair.length===1?'<div class="field"></div>':''}</div>`;
+    }
+    return html;
+  }
 
   const TABS = [
     { key:'dashboard', label:'Panel' },
@@ -428,6 +461,25 @@
     return COMPANIES.map(c => `<option value="${esc(c)}" ${c===selected?'selected':''}>${esc(c)}</option>`).join('');
   }
 
+  function crossSellSuggestions(c, pols){
+    const ramos = new Set(pols.filter(p => p.status !== 'cancelada').map(p => p.ramo));
+    const suggestions = [];
+    if (c.type === 'empresa'){
+      if (pols.length && !ramos.has('Seguro de ART')) suggestions.push('Es empresa y no tiene ART contratada.');
+    } else {
+      const hasVehicle = ramos.has('Seguro de Auto') || ramos.has('Seguro de Moto');
+      if (hasVehicle && ramos.has('Combinado Familiar')){
+        if (!ramos.has('Accidentes Personales')) suggestions.push('Tiene auto/moto y combinado familiar, pero no Accidentes Personales.');
+        if (!ramos.has('Seguro de Vida')) suggestions.push('Tiene auto/moto y combinado familiar, pero no Seguro de Vida.');
+      }
+      if (c.birthday){
+        const age = Math.floor((Date.now() - new Date(c.birthday + 'T00:00:00').getTime()) / (365.25*24*3600*1000));
+        if (age > 45 && !ramos.has('Seguro de Retiro')) suggestions.push(`Tiene ${age} años y no tiene Seguro de Retiro.`);
+      }
+    }
+    return suggestions;
+  }
+
   /* ---------- Drawer (detail view for a client, with related records) ---------- */
   function openClientDrawer(clientId){
     const c = state.clients.find(x => x.id === clientId);
@@ -439,6 +491,7 @@
     const inter = state.interactions.filter(i => i.clientId === clientId).sort((a,b)=> (b.date||'').localeCompare(a.date||''));
     const tasksC = state.tasks.filter(t => t.clientId === clientId && !t.done);
     const docsC = state.documents.filter(d => d.clientId === clientId);
+    const suggestions = crossSellSuggestions(c, pols);
     backdrop.innerHTML = `
       <div id="drawer" style="position:relative;">
         <button class="icon-btn close-drawer" aria-label="Cerrar">✕</button>
@@ -449,6 +502,12 @@
         <div class="kv"><span>Teléfono</span><span>${esc(c.phone || '—')}</span></div>
         <div class="kv"><span>Dirección</span><span>${esc(c.address || '—')}</span></div>
         <div class="kv"><span>Cumpleaños</span><span>${c.birthday ? fmtDate(c.birthday) : '—'}</span></div>
+        ${suggestions.length ? `<div style="margin-top:14px;background:var(--warn-bg);border:1px solid var(--warn);border-radius:8px;padding:10px 12px;">
+          <b style="font-size:12.5px;color:var(--warn);">💡 Oportunidades de venta</b>
+          <ul style="margin:6px 0 0 18px;font-size:12.5px;">
+            ${suggestions.map(s => `<li>${esc(s)}</li>`).join('')}
+          </ul>
+        </div>` : ''}
         <div style="margin-top:20px;">
           <h2 style="font-size:15px;">Pólizas (${pols.length})</h2>
           ${pols.length ? pols.map(p => { const ist = installmentStatus(p); return `<div class="kv"><span>${esc(p.ramo)} · ${esc(p.company)}</span><span>${fmtDate(p.endDate)}${ist.mora ? ` <span class="badge badge-danger" style="margin-left:6px;">${ist.label}</span>` : ''}</span></div>`; }).join('') : '<p class="sub">Sin pólizas cargadas.</p>'}
@@ -506,6 +565,11 @@
     const openTasks = state.tasks.filter(t => !t.done);
     const openClaims = state.claims.filter(c => c.status !== 'cerrado');
     const pendingQuotes = state.quotes.filter(q => q.status === 'pendiente' || q.status === 'enviada');
+
+    const cancelledWithReason = state.policies.filter(p => p.status === 'cancelada' && p.cancellationReason);
+    const byCancelReason = {};
+    cancelledWithReason.forEach(p => { byCancelReason[p.cancellationReason] = (byCancelReason[p.cancellationReason]||0) + 1; });
+    const cancelReasonRows = Object.entries(byCancelReason).sort((a,b)=>b[1]-a[1]);
 
     function companyRowsFor(cur){
       const map = {};
@@ -589,6 +653,14 @@
                 <span class="badge badge-danger">${installmentStatus(p).label}</span>
               </div>`).join('') : '<p class="empty">Sin cuotas atrasadas.</p>'}
           </div>
+          ${cancelReasonRows.length ? `<div class="panel">
+            <h2>Motivos de baja</h2>
+            ${cancelReasonRows.map(([name,val]) => `
+              <div class="kv" style="border-bottom:1px solid var(--border);padding:8px 0;display:flex;justify-content:space-between;font-size:13px;">
+                <span>${esc(name)}</span>
+                <span class="badge badge-muted">${val}</span>
+              </div>`).join('')}
+          </div>` : ''}
         </div>
         <div>
           <div class="panel">
@@ -941,12 +1013,13 @@
   function openPolicyForm(existing, seed){
     const p = existing || seed || {};
     const title = existing ? 'Editar póliza' : (seed && seed.sourceQuoteId ? 'Nueva póliza (desde cotización)' : (seed ? 'Renovar póliza' : 'Nueva póliza'));
-    openModal(title, `
+    const backdrop = openModal(title, `
       <div class="field"><label>Cliente</label><select name="clientId" required>${clientOptions(p.clientId)}</select></div>
       <div class="field-row">
         <div class="field"><label>Ramo</label><select name="ramo">${ramoOptions(p.ramo)}</select></div>
         <div class="field"><label>Aseguradora</label><select name="company">${companyOptions(p.company)}</select></div>
       </div>
+      <div id="ramoExtraFields">${ramoExtraFieldsHtml(p.ramo, p)}</div>
       <div class="field-row">
         <div class="field"><label>N° de póliza</label><input name="policyNumber" value="${esc(p.policyNumber||'')}"></div>
         <div class="field"><label>Prima</label><input name="premium" type="number" step="0.01" value="${esc(p.premium||'')}"></div>
@@ -970,6 +1043,10 @@
         <div class="field"><label>Inicio de vigencia</label><input name="startDate" type="date" value="${esc(p.startDate||'')}"></div>
         <div class="field"><label>Vencimiento</label><input name="endDate" type="date" value="${esc(p.endDate||'')}"></div>
       </div>
+      <div class="field"><label>Motivo de baja (si cancelás)</label><select name="cancellationReason">
+        <option value="">—</option>
+        ${CANCELLATION_REASONS.map(r => `<option value="${esc(r)}" ${p.cancellationReason===r?'selected':''}>${esc(r)}</option>`).join('')}
+      </select></div>
       ${(p.paymentHistory||[]).length ? `<div class="field">
         <label>Historial de pagos (${p.paymentHistory.length})</label>
         <div style="max-height:160px;overflow-y:auto;border:1px solid var(--border);border-radius:8px;padding:8px;">
@@ -980,6 +1057,9 @@
       </div>` : ''}
       <div class="field"><label>Notas</label><textarea name="notes">${esc(p.notes||'')}</textarea></div>
     `, async data => {
+      if (data.status === 'cancelada' && !data.cancellationReason){
+        throw new Error('Elegí un motivo de baja para cancelar la póliza.');
+      }
       data.clientName = clientName(data.clientId);
       data.premium = Number(data.premium) || 0;
       data.commissionPct = Number(data.commissionPct) || 0;
@@ -997,6 +1077,9 @@
         toast('Póliza creada.');
       }
     }, existing ? { onDelete: async () => { await db.collection('policies').doc(existing.id).delete(); toast('Póliza eliminada.'); } } : {});
+    backdrop.querySelector('select[name="ramo"]').addEventListener('change', e => {
+      backdrop.querySelector('#ramoExtraFields').innerHTML = ramoExtraFieldsHtml(e.target.value, {});
+    });
   }
 
   /* ==================== COTIZACIONES ==================== */
