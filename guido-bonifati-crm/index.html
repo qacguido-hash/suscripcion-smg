@@ -564,7 +564,7 @@
         <div style="margin-top:20px;">
           <h2 style="font-size:15px;">Documentos (${docsC.length})</h2>
           ${docsC.length ? docsC.map(d => `<div class="kv"><span>${esc(d.name)} <span class="badge ${d.status==='recibido'?'badge-ok':'badge-warn'}" style="margin-left:6px;">${d.status==='recibido'?'Recibido':'Pendiente'}</span></span>${
-            d.fileData ? `<button type="button" class="btn btn-sm btn-outline drawer-view-file" data-id="${esc(d.id)}">Ver</button>`
+            d.chunkCount ? `<button type="button" class="btn btn-sm btn-outline drawer-view-file" data-id="${esc(d.id)}">Ver</button>`
             : d.url ? `<a href="${esc(d.url)}" target="_blank" rel="noopener" style="color:var(--blue);font-weight:600;">Abrir ↗</a>` : '<span class="sub">Sin archivo</span>'
           }</div>`).join('') : '<p class="sub">Sin documentos registrados.</p>'}
         </div>
@@ -1744,7 +1744,7 @@
           <div><h1>Documentación</h1><p>Registro de documentos por cliente — pendientes y recibidos</p></div>
           <button class="btn btn-primary" id="newDocBtn">+ Nuevo registro</button>
         </div>
-        <p class="empty" style="text-align:left;padding:0 0 14px;">Los archivos livianos (hasta 170 KB — un DNI escaneado, una póliza de pocas páginas) se guardan directo acá. Para los más pesados, subilos a tu Drive y pegá el link.</p>
+        <p class="empty" style="text-align:left;padding:0 0 14px;">Cada cliente tiene 5 MB de espacio para guardar documentos acá (repartibles en varios archivos: DNI, póliza firmada, CBU, etc.). Para archivos más pesados, subilos a tu Drive y pegá el link.</p>
         <div class="table-wrap"><table>
           <thead><tr><th>Cliente</th><th>Documento</th><th>Estado</th><th>Fecha</th><th>Archivo</th><th></th></tr></thead>
           <tbody id="docRows"></tbody>
@@ -1765,7 +1765,7 @@
         <td data-label="Documento">${esc(d.name)}</td>
         <td data-label="Estado"><span class="badge ${d.status==='recibido'?'badge-ok':'badge-warn'}">${d.status==='recibido'?'Recibido':'Pendiente'}</span></td>
         <td data-label="Fecha">${fmtDate(d.date)}</td>
-        <td data-label="Archivo">${d.fileData
+        <td data-label="Archivo">${d.chunkCount
           ? `<div class="row-actions"><button class="btn btn-sm btn-outline view-file" data-id="${d.id}">Ver</button><button class="btn btn-sm btn-outline dl-file" data-id="${d.id}">Descargar</button></div>`
           : d.url ? `<a href="${esc(d.url)}" target="_blank" rel="noopener" class="btn btn-sm btn-outline">Abrir ↗</a>` : '<span class="badge badge-muted">Sin archivo</span>'}</td>
         <td class="no-label"><div class="row-actions"><button class="icon-btn edit-doc" data-id="${d.id}" title="Editar">✎</button></div></td>
@@ -1780,12 +1780,41 @@
       const d = state.documents.find(x => x.id === b.dataset.id); if (d) downloadStoredFile(d);
     }));
   }
-  const MAX_FILE_BYTES = 170 * 1024;
+  const CLIENT_STORAGE_BUDGET = 5 * 1024 * 1024;
+  const MAX_FILE_BYTES = CLIENT_STORAGE_BUDGET;
+  const CHUNK_B64_CHARS = 250000;
+  function clientStorageUsed(clientId, excludeDocId){
+    return state.documents
+      .filter(x => x.clientId === clientId && x.id !== excludeDocId && x.fileSize)
+      .reduce((s,x) => s + (Number(x.fileSize)||0), 0);
+  }
+  async function saveFileChunks(documentId, dataUrl, replace){
+    if (replace) await deleteFileChunks(documentId);
+    const base64 = (dataUrl.split(',')[1] || '');
+    const total = Math.max(1, Math.ceil(base64.length / CHUNK_B64_CHARS));
+    for (let i = 0; i < total; i++){
+      const part = base64.slice(i*CHUNK_B64_CHARS, (i+1)*CHUNK_B64_CHARS);
+      await db.collection('documentChunks').add({ documentId, index: i, data: part });
+    }
+    return total;
+  }
+  async function deleteFileChunks(documentId){
+    const snap = await db.collection('documentChunks').where('documentId','==',documentId).get();
+    for (const s of snap.docs){ await db.collection('documentChunks').doc(s.id).delete(); }
+  }
+  async function loadFileDataUrl(d){
+    const snap = await db.collection('documentChunks').where('documentId','==',d.id).orderBy('index').get();
+    const base64 = snap.docs.map(s => s.data().data).join('');
+    return `data:${d.fileType || 'application/octet-stream'};base64,${base64}`;
+  }
   function openDocForm(existing){
     const d = existing || {};
     let pendingFile = null; // null | 'toolarge' | { name, type, size, base64 }
     const backdrop = openModal(existing ? 'Editar documento' : 'Nuevo registro de documento', `
-      <div class="field"><label>Cliente</label><select name="clientId" required>${clientOptions(d.clientId)}</select></div>
+      <div class="field">
+        <label>Cliente</label><select name="clientId" id="docClientSelect" required>${clientOptions(d.clientId)}</select>
+        <div id="clientStorageHint" style="font-size:11.5px;color:var(--muted);margin-top:4px;"></div>
+      </div>
       <div class="field"><label>Documento</label><input name="name" required placeholder="Ej: DNI, póliza firmada, CBU…" value="${esc(d.name||'')}"></div>
       <div class="field-row">
         <div class="field"><label>Estado</label><select name="status">
@@ -1795,29 +1824,54 @@
         <div class="field"><label>Fecha</label><input name="date" type="date" value="${esc(d.date || new Date().toISOString().slice(0,10))}"></div>
       </div>
       <div class="field">
-        <label>Adjuntar archivo (PDF o imagen, hasta 170 KB)</label>
+        <label>Adjuntar archivo (PDF o imagen)</label>
         <input type="file" id="docFileInput" accept="application/pdf,image/*">
-        <div id="docFileHint" style="font-size:11.5px;color:var(--muted);margin-top:5px;">${d.fileName ? `Archivo guardado: ${esc(d.fileName)} (${Math.round((d.fileSize||0)/1024)} KB) — elegí otro para reemplazarlo.` : 'Si pesa más de 170 KB no entra acá: comprimilo o usá el link de abajo.'}</div>
+        <div id="docFileHint" style="font-size:11.5px;color:var(--muted);margin-top:5px;">${d.fileName ? `Archivo guardado: ${esc(d.fileName)} (${Math.round((d.fileSize||0)/1024)} KB) — elegí otro para reemplazarlo.` : 'Cada cliente tiene 5 MB de espacio en total, repartibles en varios archivos.'}</div>
       </div>
       <div class="field"><label>Link al archivo (Drive, mail, etc.)</label><input name="url" type="url" placeholder="https://drive.google.com/…" value="${esc(d.url||'')}"></div>
       <div class="field"><label>Nota</label><textarea name="note">${esc(d.note||'')}</textarea></div>
     `, async data => {
-      if (pendingFile === 'toolarge') throw new Error('El archivo pesa más de 170 KB — comprimilo o usá el link de Drive.');
-      if (pendingFile){
-        data.fileName = pendingFile.name;
-        data.fileType = pendingFile.type;
-        data.fileSize = pendingFile.size;
-        data.fileData = pendingFile.base64;
+      if (pendingFile === 'toolarge') throw new Error('El archivo pesa más de 5 MB — comprimilo o usá el link de Drive.');
+      if (pendingFile && pendingFile !== 'toolarge'){
+        const used = clientStorageUsed(data.clientId, existing ? existing.id : null);
+        if (used + pendingFile.size > CLIENT_STORAGE_BUDGET){
+          const usedMb = (used/1024/1024).toFixed(2), fileMb = (pendingFile.size/1024/1024).toFixed(2);
+          throw new Error(`Este cliente ya usa ${usedMb} MB de los 5 MB disponibles — este archivo (${fileMb} MB) no entra. Borrá otro archivo de este cliente o subí este a Drive.`);
+        }
       }
+      const fileMeta = pendingFile ? { fileName: pendingFile.name, fileType: pendingFile.type, fileSize: pendingFile.size } : null;
       if (existing){
+        if (fileMeta){
+          const chunkCount = await saveFileChunks(existing.id, pendingFile.base64, !!existing.chunkCount);
+          Object.assign(data, fileMeta, { chunkCount });
+        }
         await db.collection('documents').doc(existing.id).update(data);
         toast('Documento actualizado.');
       } else {
         data.createdAt = new Date().toISOString();
-        await db.collection('documents').add(data);
+        const ref = await db.collection('documents').add(data);
+        if (fileMeta){
+          const chunkCount = await saveFileChunks(ref.id, pendingFile.base64, false);
+          await db.collection('documents').doc(ref.id).update(Object.assign({}, fileMeta, { chunkCount }));
+        }
         toast('Registro creado.');
       }
-    }, existing ? { onDelete: async () => { await db.collection('documents').doc(existing.id).delete(); toast('Registro eliminado.'); } } : {});
+    }, existing ? { onDelete: async () => {
+        if (existing.chunkCount) await deleteFileChunks(existing.id);
+        await db.collection('documents').doc(existing.id).delete();
+        toast('Registro eliminado.');
+      } } : {});
+
+    const clientSelect = backdrop.querySelector('#docClientSelect');
+    const storageHint = backdrop.querySelector('#clientStorageHint');
+    function updateStorageHint(){
+      const used = clientStorageUsed(clientSelect.value, existing ? existing.id : null);
+      const usedMb = (used/1024/1024).toFixed(2);
+      storageHint.textContent = `Espacio usado por este cliente: ${usedMb} MB de 5 MB.`;
+      storageHint.style.color = used >= CLIENT_STORAGE_BUDGET ? 'var(--danger)' : 'var(--muted)';
+    }
+    updateStorageHint();
+    clientSelect.addEventListener('change', updateStorageHint);
 
     const fileInput = backdrop.querySelector('#docFileInput');
     const hint = backdrop.querySelector('#docFileHint');
@@ -1826,7 +1880,14 @@
       if (!f){ pendingFile = null; return; }
       if (f.size > MAX_FILE_BYTES){
         pendingFile = 'toolarge';
-        hint.textContent = `Pesa ${Math.round(f.size/1024)} KB — supera el máximo de 170 KB. Comprimilo o usá el link de abajo.`;
+        hint.textContent = `Pesa ${(f.size/1024/1024).toFixed(1)} MB — supera el máximo de 5 MB. Comprimilo o usá el link de abajo.`;
+        hint.style.color = 'var(--danger)';
+        return;
+      }
+      const used = clientStorageUsed(clientSelect.value, existing ? existing.id : null);
+      if (used + f.size > CLIENT_STORAGE_BUDGET){
+        pendingFile = 'toolarge';
+        hint.textContent = `Este cliente ya usa ${(used/1024/1024).toFixed(2)} MB de 5 MB — este archivo (${(f.size/1024/1024).toFixed(2)} MB) no entra.`;
         hint.style.color = 'var(--danger)';
         return;
       }
@@ -1847,19 +1908,22 @@
     for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
     return new Blob([arr], { type: mime });
   }
-  function viewStoredFile(d){
-    if (!d.fileData) return;
-    const blob = dataUrlToBlob(d.fileData);
-    const url = URL.createObjectURL(blob);
-    window.open(url, '_blank');
-    setTimeout(() => URL.revokeObjectURL(url), 60000);
+  async function viewStoredFile(d){
+    if (!d.chunkCount) return;
+    try {
+      const blob = dataUrlToBlob(await loadFileDataUrl(d));
+      const url = URL.createObjectURL(blob);
+      window.open(url, '_blank');
+      setTimeout(() => URL.revokeObjectURL(url), 60000);
+    } catch (e) { toast('No se pudo abrir el archivo.'); }
   }
   async function downloadStoredFile(d){
-    if (!d.fileData) return;
+    if (!d.chunkCount) return;
     const downloads = await claude.use('downloads');
     if (!downloads){ toast('La descarga no está disponible en esta vista.'); return; }
     try {
-      await downloads.save({ filename: d.fileName || 'documento', data: dataUrlToBlob(d.fileData) });
+      const dataUrl = await loadFileDataUrl(d);
+      await downloads.save({ filename: d.fileName || 'documento', data: dataUrlToBlob(dataUrl) });
     } catch (e) { if (e && e.code !== 'declined') toast('No se pudo descargar el archivo.'); }
   }
 
