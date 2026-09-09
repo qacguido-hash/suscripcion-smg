@@ -116,6 +116,8 @@
   .btn-outline:hover{border-color:var(--blue);color:var(--blue);}
   .btn-danger-outline{background:#fff;border-color:var(--danger);color:var(--danger);}
   .btn-danger-outline:hover{background:var(--danger-bg);}
+  .btn-danger{background:var(--danger);border-color:var(--danger);color:#fff;}
+  .btn-danger:hover{opacity:.9;}
   .btn-sm{padding:6px 11px;font-size:12px;}
   .btn:disabled{opacity:.5;cursor:not-allowed;}
 
@@ -465,10 +467,34 @@
     const form = backdrop.querySelector('form');
     form.querySelector('[data-act="cancel"]').addEventListener('click', () => backdrop.remove());
     if (opts.onDelete){
-      form.querySelector('[data-act="del"]').addEventListener('click', async () => {
-        if (!confirm('¿Eliminar este registro? No se puede deshacer.')) return;
-        await opts.onDelete();
-        backdrop.remove();
+      const delBtn = form.querySelector('[data-act="del"]');
+      let confirming = false;
+      let revertTimer = null;
+      function resetDelBtn(){
+        confirming = false;
+        delBtn.disabled = false;
+        delBtn.textContent = 'Eliminar';
+        delBtn.classList.remove('btn-danger');
+        delBtn.classList.add('btn-danger-outline');
+      }
+      delBtn.addEventListener('click', async () => {
+        if (!confirming){
+          confirming = true;
+          delBtn.textContent = '¿Seguro? Eliminar';
+          delBtn.classList.remove('btn-danger-outline');
+          delBtn.classList.add('btn-danger');
+          revertTimer = setTimeout(resetDelBtn, 4000);
+          return;
+        }
+        clearTimeout(revertTimer);
+        delBtn.disabled = true;
+        try {
+          await opts.onDelete();
+          backdrop.remove();
+        } catch (err) {
+          toast('Error al eliminar: ' + (err && err.message ? err.message : 'intentá de nuevo'));
+          resetDelBtn();
+        }
       });
     }
     form.addEventListener('submit', async e => {
@@ -1179,6 +1205,7 @@
       const s = policyStatusInfo(p);
       const ist = installmentStatus(p);
       const canRegisterPayment = p.status !== 'cancelada' && (Number(p.installmentsPaid)||0) < (Number(p.installments)||1);
+      const files = docFiles(p);
       return `<tr>
         <td data-label="Cliente">${esc(clientName(p.clientId))}</td>
         <td data-label="Ramo">${esc(p.ramo)}</td>
@@ -1190,6 +1217,7 @@
         <td data-label="Estado"><span class="badge ${s.cls}">${s.label}</span></td>
         <td class="no-label"><div class="row-actions">
           ${canRegisterPayment ? `<button class="icon-btn mark-paid" data-id="${p.id}" title="Registrar pago de cuota">＋</button>` : ''}
+          ${files.length ? `<button class="icon-btn view-pol-files" data-id="${p.id}" title="Ver archivos adjuntos (${files.length})">📎</button>` : ''}
           <button class="icon-btn renew-pol" data-id="${p.id}" title="Renovar póliza">↻</button>
           <button class="icon-btn edit-pol" data-id="${p.id}" title="Editar">✎</button>
         </div></td>
@@ -1205,6 +1233,29 @@
       const p = state.policies.find(x => x.id === b.dataset.id);
       if (p) openRegisterPaymentForm(p);
     }));
+    tbody.querySelectorAll('.view-pol-files').forEach(b => b.addEventListener('click', () => {
+      const p = state.policies.find(x => x.id === b.dataset.id);
+      if (p) openFilesListModal(`Archivos — ${p.ramo} · ${clientName(p.clientId)}`, docFiles(p));
+    }));
+  }
+  function openFilesListModal(title, files){
+    const backdrop = document.createElement('div');
+    backdrop.className = 'modal-backdrop';
+    backdrop.innerHTML = `
+      <div class="modal">
+        <h2>${esc(title)}</h2>
+        ${files.length ? files.map(f => `<div class="kv" style="align-items:center;">
+          <span>📎 ${esc(f.name)} ${f.size ? `(${Math.round(f.size/1024)} KB)` : ''}</span>
+          <span class="row-actions">
+            <button type="button" class="btn btn-sm btn-outline flm-view" data-id="${esc(f.id)}" data-type="${esc(f.type||'')}" data-count="${f.chunkCount||0}">Ver</button>
+            <button type="button" class="btn btn-sm btn-outline flm-dl" data-id="${esc(f.id)}" data-name="${esc(f.name||'')}" data-type="${esc(f.type||'')}" data-count="${f.chunkCount||0}">Descargar</button>
+          </span></div>`).join('') : '<p class="sub">Sin archivos adjuntos.</p>'}
+        <div class="modal-actions"><button type="button" class="btn btn-outline" data-act="close">Cerrar</button></div>
+      </div>`;
+    document.body.appendChild(backdrop);
+    backdrop.querySelector('[data-act="close"]').addEventListener('click', () => backdrop.remove());
+    backdrop.querySelectorAll('.flm-view').forEach(b => b.addEventListener('click', () => viewStoredFile(b.dataset.id, b.dataset.type, Number(b.dataset.count))));
+    backdrop.querySelectorAll('.flm-dl').forEach(b => b.addEventListener('click', () => downloadStoredFile(b.dataset.id, b.dataset.name, b.dataset.type, Number(b.dataset.count))));
   }
   function openRegisterPaymentForm(p){
     const total = Number(p.installments)||1;
@@ -1236,15 +1287,22 @@
     const p = existing || seed || {};
     const title = existing ? 'Editar póliza' : (seed && seed.sourceQuoteId ? 'Nueva póliza (desde cotización)' : (seed ? 'Renovar póliza' : 'Nueva póliza'));
     const backdrop = openModal(title, `
-      <div class="field"><label>Cliente</label><select name="clientId" required>${clientOptions(p.clientId)}</select></div>
+      <div class="field"><label>Cliente</label><select name="clientId" id="polClientSelect" required>${clientOptions(p.clientId)}</select></div>
       <div class="field-row">
         <div class="field"><label>Ramo</label><select name="ramo">${ramoOptions(p.ramo)}</select></div>
-        <div class="field"><label>Aseguradora</label><select name="company">${companyOptions(p.company)}</select></div>
+        <div class="field"><label>Aseguradora</label><select name="company" id="polCompanySelect">${companyOptions(p.company)}</select></div>
       </div>
       <div id="ramoExtraFields">${ramoExtraFieldsHtml(p.ramo, p)}</div>
       <div class="field-row">
         <div class="field"><label>N° de póliza</label><input name="policyNumber" value="${esc(p.policyNumber||'')}"></div>
         <div class="field"><label>Prima</label><input name="premium" type="number" step="0.01" value="${esc(p.premium||'')}"></div>
+      </div>
+      <div class="field">
+        <label>Archivos adjuntos (póliza escaneada, endosos, etc.)</label>
+        <div id="polFilesList"></div>
+        <input type="file" id="polFileInput" accept="application/pdf,image/*" multiple>
+        <div id="polFileHint" style="font-size:11.5px;color:var(--muted);margin-top:5px;">Comparte el espacio de 15 MB del cliente con Documentación.</div>
+        <div id="polStorageHint" style="font-size:11.5px;color:var(--muted);margin-top:4px;"></div>
       </div>
       <div class="field-row">
         <div class="field"><label>Moneda</label><select name="currency">${CURRENCIES.map(cur => `<option value="${cur}" ${(p.currency||'ARS')===cur?'selected':''}>${CURRENCY_LABEL[cur]}</option>`).join('')}</select></div>
@@ -1282,6 +1340,12 @@
       if (data.status === 'cancelada' && !data.cancellationReason){
         throw new Error('Elegí un motivo de baja para cancelar la póliza.');
       }
+      const totalSize = am.totalSize();
+      const usedElsewhere = clientStorageUsed(data.clientId, existing ? existing.id : null);
+      if (usedElsewhere + totalSize > CLIENT_STORAGE_BUDGET){
+        throw new Error(`Este cliente usaría ${((usedElsewhere+totalSize)/1024/1024).toFixed(2)} MB de los 15 MB disponibles. Quitá algún archivo o subilo a Drive.`);
+      }
+      data.files = await am.finalize();
       data.clientName = clientName(data.clientId);
       data.premium = Number(data.premium) || 0;
       data.commissionPct = Number(data.commissionPct) || 0;
@@ -1301,9 +1365,28 @@
         }
         toast('Póliza creada.');
       }
-    }, existing ? { onDelete: async () => { await db.collection('policies').doc(existing.id).delete(); toast('Póliza eliminada.'); } } : {});
+    }, existing ? { onDelete: async () => {
+        for (const f of docFiles(existing)) await deleteFileChunks(f.id).catch(() => {});
+        await db.collection('policies').doc(existing.id).delete();
+        toast('Póliza eliminada.');
+      } } : {});
+    const am = initAttachmentManager({
+      initialFiles: docFiles(p),
+      clientSelectEl: backdrop.querySelector('#polClientSelect'),
+      filesListEl: backdrop.querySelector('#polFilesList'),
+      fileInputEl: backdrop.querySelector('#polFileInput'),
+      hintEl: backdrop.querySelector('#polFileHint'),
+      storageHintEl: backdrop.querySelector('#polStorageHint'),
+      getExcludeId: () => existing ? existing.id : null,
+    });
     backdrop.querySelector('select[name="ramo"]').addEventListener('change', e => {
       backdrop.querySelector('#ramoExtraFields').innerHTML = ramoExtraFieldsHtml(e.target.value, {});
+    });
+    backdrop.querySelector('#polCompanySelect').addEventListener('change', e => {
+      const pctInput = backdrop.querySelector('input[name="commissionPct"]');
+      if (pctInput.value) return;
+      const ins = state.insurers.find(i => i.company === e.target.value);
+      if (ins && ins.defaultCommissionPct != null) pctInput.value = ins.defaultCommissionPct;
     });
   }
 
@@ -1794,10 +1877,11 @@
     if (d.fileName) return [{ id: d.id, name: d.fileName, type: d.fileType, size: d.fileSize, chunkCount: d.chunkCount }];
     return [];
   }
-  function clientStorageUsed(clientId, excludeDocId){
-    return state.documents
-      .filter(x => x.clientId === clientId && x.id !== excludeDocId)
+  function clientStorageUsed(clientId, excludeId){
+    const sumFrom = arr => arr
+      .filter(x => x.clientId === clientId && x.id !== excludeId)
       .reduce((s,x) => s + docFiles(x).reduce((s2,f) => s2 + (Number(f.size)||0), 0), 0);
+    return sumFrom(state.documents) + sumFrom(state.policies);
   }
   function newFileId(){
     return 'f' + Date.now().toString(36) + Math.random().toString(36).slice(2, 9);
@@ -1839,11 +1923,104 @@
     const base64 = snap.docs.map(s => s.data().data).join('');
     return `data:${fileType || 'application/octet-stream'};base64,${base64}`;
   }
+  function initAttachmentManager(opts){
+    // opts: { initialFiles, clientSelectEl, filesListEl, fileInputEl, hintEl, storageHintEl, getExcludeId }
+    let attachments = (opts.initialFiles || []).slice();
+    let removedIds = [];
+    let pendingNewFiles = []; // { localId, name, type, size, base64 }
+
+    function currentTotalSize(){
+      return attachments.reduce((s,f) => s+(Number(f.size)||0), 0) + pendingNewFiles.reduce((s,f) => s+f.size, 0);
+    }
+    function updateStorageHint(){
+      if (!opts.storageHintEl) return;
+      const used = clientStorageUsed(opts.clientSelectEl.value, opts.getExcludeId());
+      const usedMb = (used/1024/1024).toFixed(2);
+      opts.storageHintEl.textContent = `Espacio usado por este cliente (sin contar lo de este formulario): ${usedMb} MB de 15 MB.`;
+      opts.storageHintEl.style.color = used >= CLIENT_STORAGE_BUDGET ? 'var(--danger)' : 'var(--muted)';
+    }
+    function renderFilesList(){
+      const rows = [];
+      attachments.forEach((f, idx) => rows.push(`<div class="kv" style="align-items:center;">
+          <span>📎 ${esc(f.name)} ${f.size ? `(${Math.round(f.size/1024)} KB)` : ''}</span>
+          <span class="row-actions">
+            <button type="button" class="btn btn-sm btn-outline am-view" data-id="${esc(f.id)}" data-type="${esc(f.type||'')}" data-count="${f.chunkCount||0}">Ver</button>
+            <button type="button" class="btn btn-sm btn-danger-outline am-remove" data-kind="existing" data-idx="${idx}">Quitar</button>
+          </span></div>`));
+      pendingNewFiles.forEach((f, idx) => rows.push(`<div class="kv" style="align-items:center;">
+          <span>🆕 ${esc(f.name)} (${Math.round(f.size/1024)} KB)</span>
+          <span class="row-actions"><button type="button" class="btn btn-sm btn-danger-outline am-remove" data-kind="pending" data-idx="${idx}">Quitar</button></span></div>`));
+      opts.filesListEl.innerHTML = rows.join('') || '<p class="sub" style="margin:4px 0;">Sin archivos adjuntos todavía.</p>';
+      opts.filesListEl.querySelectorAll('.am-remove').forEach(b => b.addEventListener('click', () => {
+        const idx = Number(b.dataset.idx);
+        if (b.dataset.kind === 'existing'){ removedIds.push(attachments[idx].id); attachments.splice(idx, 1); }
+        else { pendingNewFiles.splice(idx, 1); }
+        renderFilesList();
+        updateStorageHint();
+      }));
+      opts.filesListEl.querySelectorAll('.am-view').forEach(b => b.addEventListener('click', () => {
+        viewStoredFile(b.dataset.id, b.dataset.type, Number(b.dataset.count));
+      }));
+    }
+    renderFilesList();
+    updateStorageHint();
+    opts.clientSelectEl.addEventListener('change', updateStorageHint);
+
+    opts.fileInputEl.addEventListener('change', () => {
+      const files = Array.from(opts.fileInputEl.files || []);
+      if (!files.length) return;
+      const used = clientStorageUsed(opts.clientSelectEl.value, opts.getExcludeId());
+      let runningTotal = currentTotalSize();
+      const rejected = [];
+      files.forEach(f => {
+        if (f.size > MAX_FILE_BYTES || used + runningTotal + f.size > CLIENT_STORAGE_BUDGET){
+          rejected.push(f.name);
+          return;
+        }
+        runningTotal += f.size;
+        const reader = new FileReader();
+        reader.onload = () => {
+          pendingNewFiles.push({ localId: newFileId(), name: f.name, type: f.type, size: f.size, base64: reader.result });
+          renderFilesList();
+          updateStorageHint();
+        };
+        reader.readAsDataURL(f);
+      });
+      if (rejected.length){
+        opts.hintEl.textContent = `No entran en el espacio de 15 MB del cliente: ${rejected.join(', ')}.`;
+        opts.hintEl.style.color = 'var(--danger)';
+      } else {
+        opts.hintEl.textContent = 'Podés elegir varios archivos a la vez, o ir agregando de a uno — no reemplazan a los anteriores.';
+        opts.hintEl.style.color = 'var(--muted)';
+      }
+      opts.fileInputEl.value = '';
+    });
+
+    return {
+      totalSize: currentTotalSize,
+      async finalize(){
+        const savedNew = [];
+        for (const f of pendingNewFiles){
+          let chunkCount;
+          try {
+            chunkCount = await saveFileChunks(f.localId, f.base64, (done, total) => {
+              if (opts.hintEl){ opts.hintEl.textContent = `Subiendo ${f.name}: parte ${done} de ${total}…`; opts.hintEl.style.color = 'var(--muted)'; }
+            });
+          } catch (e) {
+            await deleteFileChunks(f.localId).catch(() => {});
+            throw e;
+          }
+          savedNew.push({ id: f.localId, name: f.name, type: f.type, size: f.size, chunkCount });
+        }
+        for (const id of removedIds){
+          await deleteFileChunks(id).catch(() => {});
+        }
+        return attachments.concat(savedNew);
+      },
+    };
+  }
   function openDocForm(existing){
     const d = existing || {};
-    let attachments = docFiles(d).slice(); // already-saved files: { id, name, type, size, chunkCount }
-    let removedIds = [];
-    let pendingNewFiles = []; // not-yet-saved: { localId, name, type, size, base64 }
     const backdrop = openModal(existing ? 'Editar documento' : 'Nuevo registro de documento', `
       <div class="field">
         <label>Cliente</label><select name="clientId" id="docClientSelect" required>${clientOptions(d.clientId)}</select>
@@ -1866,29 +2043,12 @@
       <div class="field"><label>Link al archivo (Drive, mail, etc.)</label><input name="url" type="url" placeholder="https://drive.google.com/…" value="${esc(d.url||'')}"></div>
       <div class="field"><label>Nota</label><textarea name="note">${esc(d.note||'')}</textarea></div>
     `, async data => {
-      const totalSize = attachments.reduce((s,f) => s+(Number(f.size)||0), 0) + pendingNewFiles.reduce((s,f) => s+f.size, 0);
+      const totalSize = am.totalSize();
       const usedElsewhere = clientStorageUsed(data.clientId, existing ? existing.id : null);
       if (usedElsewhere + totalSize > CLIENT_STORAGE_BUDGET){
         throw new Error(`Este cliente usaría ${((usedElsewhere+totalSize)/1024/1024).toFixed(2)} MB de los 15 MB disponibles. Quitá algún archivo o subilo a Drive.`);
       }
-      const savedNew = [];
-      for (const f of pendingNewFiles){
-        let chunkCount;
-        try {
-          chunkCount = await saveFileChunks(f.localId, f.base64, (done, total) => {
-            hint.textContent = `Subiendo ${f.name}: parte ${done} de ${total}…`;
-            hint.style.color = 'var(--muted)';
-          });
-        } catch (e) {
-          await deleteFileChunks(f.localId).catch(() => {});
-          throw e;
-        }
-        savedNew.push({ id: f.localId, name: f.name, type: f.type, size: f.size, chunkCount });
-      }
-      for (const id of removedIds){
-        await deleteFileChunks(id).catch(() => {});
-      }
-      data.files = attachments.concat(savedNew);
+      data.files = await am.finalize();
       if (existing){
         await db.collection('documents').doc(existing.id).update(data);
         toast('Documento actualizado.');
@@ -1903,76 +2063,14 @@
         toast('Registro eliminado.');
       } } : {});
 
-    const clientSelect = backdrop.querySelector('#docClientSelect');
-    const storageHint = backdrop.querySelector('#clientStorageHint');
-    const filesListEl = backdrop.querySelector('#docFilesList');
-    const fileInput = backdrop.querySelector('#docFileInput');
-    const hint = backdrop.querySelector('#docFileHint');
-
-    function currentTotalSize(){
-      return attachments.reduce((s,f) => s+(Number(f.size)||0), 0) + pendingNewFiles.reduce((s,f) => s+f.size, 0);
-    }
-    function updateStorageHint(){
-      const used = clientStorageUsed(clientSelect.value, existing ? existing.id : null);
-      const usedMb = (used/1024/1024).toFixed(2);
-      storageHint.textContent = `Espacio usado por este cliente (sin contar lo de este formulario): ${usedMb} MB de 15 MB.`;
-      storageHint.style.color = used >= CLIENT_STORAGE_BUDGET ? 'var(--danger)' : 'var(--muted)';
-    }
-    function renderFilesList(){
-      const rows = [];
-      attachments.forEach((f, idx) => rows.push(`<div class="kv" style="align-items:center;">
-          <span>📎 ${esc(f.name)} ${f.size ? `(${Math.round(f.size/1024)} KB)` : ''}</span>
-          <span class="row-actions">
-            <button type="button" class="btn btn-sm btn-outline doc-file-view" data-id="${esc(f.id)}" data-type="${esc(f.type||'')}" data-count="${f.chunkCount||0}">Ver</button>
-            <button type="button" class="btn btn-sm btn-danger-outline doc-file-remove" data-kind="existing" data-idx="${idx}">Quitar</button>
-          </span></div>`));
-      pendingNewFiles.forEach((f, idx) => rows.push(`<div class="kv" style="align-items:center;">
-          <span>🆕 ${esc(f.name)} (${Math.round(f.size/1024)} KB)</span>
-          <span class="row-actions"><button type="button" class="btn btn-sm btn-danger-outline doc-file-remove" data-kind="pending" data-idx="${idx}">Quitar</button></span></div>`));
-      filesListEl.innerHTML = rows.join('') || '<p class="sub" style="margin:4px 0;">Sin archivos adjuntos todavía.</p>';
-      filesListEl.querySelectorAll('.doc-file-remove').forEach(b => b.addEventListener('click', () => {
-        const idx = Number(b.dataset.idx);
-        if (b.dataset.kind === 'existing'){ removedIds.push(attachments[idx].id); attachments.splice(idx, 1); }
-        else { pendingNewFiles.splice(idx, 1); }
-        renderFilesList();
-        updateStorageHint();
-      }));
-      filesListEl.querySelectorAll('.doc-file-view').forEach(b => b.addEventListener('click', () => {
-        viewStoredFile(b.dataset.id, b.dataset.type, Number(b.dataset.count));
-      }));
-    }
-    renderFilesList();
-    updateStorageHint();
-    clientSelect.addEventListener('change', updateStorageHint);
-
-    fileInput.addEventListener('change', () => {
-      const files = Array.from(fileInput.files || []);
-      if (!files.length) return;
-      const used = clientStorageUsed(clientSelect.value, existing ? existing.id : null);
-      let runningTotal = currentTotalSize();
-      const rejected = [];
-      files.forEach(f => {
-        if (f.size > MAX_FILE_BYTES || used + runningTotal + f.size > CLIENT_STORAGE_BUDGET){
-          rejected.push(f.name);
-          return;
-        }
-        runningTotal += f.size;
-        const reader = new FileReader();
-        reader.onload = () => {
-          pendingNewFiles.push({ localId: newFileId(), name: f.name, type: f.type, size: f.size, base64: reader.result });
-          renderFilesList();
-          updateStorageHint();
-        };
-        reader.readAsDataURL(f);
-      });
-      if (rejected.length){
-        hint.textContent = `No entran en el espacio de 15 MB del cliente: ${rejected.join(', ')}.`;
-        hint.style.color = 'var(--danger)';
-      } else {
-        hint.textContent = 'Podés elegir varios archivos a la vez, o ir agregando de a uno — no reemplazan a los anteriores.';
-        hint.style.color = 'var(--muted)';
-      }
-      fileInput.value = '';
+    const am = initAttachmentManager({
+      initialFiles: docFiles(d),
+      clientSelectEl: backdrop.querySelector('#docClientSelect'),
+      filesListEl: backdrop.querySelector('#docFilesList'),
+      fileInputEl: backdrop.querySelector('#docFileInput'),
+      hintEl: backdrop.querySelector('#docFileHint'),
+      storageHintEl: backdrop.querySelector('#clientStorageHint'),
+      getExcludeId: () => existing ? existing.id : null,
     });
   }
   function dataUrlToBlob(dataUrl){
@@ -2080,6 +2178,18 @@
   }
 
   /* ==================== COMISIONES ==================== */
+  function insurerCommissionBase(company){
+    const ins = state.insurers.find(i => i.company === company);
+    return (ins && ins.commissionBase) || 'prima';
+  }
+  function policyPremio(p){
+    const prima = Number(p.premium) || 0;
+    return prima + prima * defaultTaxPctForRamo(p.ramo) / 100;
+  }
+  function policyCommissionAmount(p){
+    const base = insurerCommissionBase(p.company) === 'premio' ? policyPremio(p) : (Number(p.premium)||0);
+    return base * (Number(p.commissionPct)||0) / 100;
+  }
   function renderComisiones(){
     const el = document.querySelector('.page[data-page="comisiones"]');
     const active = state.policies.filter(p => p.status !== 'cancelada');
@@ -2087,15 +2197,14 @@
 
     function commDataFor(cur){
       const rows = active.filter(p => (p.currency === 'USD' ? 'USD' : 'ARS') === cur);
-      const total = rows.reduce((s,p) => s + (Number(p.premium)||0) * (Number(p.commissionPct)||0)/100, 0);
+      const total = rows.reduce((s,p) => s + policyCommissionAmount(p), 0);
       const rmasd = total * RMASD_SPLIT_PCT / 100;
       return { rows, total, rmasd, mine: total - rmasd };
     }
     function companyRowsHtml(rows, currency){
       const byCompany = {};
       rows.forEach(p => {
-        const c = (Number(p.premium)||0) * (Number(p.commissionPct)||0)/100;
-        byCompany[p.company] = (byCompany[p.company]||0) + c;
+        byCompany[p.company] = (byCompany[p.company]||0) + policyCommissionAmount(p);
       });
       const entries = Object.entries(byCompany).sort((a,b)=>b[1]-a[1]);
       if (!entries.length) return '<tr><td colspan="6" class="no-label"><p class="empty">Cargá el % de comisión en cada póliza para ver el estimado.</p></td></tr>';
@@ -2104,7 +2213,8 @@
         const prem = rows.filter(p => p.company === name).reduce((s,p)=>s+(Number(p.premium)||0),0);
         const rmasd = val * RMASD_SPLIT_PCT / 100;
         const mine = val - rmasd;
-        return `<tr><td data-label="Aseguradora">${esc(name)}</td><td data-label="Pólizas">${n}</td><td data-label="Prima total">${fmtMoney(prem, currency)}</td><td data-label="Comisión total">${fmtMoney(val, currency)}</td><td data-label="RMASD">${fmtMoney(rmasd, currency)}</td><td data-label="Tu comisión">${fmtMoney(mine, currency)}</td></tr>`;
+        const base = insurerCommissionBase(name);
+        return `<tr><td data-label="Aseguradora">${esc(name)}${base==='premio'?' <span class="badge badge-muted" style="font-size:10px;">s/premio</span>':''}</td><td data-label="Pólizas">${n}</td><td data-label="Prima total">${fmtMoney(prem, currency)}</td><td data-label="Comisión total">${fmtMoney(val, currency)}</td><td data-label="RMASD">${fmtMoney(rmasd, currency)}</td><td data-label="Tu comisión">${fmtMoney(mine, currency)}</td></tr>`;
       }).join('');
     }
     function section(data, currency){
@@ -2123,7 +2233,7 @@
     }
     const ars = commDataFor('ARS');
     el.innerHTML = `
-      <div class="page-head"><div><h1>Comisiones</h1><p>Estimado según prima y % de comisión cargado en cada póliza. Se reparte ${RMASD_SPLIT_PCT}% para RMASD y ${100-RMASD_SPLIT_PCT}% para vos.</p></div></div>
+      <div class="page-head"><div><h1>Comisiones</h1><p>Estimado según prima y % de comisión cargado en cada póliza (configurá el % y la base por defecto en Aseguradoras). Las marcadas "s/premio" comisionan sobre prima + impuestos, no solo sobre la prima. Se reparte ${RMASD_SPLIT_PCT}% para RMASD y ${100-RMASD_SPLIT_PCT}% para vos.</p></div></div>
       ${hasUSD ? '<h2 style="font-size:15px;margin-bottom:8px;">En pesos (ARS)</h2>' : ''}
       ${section(ars, 'ARS')}
       ${hasUSD ? `<h2 style="font-size:15px;margin:22px 0 8px;">En dólares (USD)</h2>${section(commDataFor('USD'), 'USD')}` : ''}
@@ -2258,7 +2368,8 @@
         return `<div class="kv"><span>${r.label}</span><span>${esc(v.name||'—')} · ${esc(v.phone||'—')} · ${esc(v.email||'—')}</span></div>`;
       }).join('');
       return `<div class="item-card">
-        <div class="top-row"><h3>${esc(company)}</h3><button class="btn btn-sm btn-outline edit-contacts" data-company="${esc(company)}">Editar contactos</button></div>
+        <div class="top-row"><h3>${esc(company)}</h3><button class="btn btn-sm btn-outline edit-contacts" data-company="${esc(company)}">Editar contactos y comisión</button></div>
+        <div class="kv"><span>Comisión</span><span>${rec && rec.defaultCommissionPct != null ? `${esc(rec.defaultCommissionPct)}% sobre ${rec.commissionBase === 'premio' ? 'premio' : 'prima'}` : 'Sin cargar'}</span></div>
         ${contactRows || '<p class="sub">Sin contactos cargados.</p>'}
         ${rec && rec.hours ? `<div class="kv"><span>Horario de atención</span><span>${esc(rec.hours)}</span></div>` : ''}
         <div style="margin-top:10px;display:flex;justify-content:space-between;align-items:center;">
@@ -2290,13 +2401,25 @@
       </div>
       <div class="field"><label>Email</label><input name="email_${r.key}" type="email" value="${esc((contacts[r.key]||{}).email||'')}"></div>
     `).join('');
+    const defaultBase = (existing && existing.commissionBase) || (company === 'Triunfo Seguros' ? 'premio' : 'prima');
     openModal(`Contactos — ${company}`, `
+      <div class="field-row">
+        <div class="field"><label>% de comisión</label><input name="defaultCommissionPct" type="number" step="0.01" value="${esc((existing&&existing.defaultCommissionPct)||'')}"></div>
+        <div class="field"><label>Se comisiona sobre</label><select name="commissionBase">
+          <option value="prima" ${defaultBase!=='premio'?'selected':''}>Prima</option>
+          <option value="premio" ${defaultBase==='premio'?'selected':''}>Premio (prima + impuestos)</option>
+        </select></div>
+      </div>
       ${fieldsHtml}
       <div class="field" style="margin-top:8px;"><label>Horario de atención</label><input name="hours" value="${esc((existing&&existing.hours)||'')}"></div>
     `, async data => {
       const newContacts = {};
       INSURER_ROLES.forEach(r => { newContacts[r.key] = { name: data['name_'+r.key]||'', phone: data['phone_'+r.key]||'', email: data['email_'+r.key]||'' }; });
-      const payload = { company, contacts: newContacts, hours: data.hours||'' };
+      const payload = {
+        company, contacts: newContacts, hours: data.hours||'',
+        defaultCommissionPct: data.defaultCommissionPct ? Number(data.defaultCommissionPct) : null,
+        commissionBase: data.commissionBase || 'prima',
+      };
       if (existing){
         await db.collection('insurers').doc(existing.id).update(payload);
       } else {
