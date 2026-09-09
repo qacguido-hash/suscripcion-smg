@@ -201,6 +201,7 @@
   #drawer{width:min(440px,100%);background:#fff;height:100%;overflow-y:auto;padding:24px;box-shadow:-8px 0 30px rgba(0,0,0,.12);}
   #drawer h2{font-family:var(--font-cond);font-size:20px;color:var(--blue);margin-bottom:4px;}
   #drawer .sub{font-size:12.5px;color:var(--muted);margin-bottom:18px;}
+  .kv{display:flex;justify-content:space-between;align-items:center;gap:10px;}
   #drawer .kv{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;}
   #drawer .kv span:first-child{color:var(--muted);}
   #drawer .close-drawer{position:absolute;top:16px;right:16px;}
@@ -633,7 +634,6 @@
     const overdue = activePolicies.filter(p => { const d = daysUntil(p.endDate); return d !== null && d < 0; });
     const inArrears = activePolicies.filter(p => installmentStatus(p).mora);
     const openTasks = state.tasks.filter(t => !t.done);
-    const openClaims = state.claims.filter(c => c.status !== 'cerrado');
     const pendingQuotes = state.quotes.filter(q => q.status === 'pendiente' || q.status === 'enviada');
 
     const cancelledWithReason = state.policies.filter(p => p.status === 'cancelada' && p.cancellationReason);
@@ -711,12 +711,8 @@
         <div class="stat-card"><b>${activePolicies.length}</b><span>Pólizas vigentes</span></div>
         <div class="stat-card"><b>${fmtMoney(totalPremiumARS)}</b><span>Prima total cartera${hasUSD ? ' (ARS)' : ''}</span></div>
         ${hasUSD ? `<div class="stat-card"><b>${fmtMoney(totalPremiumUSD,'USD')}</b><span>Prima total cartera (USD)</span></div>` : ''}
-        <div class="stat-card"><b style="color:var(--warn);">${soon.length}</b><span>Vencen en 30 días</span></div>
-        <div class="stat-card"><b style="color:var(--danger);">${overdue.length}</b><span>Vencidas</span></div>
         <div class="stat-card"><b style="color:var(--danger);">${inArrears.length}</b><span>Pólizas en mora</span></div>
         <div class="stat-card"><b>${pendingQuotes.length}</b><span>Cotizaciones abiertas</span></div>
-        <div class="stat-card"><b>${openTasks.length}</b><span>Tareas pendientes</span></div>
-        <div class="stat-card"><b>${openClaims.length}</b><span>Siniestros abiertos</span></div>
       </div>
       <div class="dash-grid">
         <div>
@@ -784,7 +780,7 @@
               const cuotaNum = (Number(p.installmentsPaid)||0) + 1;
               return `<div class="kv" style="border-bottom:1px solid var(--border);padding:8px 0;display:flex;justify-content:space-between;font-size:13px;">
                 <span>${esc(clientName(p.clientId))} · ${esc(p.ramo)} · ${esc(p.paymentMethod||'—')}</span>
-                <span class="badge badge-warn">Cuota ${cuotaNum}/${total} · ${fmtMoney((Number(p.premium)||0)/total, p.currency)}</span>
+                <span class="badge badge-warn">Cuota ${cuotaNum}/${total} · ${fmtMoney(policyPremio(p)/total, p.currency)}</span>
               </div>`;
             }).join('') : '<p class="empty">Sin cuotas para cobrar este mes.</p>'}
           </div>
@@ -1260,7 +1256,7 @@
   function openRegisterPaymentForm(p){
     const total = Number(p.installments)||1;
     const nextNum = Math.min(total, (Number(p.installmentsPaid)||0) + 1);
-    const suggestedAmount = ((Number(p.premium)||0) / total).toFixed(2);
+    const suggestedAmount = (policyPremio(p) / total).toFixed(2);
     openModal(`Registrar pago — ${p.ramo||'Póliza'}`, `
       <div class="field-row">
         <div class="field"><label>Fecha de pago</label><input name="date" type="date" value="${new Date().toISOString().slice(0,10)}"></div>
@@ -1296,6 +1292,10 @@
       <div class="field-row">
         <div class="field"><label>N° de póliza</label><input name="policyNumber" value="${esc(p.policyNumber||'')}"></div>
         <div class="field"><label>Prima</label><input name="premium" type="number" step="0.01" value="${esc(p.premium||'')}"></div>
+      </div>
+      <div class="field">
+        <label>Premio total (opcional — lo que paga el cliente: prima + impuestos)</label>
+        <input name="premioTotal" type="number" step="0.01" value="${esc(p.premioTotal||'')}" placeholder="Si lo dejás vacío, se estima automáticamente">
       </div>
       <div class="field">
         <label>Archivos adjuntos (póliza escaneada, endosos, etc.)</label>
@@ -1348,6 +1348,7 @@
       data.files = await am.finalize();
       data.clientName = clientName(data.clientId);
       data.premium = Number(data.premium) || 0;
+      data.premioTotal = data.premioTotal ? Number(data.premioTotal) : null;
       data.commissionPct = Number(data.commissionPct) || 0;
       data.installments = Number(data.installments) || 1;
       data.installmentsPaid = Math.min(data.installments, Math.max(0, Number(data.installmentsPaid) || 0));
@@ -2183,6 +2184,7 @@
     return (ins && ins.commissionBase) || 'prima';
   }
   function policyPremio(p){
+    if (p.premioTotal) return Number(p.premioTotal) || 0;
     const prima = Number(p.premium) || 0;
     return prima + prima * defaultTaxPctForRamo(p.ramo) / 100;
   }
