@@ -568,8 +568,9 @@
     return backdrop;
   }
 
-  function clientOptions(selected){
+  function clientOptions(selected, excludeId){
     return state.clients
+      .filter(c => c.id !== excludeId)
       .slice().sort((a,b) => a.name.localeCompare(b.name))
       .map(c => `<option value="${esc(c.id)}" ${c.id===selected?'selected':''}>${esc(c.name)}</option>`).join('');
   }
@@ -616,7 +617,7 @@
     if (suggestion) return `Hola ${firstName}! Soy Guido, tu asesor de seguros. Viendo tu cobertura actual, se me ocurrió que te puede convenir sumar un ${suggestion.ramo}. ¿Te interesa que te pase una cotización sin compromiso?`;
     return `Hola ${firstName}! Soy Guido, tu asesor de seguros. Te escribo para saber cómo estás y si necesitás revisar alguna cobertura. ¡Cualquier cosa, contame!`;
   }
-  function openWhatsAppComposer(client, suggestion){
+  function openWhatsAppComposer(client, suggestion, customMessage){
     const waNumber = phoneToWhatsApp(client.phone);
     if (!waNumber){ toast('Este cliente no tiene teléfono cargado.'); return; }
     const backdrop = document.createElement('div');
@@ -624,7 +625,7 @@
     backdrop.innerHTML = `
       <div class="modal">
         <h2>WhatsApp — ${esc(client.name)}</h2>
-        <div class="field"><label>Mensaje</label><textarea id="waMessageInput" style="min-height:120px;">${esc(defaultWhatsAppMessage(client, suggestion))}</textarea></div>
+        <div class="field"><label>Mensaje</label><textarea id="waMessageInput" style="min-height:120px;">${esc(customMessage || defaultWhatsAppMessage(client, suggestion))}</textarea></div>
         <p class="sub" style="margin:-4px 0 6px;">Se abre WhatsApp con este mensaje cargado — todavía lo podés editar ahí antes de enviarlo.</p>
         <div class="modal-actions">
           <button type="button" class="btn btn-outline" data-act="close">Cerrar</button>
@@ -638,6 +639,60 @@
       window.open(`https://wa.me/${waNumber}?text=${encodeURIComponent(text)}`, '_blank');
       backdrop.remove();
     });
+  }
+
+  function defaultPolicyReminderMessage(client, p){
+    const firstName = (client.name||'').trim().split(/\s+/)[0] || '';
+    const ist = installmentStatus(p);
+    const d = daysUntil(p.endDate);
+    if (ist.mora) return `Hola ${firstName}! Te escribo porque tenés una cuota atrasada de tu ${p.ramo} (${p.company}). ¿Coordinamos el pago para regularizarla?`;
+    if (d !== null && d < 0) return `Hola ${firstName}! Te aviso que tu póliza de ${p.ramo} (${p.company}) está vencida. ¿La renovamos para que sigas con cobertura?`;
+    if (d !== null && d <= 30) return `Hola ${firstName}! Te aviso que tu póliza de ${p.ramo} (${p.company}) vence el ${fmtDate(p.endDate)}. ¿Coordinamos la renovación?`;
+    return `Hola ${firstName}! Te escribo por tu póliza de ${p.ramo} (${p.company}).`;
+  }
+  const REFERRAL_BONUS_PCT = 15;
+  function referralHasFirstPayment(referredClient){
+    const pols = state.policies.filter(p => p.clientId === referredClient.id);
+    return pols.some(p => (p.paymentHistory||[]).length > 0 || (Number(p.installmentsPaid)||0) > 0);
+  }
+  function renderReferralsPanel(el){
+    const panel = el.querySelector('#referralsPanel');
+    const referrals = state.clients.filter(c => c.referredBy);
+    if (!referrals.length){ panel.innerHTML = ''; return; }
+    panel.innerHTML = `
+      <div class="panel" style="margin-bottom:16px;">
+        <h2>🎁 Programa de referidos (${referrals.length})</h2>
+        ${referrals.map(referred => {
+          const referrer = state.clients.find(x => x.id === referred.referredBy);
+          if (!referrer) return '';
+          const paid = referralHasFirstPayment(referred);
+          const applied = !!referred.referralBonusApplied;
+          const status = applied ? { label:'Bonificación aplicada', cls:'badge-ok' }
+            : paid ? { label:`${REFERRAL_BONUS_PCT}% OFF disponible`, cls:'badge-warn' }
+            : { label:'Esperando 1er pago', cls:'badge-muted' };
+          return `<div class="kv" style="border-bottom:1px solid var(--border);padding:8px 0;font-size:13px;">
+            <span><a href="#" class="referral-link" data-id="${referrer.id}" style="font-weight:600;color:var(--blue);">${esc(referrer.name)}</a> recomendó a <a href="#" class="referral-link" data-id="${referred.id}" style="color:var(--blue);">${esc(referred.name)}</a></span>
+            <span style="display:flex;align-items:center;gap:8px;">
+              <span class="badge ${status.cls}">${status.label}</span>
+              ${paid && !applied ? `<button type="button" class="btn btn-sm btn-outline referral-mark-applied" data-id="${referred.id}">Marcar aplicada</button>` : ''}
+              ${paid && !applied && referrer.phone ? `<button type="button" class="btn btn-sm btn-outline referral-wa" data-id="${referred.id}">WhatsApp</button>` : ''}
+            </span>
+          </div>`;
+        }).join('')}
+      </div>
+    `;
+    panel.querySelectorAll('.referral-link').forEach(a => a.addEventListener('click', e => { e.preventDefault(); openClientDrawer(a.dataset.id); }));
+    panel.querySelectorAll('.referral-mark-applied').forEach(b => b.addEventListener('click', async () => {
+      await db.collection('clients').doc(b.dataset.id).update({ referralBonusApplied: true });
+      toast('Bonificación marcada como aplicada.');
+    }));
+    panel.querySelectorAll('.referral-wa').forEach(b => b.addEventListener('click', () => {
+      const referred = state.clients.find(x => x.id === b.dataset.id);
+      const referrer = state.clients.find(x => x.id === referred.referredBy);
+      const firstName = (referrer.name||'').trim().split(/\s+/)[0] || '';
+      const msg = `Hola ${firstName}! Te cuento que ${referred.name} ya emitió su póliza gracias a tu recomendación, así que te ganaste un ${REFERRAL_BONUS_PCT}% OFF en el pago de tu póliza de auto. ¡Gracias por confiar en mí!`;
+      openWhatsAppComposer(referrer, null, msg);
+    }));
   }
 
   /* ---------- Drawer (detail view for a client, with related records) ---------- */
@@ -663,6 +718,7 @@
         <div class="kv"><span>Dirección</span><span>${esc(c.address || '—')}</span></div>
         <div class="kv"><span>Medio de pago</span><span>${esc(c.paymentMethod || '—')}</span></div>
         <div class="kv"><span>Cumpleaños</span><span>${c.birthday ? fmtDate(c.birthday) : '—'}</span></div>
+        ${c.referredBy ? `<div class="kv"><span>Recomendado por</span><span>${esc(clientName(c.referredBy))}</span></div>` : ''}
         ${suggestions.length ? `<div style="margin-top:14px;background:var(--warn-bg);border:1px solid var(--warn);border-radius:8px;padding:10px 12px;">
           <b style="font-size:12.5px;color:var(--warn);">💡 Oportunidades de venta cruzada</b>
           ${suggestions.map((s,idx) => `<div class="kv" style="font-size:12.5px;padding:4px 0;"><span>${esc(s.text)}</span>${c.phone ? `<button type="button" class="btn btn-sm btn-outline drawer-wa-suggestion" data-idx="${idx}">WhatsApp</button>` : ''}</div>`).join('')}
@@ -1050,6 +1106,7 @@
             <button class="btn btn-primary" id="newClientBtn">+ Nuevo cliente</button>
           </div>
         </div>
+        <div id="referralsPanel"></div>
         <div id="crossSellPanel"></div>
         <div class="toolbar">
           <input type="search" id="clientSearch" placeholder="Buscar por nombre, email o teléfono…" style="min-width:260px;">
@@ -1095,6 +1152,7 @@
   }
   function renderClientRows(){
     const el = document.querySelector('.page[data-page="clientes"]');
+    renderReferralsPanel(el);
     renderCrossSellPanel(el);
     const q = (el.querySelector('#clientSearch').value || '').toLowerCase();
     const tagSelect = el.querySelector('#clientTagFilter');
@@ -1160,6 +1218,10 @@
           ${PAYMENT_METHODS.map(m => `<option value="${esc(m)}" ${c.paymentMethod===m?'selected':''}>${esc(m)}</option>`).join('')}
         </select></div>
       </div>
+      <div class="field"><label>Recomendado por</label><select name="referredBy">
+        <option value="">— Nadie / no sabe —</option>
+        ${clientOptions(c.referredBy, existing ? existing.id : null)}
+      </select></div>
       <div class="field"><label>Etiquetas</label><input name="tags" placeholder="VIP, Referido, Riesgo de fuga…" value="${esc((c.tags||[]).join(', '))}"></div>
       <div class="field"><label>Notas</label><textarea name="notes">${esc(c.notes||'')}</textarea></div>
     `, async data => {
@@ -1308,6 +1370,9 @@
       const ist = installmentStatus(p);
       const canRegisterPayment = p.status !== 'cancelada' && (Number(p.installmentsPaid)||0) < (Number(p.installments)||1);
       const files = docFiles(p);
+      const d = daysUntil(p.endDate);
+      const needsReminder = p.status !== 'cancelada' && (ist.mora || (d !== null && d <= 30));
+      const client = state.clients.find(x => x.id === p.clientId);
       return `<tr>
         <td data-label="Cliente">${esc(clientName(p.clientId))}</td>
         <td data-label="Ramo">${esc(p.ramo)}</td>
@@ -1319,6 +1384,7 @@
         <td data-label="Estado"><span class="badge ${s.cls}">${s.label}</span></td>
         <td class="no-label"><div class="row-actions">
           ${canRegisterPayment ? `<button class="icon-btn mark-paid" data-id="${p.id}" title="Registrar pago de cuota">＋</button>` : ''}
+          ${needsReminder && client && client.phone ? `<button class="icon-btn wa-pol-reminder" data-id="${p.id}" title="Avisar por WhatsApp">💬</button>` : ''}
           ${files.length ? `<button class="icon-btn view-pol-files" data-id="${p.id}" title="Ver archivos adjuntos (${files.length})">📎</button>` : ''}
           ${p.autoRenew ? '' : `<button class="icon-btn renew-pol" data-id="${p.id}" title="Renovar póliza">↻</button>`}
           <button class="icon-btn edit-pol" data-id="${p.id}" title="Editar">✎</button>
@@ -1338,6 +1404,11 @@
     tbody.querySelectorAll('.view-pol-files').forEach(b => b.addEventListener('click', () => {
       const p = state.policies.find(x => x.id === b.dataset.id);
       if (p) openFilesListModal(`Archivos — ${p.ramo} · ${clientName(p.clientId)}`, docFiles(p));
+    }));
+    tbody.querySelectorAll('.wa-pol-reminder').forEach(b => b.addEventListener('click', () => {
+      const p = state.policies.find(x => x.id === b.dataset.id);
+      const client = p && state.clients.find(x => x.id === p.clientId);
+      if (client) openWhatsAppComposer(client, null, defaultPolicyReminderMessage(client, p));
     }));
   }
   function openFilesListModal(title, files){
@@ -1422,10 +1493,12 @@
         ${dueThisMonth.length ? dueThisMonth.map(p => {
           const total = Number(p.installments)||1;
           const cuotaNum = (Number(p.installmentsPaid)||0) + 1;
+          const client = state.clients.find(x => x.id === p.clientId);
           return `<div class="kv" style="border-bottom:1px solid var(--border);padding:8px 0;font-size:13px;">
             <span>${esc(clientName(p.clientId))} · ${esc(p.ramo)} · ${esc(p.paymentMethod||'—')}</span>
             <span style="display:flex;align-items:center;gap:8px;">
               <span class="badge badge-warn">Cuota ${cuotaNum}/${total} · ${fmtMoney(policyPremio(p)/total, p.currency)}</span>
+              ${client && client.phone ? `<button type="button" class="btn btn-sm btn-outline cob-wa" data-id="${p.id}">WhatsApp</button>` : ''}
               <button type="button" class="btn btn-sm btn-outline cob-pay" data-id="${p.id}">Registrar pago</button>
             </span>
           </div>`;
@@ -1433,14 +1506,15 @@
       </div>
       <div class="panel" style="margin-bottom:16px;">
         <h2>Cuotas en mora</h2>
-        ${inArrears.length ? inArrears.map(p => `
+        ${inArrears.length ? inArrears.map(p => { const client = state.clients.find(x => x.id === p.clientId); return `
           <div class="kv" style="border-bottom:1px solid var(--border);padding:8px 0;font-size:13px;">
             <span>${esc(clientName(p.clientId))} · ${esc(p.ramo)}</span>
             <span style="display:flex;align-items:center;gap:8px;">
               <span class="badge badge-danger">${installmentStatus(p).label}</span>
+              ${client && client.phone ? `<button type="button" class="btn btn-sm btn-outline cob-wa" data-id="${p.id}">WhatsApp</button>` : ''}
               <button type="button" class="btn btn-sm btn-outline cob-pay" data-id="${p.id}">Registrar pago</button>
             </span>
-          </div>`).join('') : '<p class="empty">Sin cuotas atrasadas.</p>'}
+          </div>`; }).join('') : '<p class="empty">Sin cuotas atrasadas.</p>'}
       </div>
       <div class="panel">
         <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:6px;">
@@ -1461,6 +1535,11 @@
     el.querySelectorAll('.cob-pay').forEach(b => b.addEventListener('click', () => {
       const p = state.policies.find(x => x.id === b.dataset.id);
       if (p) openRegisterPaymentForm(p);
+    }));
+    el.querySelectorAll('.cob-wa').forEach(b => b.addEventListener('click', () => {
+      const p = state.policies.find(x => x.id === b.dataset.id);
+      const client = p && state.clients.find(x => x.id === p.clientId);
+      if (client) openWhatsAppComposer(client, null, defaultPolicyReminderMessage(client, p));
     }));
   }
 
