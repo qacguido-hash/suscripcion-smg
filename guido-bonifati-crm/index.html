@@ -593,7 +593,14 @@
     } else {
       const hasVehicle = ramos.has('Seguro de Auto') || ramos.has('Seguro de Moto');
       const hasHome = ramos.has('Combinado Familiar');
-      if (hasVehicle && !hasHome) add('Combinado Familiar', 'Tiene auto/moto, pero no seguro del hogar (Combinado Familiar).');
+      const vehiclePol = active.find(p => (p.ramo === 'Seguro de Auto' || p.ramo === 'Seguro de Moto') && p.vehicleYear);
+      const vehicleAge = vehiclePol ? new Date().getFullYear() - Number(vehiclePol.vehicleYear) : null;
+      if (hasVehicle && !hasHome){
+        const text = vehicleAge != null
+          ? `Tu ${vehiclePol.ramo === 'Seguro de Moto' ? 'moto' : 'auto'} tiene ${vehicleAge} años — ¿querés considerar un Combinado Familiar para el hogar?`
+          : 'Tiene auto/moto, pero no seguro del hogar (Combinado Familiar).';
+        add('Combinado Familiar', text);
+      }
       if (hasVehicle && hasHome && !ramos.has('Accidentes Personales')) add('Accidentes Personales', 'Tiene auto/moto y combinado familiar, pero no Accidentes Personales.');
       if (hasVehicle && hasHome && !ramos.has('Seguro de Vida')) add('Seguro de Vida', 'Tiene auto/moto y combinado familiar, pero no Seguro de Vida.');
       if (ramos.has('Seguro de Vida') && !ramos.has('Accidentes Personales')) add('Accidentes Personales', 'Tiene Seguro de Vida, pero no Accidentes Personales.');
@@ -721,7 +728,7 @@
         ${c.referredBy ? `<div class="kv"><span>Recomendado por</span><span>${esc(clientName(c.referredBy))}</span></div>` : ''}
         ${suggestions.length ? `<div style="margin-top:14px;background:var(--warn-bg);border:1px solid var(--warn);border-radius:8px;padding:10px 12px;">
           <b style="font-size:12.5px;color:var(--warn);">💡 Oportunidades de venta cruzada</b>
-          ${suggestions.map((s,idx) => `<div class="kv" style="font-size:12.5px;padding:4px 0;"><span>${esc(s.text)}</span>${c.phone ? `<button type="button" class="btn btn-sm btn-outline drawer-wa-suggestion" data-idx="${idx}">WhatsApp</button>` : ''}</div>`).join('')}
+          ${suggestions.map((s,idx) => ({s,idx})).slice(0,3).map(({s,idx}) => `<div class="kv" style="font-size:12.5px;padding:4px 0;"><span>${esc(s.text)}</span>${c.phone ? `<button type="button" class="btn btn-sm btn-outline drawer-wa-suggestion" data-idx="${idx}">WhatsApp</button>` : ''}</div>`).join('')}
         </div>` : ''}
         <div style="margin-top:20px;">
           <h2 style="font-size:15px;">Pólizas (${pols.length})</h2>
@@ -776,6 +783,37 @@
   }
 
   /* ==================== DASHBOARD ==================== */
+  const CHART_PALETTE = ['#34506B','#C9A227','#5B6472','#7C9CB4','#A9871C','#8FA998','#B0303A','#6B4F8A','#4E8B8B','#C77B4B'];
+  function doughnutChartHtml(rows){
+    const total = rows.reduce((s,[,v]) => s+v, 0);
+    if (!total) return '<p class="empty">Todavía no hay pólizas cargadas.</p>';
+    let acc = 0;
+    const stops = rows.map(([,val], i) => {
+      const from = acc/total*100;
+      acc += val;
+      const to = acc/total*100;
+      return `${CHART_PALETTE[i%CHART_PALETTE.length]} ${from}% ${to}%`;
+    }).join(', ');
+    const legend = rows.map(([name,val], i) => {
+      const pct = Math.round(val/total*100);
+      return `<div style="display:flex;align-items:center;gap:8px;font-size:12.5px;margin-bottom:6px;">
+        <span style="width:10px;height:10px;border-radius:50%;background:${CHART_PALETTE[i%CHART_PALETTE.length]};flex-shrink:0;"></span>
+        <span style="flex:1;">${esc(name)}</span>
+        <span style="font-weight:600;">${pct}% (${val})</span>
+      </div>`;
+    }).join('');
+    return `
+      <div style="display:flex;gap:22px;align-items:center;flex-wrap:wrap;">
+        <div style="width:140px;height:140px;border-radius:50%;background:conic-gradient(${stops});flex-shrink:0;position:relative;">
+          <div style="position:absolute;inset:22px;background:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-direction:column;">
+            <b style="font-size:18px;color:var(--blue);">${total}</b>
+            <span style="font-size:10px;color:var(--muted);">pólizas</span>
+          </div>
+        </div>
+        <div style="flex:1;min-width:180px;">${legend}</div>
+      </div>
+    `;
+  }
   function renderDashboard(){
     const el = document.querySelector('.page[data-page="dashboard"]');
     const activePolicies = state.policies.filter(p => p.status !== 'cancelada');
@@ -821,7 +859,6 @@
     const byRamo = {};
     activePolicies.forEach(p => { byRamo[p.ramo] = (byRamo[p.ramo]||0) + 1; });
     const ramoRows = Object.entries(byRamo).sort((a,b)=>b[1]-a[1]);
-    const maxRamo = ramoRows.length ? ramoRows[0][1] : 1;
 
     const upcomingTasks = openTasks.slice().sort((a,b)=>(a.dueDate||'9999').localeCompare(b.dueDate||'9999')).slice(0,6);
 
@@ -868,13 +905,8 @@
             ${barRowsHtml(companyRowsUSD, 'USD')}
           </div>` : ''}
           <div class="panel">
-            <h2>Cartera por ramo</h2>
-            ${ramoRows.length ? ramoRows.map(([name,val]) => `
-              <div class="bar-row">
-                <span class="label">${esc(name)}</span>
-                <span class="bar-track"><span class="bar-fill" style="width:${Math.round(val/maxRamo*100)}%;background:var(--yellow-deep);"></span></span>
-                <span class="val">${val}</span>
-              </div>`).join('') : '<p class="empty">Todavía no hay pólizas cargadas.</p>'}
+            <h2>Ventas por ramo</h2>
+            ${doughnutChartHtml(ramoRows)}
           </div>
           ${cancelReasonRows.length ? `<div class="panel">
             <h2>Motivos de baja</h2>
@@ -1679,7 +1711,8 @@
     const prima = Number(q.premium) || 0;
     const taxPct = q.taxPct != null ? Number(q.taxPct) || 0 : defaultTaxPctForRamo(q.ramo);
     const taxes = prima * taxPct / 100;
-    return { prima, taxPct, taxes, premio: prima + taxes };
+    const premio = q.premioTotal ? Number(q.premioTotal) || 0 : prima + taxes;
+    return { prima, taxPct, taxes, premio };
   }
   function pdfHeader(doc){
     try { doc.addImage(LOGO_MARK_B64, 'PNG', 14, 10, 22, 9.8); } catch(e){ /* logo is best-effort */ }
@@ -1797,13 +1830,51 @@
       const q = state.quotes.find(x => x.id === b.dataset.id); if (q) generateQuotePdf(q);
     }));
     list.querySelectorAll('.convert-quote').forEach(b => b.addEventListener('click', () => {
-      const q = state.quotes.find(x => x.id === b.dataset.id); if (q) convertQuoteToPolicy(q);
+      const q = state.quotes.find(x => x.id === b.dataset.id); if (q) openConvertQuoteChoice(q);
     }));
+  }
+  function openConvertQuoteChoice(q){
+    const clientPols = state.policies.filter(p => p.clientId === q.clientId && p.status !== 'cancelada');
+    const backdrop = document.createElement('div');
+    backdrop.className = 'modal-backdrop';
+    backdrop.innerHTML = `
+      <div class="modal">
+        <h2>Convertir cotización en póliza</h2>
+        <p class="sub" style="margin-bottom:14px;">¿Esta cotización es para emitir una póliza nueva, o es un endoso / cambio (aseguradora, suma asegurada, etc.) sobre una póliza que el cliente ya tiene?</p>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <button type="button" class="btn btn-primary" data-act="new" style="width:100%;">Emitir póliza nueva</button>
+          ${clientPols.length ? `<button type="button" class="btn btn-outline" data-act="existing" style="width:100%;">Modificar una póliza existente (endoso)</button>` : ''}
+        </div>
+        <div class="modal-actions"><button type="button" class="btn btn-outline" data-act="cancel">Cancelar</button></div>
+      </div>`;
+    document.body.appendChild(backdrop);
+    backdrop.querySelector('[data-act="cancel"]').addEventListener('click', () => backdrop.remove());
+    backdrop.querySelector('[data-act="new"]').addEventListener('click', () => { backdrop.remove(); convertQuoteToPolicy(q); });
+    const existingBtn = backdrop.querySelector('[data-act="existing"]');
+    if (existingBtn) existingBtn.addEventListener('click', () => { backdrop.remove(); openConvertQuotePickPolicy(q, clientPols); });
+  }
+  function openConvertQuotePickPolicy(q, clientPols){
+    openModal('¿Qué póliza modificamos?', `
+      <div class="field"><label>Póliza a modificar</label><select name="targetPolicyId" required>
+        ${clientPols.map(p => `<option value="${p.id}">${esc(p.ramo)} · ${esc(p.company)}${p.policyNumber?' · N° '+esc(p.policyNumber):''}</option>`).join('')}
+      </select></div>
+      <p class="sub">Se abre esa póliza para editar, con los datos nuevos de la cotización (aseguradora, prima, premio, suma asegurada) ya cargados — revisá y guardá los cambios.</p>
+    `, async data => {
+      const target = clientPols.find(p => p.id === data.targetPolicyId);
+      if (!target) throw new Error('Elegí una póliza.');
+      await db.collection('quotes').doc(q.id).update({ convertedToPolicyId: target.id });
+      openPolicyForm(Object.assign({}, target, {
+        ramo: q.ramo, company: q.company, premium: q.premium,
+        premioTotal: q.premioTotal || target.premioTotal || null,
+        sumInsured: q.sumInsured || target.sumInsured,
+      }));
+    });
   }
   function convertQuoteToPolicy(q){
     openPolicyForm(null, {
       clientId: q.clientId, ramo: q.ramo, company: q.company,
-      premium: q.premium, currency: 'ARS', status: 'activa',
+      premium: q.premium, premioTotal: q.premioTotal || null, sumInsured: q.sumInsured || null,
+      currency: 'ARS', status: 'activa',
       notes: q.coverageNotes || '', sourceQuoteId: q.id,
     });
   }
@@ -1821,27 +1892,29 @@
       </div>
       <div class="field-row">
         <div class="field"><label>Impuestos y recargos (%)</label><input name="taxPct" type="number" step="0.01" value="${esc(q.taxPct != null ? q.taxPct : defaultTaxPctForRamo(q.ramo))}"></div>
+        ${moneyFieldHtml('premioTotal', q.premioTotal, { label: 'Premio real (si te lo informó la aseguradora)', placeholder: 'Si lo dejás vacío, se estima con el % de arriba' })}
+      </div>
+      <div class="field-row">
         <div class="field"><label>Estado</label><select name="status">
           <option value="pendiente" ${q.status==='pendiente'?'selected':''}>Pendiente</option>
           <option value="enviada" ${q.status==='enviada'?'selected':''}>Enviada</option>
           <option value="aceptada" ${q.status==='aceptada'?'selected':''}>Aceptada</option>
           <option value="rechazada" ${q.status==='rechazada'?'selected':''}>Rechazada</option>
         </select></div>
-      </div>
-      <div class="field-row">
         <div class="field"><label>Próximo contacto</label><input name="nextContactDate" type="date" value="${esc(q.nextContactDate||'')}"></div>
-        <div class="field"><label>Motivo de rechazo (si aplica)</label><select name="rejectionReason">
-          <option value="">—</option>
-          ${REJECTION_REASONS.map(r => `<option value="${esc(r)}" ${q.rejectionReason===r?'selected':''}>${esc(r)}</option>`).join('')}
-        </select></div>
       </div>
-      <p class="sub" style="margin:-4px 0 6px;">Los % de impuestos son un punto de partida orientativo (ajustalo con lo que informe cada aseguradora).</p>
+      <div class="field"><label>Motivo de rechazo (si aplica)</label><select name="rejectionReason">
+        <option value="">—</option>
+        ${REJECTION_REASONS.map(r => `<option value="${esc(r)}" ${q.rejectionReason===r?'selected':''}>${esc(r)}</option>`).join('')}
+      </select></div>
+      <p class="sub" style="margin:-4px 0 6px;">Si cargás el premio real, se usa ese valor exacto en vez del % de impuestos estimado — así evitamos diferencias como la de Triunfo con Leila.</p>
       <div class="field"><label>Detalle de cobertura</label><textarea name="coverageNotes">${esc(q.coverageNotes||'')}</textarea></div>
     `, async data => {
       data.clientName = clientName(data.clientId);
       data.premium = Number(data.premium) || 0;
       data.sumInsured = Number(data.sumInsured) || 0;
       data.taxPct = Number(data.taxPct) || 0;
+      data.premioTotal = data.premioTotal ? Number(data.premioTotal) : null;
       if (existing){
         await db.collection('quotes').doc(existing.id).update(data);
         toast('Cotización actualizada.');
@@ -1861,6 +1934,14 @@
     const doc = new jsPDF();
     const client = state.clients.find(c => c.id === q.clientId);
     pdfHeader(doc);
+    const insurerLogo = INSURER_LOGOS[q.company];
+    if (insurerLogo){
+      try {
+        const logoH = 9.8;
+        const logoW = insurerLogo.w * logoH / insurerLogo.h;
+        doc.addImage(insurerLogo.src, 'PNG', 196 - logoW, 10, logoW, logoH);
+      } catch(e) { /* logo is best-effort */ }
+    }
     let y = 40;
     doc.setFont('helvetica','bold'); doc.setFontSize(14); doc.text('Cotización de seguro', 14, y); y += 10;
     doc.setFont('helvetica','normal'); doc.setFontSize(11);
@@ -1937,12 +2018,20 @@
     doc.setFont('helvetica','bold'); doc.setFontSize(12); doc.text(`Pólizas (${pols.length})`, 14, y); y += 8;
     doc.setFont('helvetica','normal'); doc.setFontSize(10);
     if (!pols.length){ doc.text('Sin pólizas cargadas.', 14, y); y += 8; }
-    pols.forEach(p => {
-      ensureSpace(14);
-      const s = policyStatusInfo(p);
-      doc.setFont('helvetica','bold'); doc.text(`${p.ramo || '—'} · ${p.company || '—'}`, 14, y); y += 6;
-      doc.setFont('helvetica','normal');
-      doc.text(`N° ${p.policyNumber || '—'}   Prima: ${fmtMoney(p.premium, p.currency)}   Vence: ${fmtDate(p.endDate)}   Estado: ${s.label}`, 14, y); y += 8;
+    const polsByRamo = {};
+    pols.forEach(p => { (polsByRamo[p.ramo || 'Sin ramo'] = polsByRamo[p.ramo || 'Sin ramo'] || []).push(p); });
+    Object.keys(polsByRamo).sort().forEach(ramo => {
+      ensureSpace(10);
+      doc.setFont('helvetica','bold'); doc.setFontSize(10.5); doc.setTextColor(52,80,107);
+      doc.text(ramo, 14, y); y += 6.5;
+      doc.setTextColor(30,30,30); doc.setFontSize(10);
+      polsByRamo[ramo].forEach(p => {
+        ensureSpace(14);
+        const s = policyStatusInfo(p);
+        doc.setFont('helvetica','bold'); doc.text(p.company || '—', 16, y); y += 5.5;
+        doc.setFont('helvetica','normal');
+        doc.text(`N° ${p.policyNumber || '—'}   Premio: ${fmtMoney(policyPremio(p), p.currency)}   Vence: ${p.autoRenew ? 'Automática' : fmtDate(p.endDate)}   Estado: ${s.label}`, 16, y); y += 8;
+      });
     });
     y += 4;
 
@@ -2405,7 +2494,7 @@
         <div class="top-row">
           <div>
             <h3>${esc(clientName(c.clientId))}</h3>
-            <p>${pol ? esc(pol.ramo) + ' · ' + esc(pol.company) : 'Sin póliza asociada'}</p>
+            <p>${pol ? esc(pol.ramo) + ' · ' + esc(pol.company) + (pol.policyNumber ? ' · N° ' + esc(pol.policyNumber) : '') : 'Sin póliza asociada'}</p>
           </div>
           <span class="badge ${CLAIM_BADGE[c.status]||'badge-muted'}">${CLAIM_LABEL[c.status]||c.status}</span>
         </div>
@@ -2428,7 +2517,7 @@
       <div class="field"><label>Cliente</label><select name="clientId" id="claimClient" required>${clientOptions(c.clientId)}</select></div>
       <div class="field"><label>Póliza asociada</label><select name="policyId" id="claimPolicy">
         <option value="">—</option>
-        ${clientPolicies.map(p => `<option value="${p.id}" ${p.id===c.policyId?'selected':''}>${esc(p.ramo)} · ${esc(p.company)}</option>`).join('')}
+        ${clientPolicies.map(p => `<option value="${p.id}" ${p.id===c.policyId?'selected':''}>${esc(p.ramo)} · ${esc(p.company)}${p.policyNumber ? ' · N° '+esc(p.policyNumber) : ''}</option>`).join('')}
       </select></div>
       <div class="field-row">
         <div class="field"><label>Fecha</label><input name="date" type="date" value="${esc(c.date || new Date().toISOString().slice(0,10))}"></div>
