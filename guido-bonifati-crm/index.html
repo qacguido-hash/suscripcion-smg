@@ -1711,8 +1711,10 @@
     const prima = Number(q.premium) || 0;
     const taxPct = q.taxPct != null ? Number(q.taxPct) || 0 : defaultTaxPctForRamo(q.ramo);
     const taxes = prima * taxPct / 100;
-    const premio = q.premioTotal ? Number(q.premioTotal) || 0 : prima + taxes;
-    return { prima, taxPct, taxes, premio };
+    const hasRealPremio = !!q.premioTotal;
+    const premio = hasRealPremio ? Number(q.premioTotal) || 0 : prima + taxes;
+    const otros = hasRealPremio ? premio - (prima + taxes) : 0;
+    return { prima, taxPct, taxes, otros, premio };
   }
   function pdfHeader(doc){
     try { doc.addImage(LOGO_MARK_B64, 'PNG', 14, 10, 22, 9.8); } catch(e){ /* logo is best-effort */ }
@@ -1808,7 +1810,7 @@
         <div class="top-row">
           <div>
             <h3>${esc(clientName(q.clientId))} — ${esc(q.ramo)}</h3>
-            <p>${esc(q.company)} · Prima ${fmtMoney(q.premium)} · Premio est. ${fmtMoney(quotePremio(q).premio)}</p>
+            <p>${esc(q.company)} · Prima ${fmtMoney(q.premium)} · Premio${q.premioTotal?'':' est.'} ${fmtMoney(quotePremio(q).premio)}</p>
           </div>
           <span class="badge ${QUOTE_BADGE[q.status]||'badge-muted'}">${esc(q.status)}</span>
         </div>
@@ -1955,16 +1957,23 @@
     ];
     rows.forEach(([k,v]) => { doc.setFont('helvetica','bold'); doc.text(k + ':', 14, y); doc.setFont('helvetica','normal'); doc.text(String(v), 60, y); y += 8; });
     y += 4;
-    doc.setFont('helvetica','bold'); doc.setFontSize(12); doc.text('Detalle de costos (estimado)', 14, y); y += 8;
+    const hasRealPremio = !!q.premioTotal;
+    doc.setFont('helvetica','bold'); doc.setFontSize(12); doc.text(`Detalle de costos${hasRealPremio ? '' : ' (estimado)'}`, 14, y); y += 8;
     doc.setFont('helvetica','normal'); doc.setFontSize(11);
-    const { prima, taxPct, taxes, premio } = quotePremio(q);
+    const { prima, taxPct, taxes, otros, premio } = quotePremio(q);
     doc.text('Prima:', 14, y); doc.text(fmtMoney(prima), 196, y, { align:'right' }); y += 7;
     doc.text(`Impuestos y recargos (${taxPct}%):`, 14, y); doc.text(fmtMoney(taxes), 196, y, { align:'right' }); y += 7;
+    if (hasRealPremio && Math.abs(otros) >= 1){
+      doc.text('Otros conceptos:', 14, y); doc.text(fmtMoney(otros), 196, y, { align:'right' }); y += 7;
+    }
     doc.setDrawColor(220,220,220); doc.line(14, y, 196, y); y += 7;
     doc.setFont('helvetica','bold'); doc.setFontSize(13);
-    doc.text('Premio total estimado:', 14, y); doc.text(fmtMoney(premio), 196, y, { align:'right' }); y += 8;
+    doc.text(`Premio total${hasRealPremio ? '' : ' estimado'}:`, 14, y); doc.text(fmtMoney(premio), 196, y, { align:'right' }); y += 8;
     doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(140,140,140);
-    const taxNote = doc.splitTextToSize('Los impuestos y el premio final son estimados y pueden variar según la aseguradora y la provincia; se confirman al emitir la póliza.', 182);
+    const taxNoteText = hasRealPremio
+      ? 'Prima e impuestos son orientativos; el premio total es el informado por la aseguradora. "Otros conceptos" agrupa derechos, recargos u otros ítems no desglosados.'
+      : 'Los impuestos y el premio final son estimados y pueden variar según la aseguradora y la provincia; se confirman al emitir la póliza.';
+    const taxNote = doc.splitTextToSize(taxNoteText, 182);
     doc.text(taxNote, 14, y); y += taxNote.length * 4 + 8;
     doc.setTextColor(30,30,30); doc.setFontSize(11);
     doc.setFont('helvetica','bold'); doc.text('Detalle de cobertura:', 14, y); y += 7;
