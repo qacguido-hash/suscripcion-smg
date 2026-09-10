@@ -1985,17 +1985,22 @@
     });
     y += 4;
     const hasRealPremio = !!q.premioTotal;
-    doc.setFont('helvetica','bold'); doc.setFontSize(12); doc.text(`Detalle de costos${hasRealPremio ? '' : ' (estimado)'}`, 14, y); y += 8;
+    doc.setFont('helvetica','bold'); doc.setFontSize(12); doc.text(`Detalle de costos${hasRealPremio ? '' : ' (estimado)'}`, 14, y); y += 10;
+    const costsBoxTop = y - 6;
     doc.setFont('helvetica','normal'); doc.setFontSize(11);
     const { prima, taxPct, taxes, otros, premio } = quotePremio(q);
-    doc.text('Prima:', 14, y); doc.text(fmtMoney(prima), 196, y, { align:'right' }); y += 7;
-    doc.text(`Impuestos y recargos (${taxPct}%):`, 14, y); doc.text(fmtMoney(taxes), 196, y, { align:'right' }); y += 7;
+    doc.text('Prima:', 20, y); doc.text(fmtMoney(prima), 190, y, { align:'right' }); y += 7;
+    doc.text(`Impuestos y recargos (${taxPct}%):`, 20, y); doc.text(fmtMoney(taxes), 190, y, { align:'right' }); y += 7;
     if (hasRealPremio && Math.abs(otros) >= 1){
-      doc.text('Otros conceptos:', 14, y); doc.text(fmtMoney(otros), 196, y, { align:'right' }); y += 7;
+      doc.text('Otros conceptos:', 20, y); doc.text(fmtMoney(otros), 190, y, { align:'right' }); y += 7;
     }
-    doc.setDrawColor(220,220,220); doc.line(14, y, 196, y); y += 7;
+    doc.setDrawColor(220,220,220); doc.line(20, y, 190, y); y += 7;
     doc.setFont('helvetica','bold'); doc.setFontSize(13);
-    doc.text(`Premio total${hasRealPremio ? '' : ' estimado'}:`, 14, y); doc.text(fmtMoney(premio), 196, y, { align:'right' }); y += 8;
+    doc.text(`Premio total${hasRealPremio ? '' : ' estimado'}:`, 20, y); doc.text(fmtMoney(premio), 190, y, { align:'right' }); y += 6;
+    doc.setDrawColor(221,221,221); doc.setLineWidth(0.3);
+    doc.roundedRect(14, costsBoxTop, 182, y - costsBoxTop + 2, 1.5, 1.5, 'S');
+    doc.setLineWidth(0.2);
+    y += 10;
     doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(140,140,140);
     const taxNoteText = hasRealPremio
       ? 'Prima e impuestos son orientativos; el premio total es el informado por la aseguradora. "Otros conceptos" agrupa derechos, recargos u otros ítems no desglosados.'
