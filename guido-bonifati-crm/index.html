@@ -194,6 +194,9 @@
   .field textarea{resize:vertical;min-height:64px;}
   .field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
   @media (max-width:520px){.field-row{grid-template-columns:1fr;}}
+  .money-input-wrap{position:relative;}
+  .money-prefix{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:13.5px;pointer-events:none;}
+  .money-input{padding-left:34px !important;text-align:left;}
   .modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:18px;}
 
   /* Detail drawer */
@@ -315,6 +318,7 @@
     { key:'dashboard', label:'Panel' },
     { key:'clientes', label:'Clientes' },
     { key:'polizas', label:'Pólizas' },
+    { key:'cobranzas', label:'Cobranzas' },
     { key:'cotizaciones', label:'Cotizaciones' },
     { key:'tareas', label:'Tareas' },
     { key:'documentos', label:'Documentos' },
@@ -378,6 +382,42 @@
     const symbol = currency === 'USD' ? 'US$' : '$';
     return symbol + n.toLocaleString('es-AR', { maximumFractionDigits: 0 });
   }
+  function fmtMoneyInput(n){
+    n = Number(n) || 0;
+    return n.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+  function parseMoneyInput(str){
+    if (str == null || str === '') return 0;
+    let s = String(str).trim();
+    if (s.includes(',')){
+      s = s.replace(/\./g, '').replace(',', '.');
+    } else {
+      const parts = s.split('.');
+      if (parts.length > 2){
+        s = parts.join('');
+      } else if (parts.length === 2 && parts[1].length === 3){
+        s = parts.join('');
+      }
+    }
+    s = s.replace(/[^0-9.\-]/g, '');
+    return Number(s) || 0;
+  }
+  function moneyFieldHtml(name, value, opts){
+    opts = opts || {};
+    const symbol = opts.currency === 'USD' ? 'US$' : '$';
+    return `<div class="field">
+      <label>${esc(opts.label||'')}</label>
+      <div class="money-input-wrap">
+        <span class="money-prefix" data-currency-prefix>${symbol}</span>
+        <input name="${esc(name)}" type="text" inputmode="decimal" class="money-input" data-money-field value="${value ? fmtMoneyInput(value) : ''}" ${opts.placeholder ? `placeholder="${esc(opts.placeholder)}"` : ''} ${opts.required ? 'required' : ''}>
+      </div>
+    </div>`;
+  }
+  function bindMoneyInputs(root){
+    root.querySelectorAll('[data-money-field]').forEach(input => {
+      input.addEventListener('blur', () => { input.value = input.value ? fmtMoneyInput(parseMoneyInput(input.value)) : ''; });
+    });
+  }
   function fmtDate(d){
     if (!d) return '—';
     const dt = new Date(d + 'T00:00:00');
@@ -400,7 +440,8 @@
   let db = null;
   let currentTab = 'dashboard';
   let calMonth = new Date(); calMonth.setDate(1);
-  let dashPaymentFilter = '';
+  let cobPaymentFilter = '';
+  let cobSearch = '';
   let goals = { monthlyPremiumGoal: 0, monthlyPolicyGoal: 0 };
 
   function clientName(id){
@@ -426,6 +467,7 @@
     if (currentTab === 'dashboard') renderDashboard();
     else if (currentTab === 'clientes') renderClientes();
     else if (currentTab === 'polizas') renderPolizas();
+    else if (currentTab === 'cobranzas') renderCobranzas();
     else if (currentTab === 'cotizaciones') renderCotizaciones();
     else if (currentTab === 'tareas') renderTareas();
     else if (currentTab === 'documentos') renderDocumentos();
@@ -466,6 +508,7 @@
       </form>`;
     document.body.appendChild(backdrop);
     const form = backdrop.querySelector('form');
+    bindMoneyInputs(form);
     form.querySelector('[data-act="cancel"]').addEventListener('click', () => backdrop.remove());
     if (opts.onDelete){
       const delBtn = form.querySelector('[data-act="del"]');
@@ -502,7 +545,9 @@
       e.preventDefault();
       const data = {};
       form.querySelectorAll('[name]').forEach(el => {
-        data[el.name] = el.type === 'checkbox' ? el.checked : el.value;
+        if (el.type === 'checkbox') data[el.name] = el.checked;
+        else if (el.dataset.moneyField != null) data[el.name] = parseMoneyInput(el.value);
+        else data[el.name] = el.value;
       });
       const submitBtn = form.querySelector('[type="submit"]');
       const originalLabel = submitBtn.textContent;
@@ -572,6 +617,7 @@
         <div class="kv"><span>Email</span><span>${esc(c.email || '—')}</span></div>
         <div class="kv"><span>Teléfono</span><span>${esc(c.phone || '—')}</span></div>
         <div class="kv"><span>Dirección</span><span>${esc(c.address || '—')}</span></div>
+        <div class="kv"><span>Medio de pago</span><span>${esc(c.paymentMethod || '—')}</span></div>
         <div class="kv"><span>Cumpleaños</span><span>${c.birthday ? fmtDate(c.birthday) : '—'}</span></div>
         ${suggestions.length ? `<div style="margin-top:14px;background:var(--warn-bg);border:1px solid var(--warn);border-radius:8px;padding:10px 12px;">
           <b style="font-size:12.5px;color:var(--warn);">💡 Oportunidades de venta</b>
@@ -673,14 +719,6 @@
 
     const upcomingTasks = openTasks.slice().sort((a,b)=>(a.dueDate||'9999').localeCompare(b.dueDate||'9999')).slice(0,6);
 
-    const now = new Date();
-    const dueThisMonth = activePolicies.filter(p => {
-      const due = nextInstallmentDueDate(p);
-      if (!due || due.getFullYear() !== now.getFullYear() || due.getMonth() !== now.getMonth()) return false;
-      if (dashPaymentFilter && p.paymentMethod !== dashPaymentFilter) return false;
-      return true;
-    });
-
     el.innerHTML = `
       <div class="page-head">
         <div>
@@ -689,7 +727,6 @@
         </div>
         <button class="btn btn-outline" id="exportBtn">Exportar respaldo (JSON)</button>
       </div>
-      ${(overdue.length || inArrears.length) ? `<div class="alert-banner">⚠️ ${overdue.length ? `${overdue.length} póliza${overdue.length===1?'':'s'} vencida${overdue.length===1?'':'s'}` : ''}${overdue.length && inArrears.length ? ' · ' : ''}${inArrears.length ? `${inArrears.length} póliza${inArrears.length===1?'':'s'} con cuotas en mora` : ''} — revisá Pólizas para regularizar.</div>` : ''}
       <div class="panel" style="margin-bottom:18px;">
         <div style="display:flex;justify-content:space-between;align-items:center;">
           <h2>Meta del mes</h2>
@@ -733,14 +770,6 @@
                 <span class="val">${val}</span>
               </div>`).join('') : '<p class="empty">Todavía no hay pólizas cargadas.</p>'}
           </div>
-          <div class="panel">
-            <h2>Cuotas en mora</h2>
-            ${inArrears.length ? inArrears.map(p => `
-              <div class="kv" style="border-bottom:1px solid var(--border);padding:8px 0;display:flex;justify-content:space-between;font-size:13px;">
-                <span>${esc(clientName(p.clientId))} · ${esc(p.ramo)}</span>
-                <span class="badge badge-danger">${installmentStatus(p).label}</span>
-              </div>`).join('') : '<p class="empty">Sin cuotas atrasadas.</p>'}
-          </div>
           ${cancelReasonRows.length ? `<div class="panel">
             <h2>Motivos de baja</h2>
             ${cancelReasonRows.map(([name,val]) => `
@@ -767,29 +796,11 @@
                 <span class="badge badge-muted">${fmtDate(t.dueDate)}</span>
               </div>`).join('') : '<p class="empty">No tenés tareas pendientes.</p>'}
           </div>
-          <div class="panel">
-            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:6px;">
-              <h2 style="margin:0;">Cuotas a cobrar este mes</h2>
-              <select id="dashPaymentFilter" style="font-size:12px;padding:4px 6px;">
-                <option value="">Todos los medios</option>
-                ${PAYMENT_METHODS.map(m => `<option value="${esc(m)}" ${dashPaymentFilter===m?'selected':''}>${esc(m)}</option>`).join('')}
-              </select>
-            </div>
-            ${dueThisMonth.length ? dueThisMonth.map(p => {
-              const total = Number(p.installments)||1;
-              const cuotaNum = (Number(p.installmentsPaid)||0) + 1;
-              return `<div class="kv" style="border-bottom:1px solid var(--border);padding:8px 0;display:flex;justify-content:space-between;font-size:13px;">
-                <span>${esc(clientName(p.clientId))} · ${esc(p.ramo)} · ${esc(p.paymentMethod||'—')}</span>
-                <span class="badge badge-warn">Cuota ${cuotaNum}/${total} · ${fmtMoney(policyPremio(p)/total, p.currency)}</span>
-              </div>`;
-            }).join('') : '<p class="empty">Sin cuotas para cobrar este mes.</p>'}
-          </div>
         </div>
       </div>
     `;
     el.querySelector('#exportBtn').addEventListener('click', exportBackup);
     el.querySelector('#editGoalsBtn').addEventListener('click', openGoalsForm);
-    el.querySelector('#dashPaymentFilter').addEventListener('input', e => { dashPaymentFilter = e.target.value; renderDashboard(); });
   }
   function openGoalsForm(){
     openModal('Meta del mes', `
@@ -994,7 +1005,7 @@
           <select id="clientTagFilter"><option value="">Todas las etiquetas</option></select>
         </div>
         <div class="table-wrap"><table>
-          <thead><tr><th>Nombre</th><th>Tipo</th><th>Contacto</th><th>Etiquetas</th><th>Pólizas</th><th>Cumpleaños</th><th></th></tr></thead>
+          <thead><tr><th>Nombre</th><th>Tipo</th><th>Contacto</th><th>Medio de pago</th><th>Etiquetas</th><th>Pólizas</th><th>Cumpleaños</th><th></th></tr></thead>
           <tbody id="clientRows"></tbody>
         </table></div>
       `;
@@ -1018,7 +1029,7 @@
       .filter(c => !tagF || (c.tags||[]).includes(tagF))
       .sort((a,b) => a.name.localeCompare(b.name));
     const tbody = el.querySelector('#clientRows');
-    if (!rows.length){ tbody.innerHTML = `<tr><td colspan="7" class="no-label"><p class="empty">No hay clientes que coincidan.</p></td></tr>`; return; }
+    if (!rows.length){ tbody.innerHTML = `<tr><td colspan="8" class="no-label"><p class="empty">No hay clientes que coincidan.</p></td></tr>`; return; }
     tbody.innerHTML = rows.map(c => {
       const nPol = state.policies.filter(p => p.clientId === c.id).length;
       const tagsHtml = (c.tags||[]).length ? (c.tags||[]).map(t => `<span class="badge badge-muted" style="margin:1px 3px 1px 0;">${esc(t)}</span>`).join('') : '<span class="sub">—</span>';
@@ -1027,6 +1038,7 @@
         <td data-label="Nombre"><a href="#" class="open-client" data-id="${c.id}" style="font-weight:600;color:var(--blue);">${esc(c.name)}</a></td>
         <td data-label="Tipo">${c.type === 'empresa' ? 'Empresa' : 'Persona'}</td>
         <td data-label="Contacto">${esc(c.phone || c.email || '—')}</td>
+        <td data-label="Medio de pago">${esc(c.paymentMethod || '—')}</td>
         <td data-label="Etiquetas">${tagsHtml}</td>
         <td data-label="Pólizas">${nPol}</td>
         <td data-label="Cumpleaños">${c.birthday ? fmtDate(c.birthday) : '—'}</td>
@@ -1056,7 +1068,13 @@
         <div class="field"><label>Dirección</label><input name="address" value="${esc(c.address||'')}"></div>
         <div class="field"><label>Cumpleaños</label><input name="birthday" type="date" value="${esc(c.birthday||'')}"></div>
       </div>
-      <div class="field"><label>Localidad</label><input name="locality" placeholder="Ej: Mar del Plata" value="${esc(c.locality||'')}"></div>
+      <div class="field-row">
+        <div class="field"><label>Localidad</label><input name="locality" placeholder="Ej: Mar del Plata" value="${esc(c.locality||'')}"></div>
+        <div class="field"><label>Medio de pago</label><select name="paymentMethod">
+          <option value="">—</option>
+          ${PAYMENT_METHODS.map(m => `<option value="${esc(m)}" ${c.paymentMethod===m?'selected':''}>${esc(m)}</option>`).join('')}
+        </select></div>
+      </div>
       <div class="field"><label>Etiquetas</label><input name="tags" placeholder="VIP, Referido, Riesgo de fuga…" value="${esc((c.tags||[]).join(', '))}"></div>
       <div class="field"><label>Notas</label><textarea name="notes">${esc(c.notes||'')}</textarea></div>
     `, async data => {
@@ -1263,7 +1281,7 @@
         <div class="field"><label>N° de cuota</label><input name="installmentNumber" type="number" min="1" max="${total}" value="${nextNum}"></div>
       </div>
       <div class="field-row">
-        <div class="field"><label>Monto</label><input name="amount" type="number" step="0.01" value="${suggestedAmount}"></div>
+        ${moneyFieldHtml('amount', suggestedAmount, { currency: p.currency||'ARS', label: 'Monto' })}
         <div class="field"><label>Medio de pago</label><select name="method">${PAYMENT_METHODS.map(m => `<option value="${esc(m)}" ${p.paymentMethod===m?'selected':''}>${esc(m)}</option>`).join('')}</select></div>
       </div>
       <div class="field"><label>Nota</label><input name="note" placeholder="Opcional"></div>
@@ -1279,6 +1297,85 @@
       toast('Pago registrado.');
     });
   }
+
+  /* ==================== COBRANZAS ==================== */
+  function renderCobranzas(){
+    const el = document.querySelector('.page[data-page="cobranzas"]');
+    const activePolicies = state.policies.filter(p => p.status !== 'cancelada');
+    const now = new Date();
+    const dueThisMonth = activePolicies.filter(p => {
+      const due = nextInstallmentDueDate(p);
+      if (!due || due.getFullYear() !== now.getFullYear() || due.getMonth() !== now.getMonth()) return false;
+      if (cobPaymentFilter && p.paymentMethod !== cobPaymentFilter) return false;
+      return true;
+    });
+    const inArrears = activePolicies.filter(p => installmentStatus(p).mora);
+
+    const allPayments = [];
+    state.policies.forEach(p => {
+      (p.paymentHistory||[]).forEach(h => allPayments.push({ p, h }));
+    });
+    allPayments.sort((a,b) => (b.h.date||'').localeCompare(a.h.date||''));
+    const q = cobSearch.toLowerCase();
+    const filteredPayments = q ? allPayments.filter(({p}) => clientName(p.clientId).toLowerCase().includes(q)) : allPayments;
+
+    el.innerHTML = `
+      <div class="page-head">
+        <div><h1>Cobranzas</h1><p>Cuotas del mes, mora e historial de pagos de toda la cartera</p></div>
+      </div>
+      <div class="panel" style="margin-bottom:16px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:6px;">
+          <h2 style="margin:0;">Cuotas a cobrar este mes</h2>
+          <select id="cobPaymentFilter" style="font-size:12px;padding:4px 6px;">
+            <option value="">Todos los medios</option>
+            ${PAYMENT_METHODS.map(m => `<option value="${esc(m)}" ${cobPaymentFilter===m?'selected':''}>${esc(m)}</option>`).join('')}
+          </select>
+        </div>
+        ${dueThisMonth.length ? dueThisMonth.map(p => {
+          const total = Number(p.installments)||1;
+          const cuotaNum = (Number(p.installmentsPaid)||0) + 1;
+          return `<div class="kv" style="border-bottom:1px solid var(--border);padding:8px 0;font-size:13px;">
+            <span>${esc(clientName(p.clientId))} · ${esc(p.ramo)} · ${esc(p.paymentMethod||'—')}</span>
+            <span style="display:flex;align-items:center;gap:8px;">
+              <span class="badge badge-warn">Cuota ${cuotaNum}/${total} · ${fmtMoney(policyPremio(p)/total, p.currency)}</span>
+              <button type="button" class="btn btn-sm btn-outline cob-pay" data-id="${p.id}">Registrar pago</button>
+            </span>
+          </div>`;
+        }).join('') : '<p class="empty">Sin cuotas para cobrar este mes.</p>'}
+      </div>
+      <div class="panel" style="margin-bottom:16px;">
+        <h2>Cuotas en mora</h2>
+        ${inArrears.length ? inArrears.map(p => `
+          <div class="kv" style="border-bottom:1px solid var(--border);padding:8px 0;font-size:13px;">
+            <span>${esc(clientName(p.clientId))} · ${esc(p.ramo)}</span>
+            <span style="display:flex;align-items:center;gap:8px;">
+              <span class="badge badge-danger">${installmentStatus(p).label}</span>
+              <button type="button" class="btn btn-sm btn-outline cob-pay" data-id="${p.id}">Registrar pago</button>
+            </span>
+          </div>`).join('') : '<p class="empty">Sin cuotas atrasadas.</p>'}
+      </div>
+      <div class="panel">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:6px;">
+          <h2 style="margin:0;">Historial de pagos (${filteredPayments.length})</h2>
+          <input type="search" id="cobSearch" placeholder="Buscar cliente…" value="${esc(cobSearch)}" style="max-width:220px;">
+        </div>
+        <div style="max-height:360px;overflow-y:auto;">
+          ${filteredPayments.length ? filteredPayments.map(({p,h}) => `
+            <div class="kv" style="border-bottom:1px solid var(--border);padding:8px 0;font-size:13px;">
+              <span>${esc(clientName(p.clientId))} · ${esc(p.ramo)} · Cuota ${h.installmentNumber||'—'} · ${fmtDate(h.date)}${h.method?' · '+esc(h.method):''}</span>
+              <span>${fmtMoney(h.amount, h.currency||p.currency)}</span>
+            </div>`).join('') : '<p class="empty">Todavía no hay pagos registrados.</p>'}
+        </div>
+      </div>
+    `;
+    el.querySelector('#cobPaymentFilter').addEventListener('input', e => { cobPaymentFilter = e.target.value; renderCobranzas(); });
+    el.querySelector('#cobSearch').addEventListener('input', e => { cobSearch = e.target.value; renderCobranzas(); });
+    el.querySelectorAll('.cob-pay').forEach(b => b.addEventListener('click', () => {
+      const p = state.policies.find(x => x.id === b.dataset.id);
+      if (p) openRegisterPaymentForm(p);
+    }));
+  }
+
   function openPolicyForm(existing, seed){
     const p = existing || seed || {};
     const title = existing ? 'Editar póliza' : (seed && seed.sourceQuoteId ? 'Nueva póliza (desde cotización)' : (seed ? 'Renovar póliza' : 'Nueva póliza'));
@@ -1291,12 +1388,9 @@
       <div id="ramoExtraFields">${ramoExtraFieldsHtml(p.ramo, p)}</div>
       <div class="field-row">
         <div class="field"><label>N° de póliza</label><input name="policyNumber" value="${esc(p.policyNumber||'')}"></div>
-        <div class="field"><label>Prima</label><input name="premium" type="number" step="0.01" value="${esc(p.premium||'')}"></div>
+        ${moneyFieldHtml('premium', p.premium, { currency: p.currency||'ARS', label: 'Prima' })}
       </div>
-      <div class="field">
-        <label>Premio total (opcional — lo que paga el cliente: prima + impuestos)</label>
-        <input name="premioTotal" type="number" step="0.01" value="${esc(p.premioTotal||'')}" placeholder="Si lo dejás vacío, se estima automáticamente">
-      </div>
+      ${moneyFieldHtml('premioTotal', p.premioTotal, { currency: p.currency||'ARS', label: 'Premio total (lo que paga el cliente: prima + impuestos)', placeholder: 'Ej: 1.200.000', required: true })}
       <div class="field">
         <label>Archivos adjuntos (póliza escaneada, endosos, etc.)</label>
         <div id="polFilesList"></div>
@@ -1305,7 +1399,7 @@
         <div id="polStorageHint" style="font-size:11.5px;color:var(--muted);margin-top:4px;"></div>
       </div>
       <div class="field-row">
-        <div class="field"><label>Moneda</label><select name="currency">${CURRENCIES.map(cur => `<option value="${cur}" ${(p.currency||'ARS')===cur?'selected':''}>${CURRENCY_LABEL[cur]}</option>`).join('')}</select></div>
+        <div class="field"><label>Moneda</label><select name="currency" id="polCurrencySelect">${CURRENCIES.map(cur => `<option value="${cur}" ${(p.currency||'ARS')===cur?'selected':''}>${CURRENCY_LABEL[cur]}</option>`).join('')}</select></div>
         <div class="field"><label>Comisión (%)</label><input name="commissionPct" type="number" step="0.01" value="${esc(p.commissionPct||'')}"></div>
       </div>
       <div class="field-row">
@@ -1339,6 +1433,9 @@
     `, async data => {
       if (data.status === 'cancelada' && !data.cancellationReason){
         throw new Error('Elegí un motivo de baja para cancelar la póliza.');
+      }
+      if (!data.premioTotal){
+        throw new Error('Cargá el premio total de la póliza (lo que paga el cliente).');
       }
       const totalSize = am.totalSize();
       const usedElsewhere = clientStorageUsed(data.clientId, existing ? existing.id : null);
@@ -1388,6 +1485,10 @@
       if (pctInput.value) return;
       const ins = state.insurers.find(i => i.company === e.target.value);
       if (ins && ins.defaultCommissionPct != null) pctInput.value = ins.defaultCommissionPct;
+    });
+    backdrop.querySelector('#polCurrencySelect').addEventListener('change', e => {
+      const symbol = e.target.value === 'USD' ? 'US$' : '$';
+      backdrop.querySelectorAll('[data-currency-prefix]').forEach(el => el.textContent = symbol);
     });
   }
 
@@ -1538,8 +1639,8 @@
         <div class="field"><label>Aseguradora</label><select name="company">${companyOptions(q.company)}</select></div>
       </div>
       <div class="field-row">
-        <div class="field"><label>Prima estimada ($)</label><input name="premium" type="number" step="0.01" value="${esc(q.premium||'')}"></div>
-        <div class="field"><label>Suma asegurada ($)</label><input name="sumInsured" type="number" step="0.01" value="${esc(q.sumInsured||'')}"></div>
+        ${moneyFieldHtml('premium', q.premium, { label: 'Prima estimada' })}
+        ${moneyFieldHtml('sumInsured', q.sumInsured, { label: 'Suma asegurada' })}
       </div>
       <div class="field-row">
         <div class="field"><label>Impuestos y recargos (%)</label><input name="taxPct" type="number" step="0.01" value="${esc(q.taxPct != null ? q.taxPct : defaultTaxPctForRamo(q.ramo))}"></div>
@@ -2181,7 +2282,8 @@
   /* ==================== COMISIONES ==================== */
   function insurerCommissionBase(company){
     const ins = state.insurers.find(i => i.company === company);
-    return (ins && ins.commissionBase) || 'prima';
+    if (ins && ins.commissionBase) return ins.commissionBase;
+    return company === 'Triunfo Seguros' ? 'premio' : 'prima';
   }
   function policyPremio(p){
     if (p.premioTotal) return Number(p.premioTotal) || 0;
@@ -2348,7 +2450,6 @@
   const INSURER_ROLES = [
     { key:'accountExec', label:'Ejecutivo de cuentas' },
     { key:'underwriter', label:'Suscriptor' },
-    { key:'liquidations', label:'Liquidaciones' },
     { key:'incidents', label:'Siniestros' },
   ];
   function renderAseguradoras(){
