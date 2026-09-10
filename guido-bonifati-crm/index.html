@@ -1725,6 +1725,36 @@
     doc.setDrawColor(52,80,107); doc.setLineWidth(0.8); doc.line(14, 27, 196, 27);
     doc.setLineWidth(0.2); doc.setTextColor(30,30,30);
   }
+  // Centered header used only in the quote PDF: logo + "Asesor de Seguros" + insurer line;
+  // "Guido Bonifati" is signed off at the bottom of that document instead. Returns the next free y.
+  function quotePdfHeader(doc, q){
+    const pageW = doc.internal.pageSize.getWidth();
+    const cx = pageW / 2;
+    try { doc.addImage(LOGO_MARK_B64, 'PNG', cx - 11, 10, 22, 9.8); } catch(e){ /* logo is best-effort */ }
+    doc.setFont('helvetica','normal'); doc.setFontSize(10); doc.setTextColor(169,135,28);
+    doc.text('ASESOR DE SEGUROS', cx, 25, { align:'center' });
+    doc.setDrawColor(169,135,28); doc.setLineWidth(0.5); doc.line(cx - 15, 28, cx + 15, 28);
+    let y = 35;
+    doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(130,130,130);
+    const label = 'Cotización con ';
+    const insurerLogo = INSURER_LOGOS[q.company];
+    let placedLogo = false;
+    if (insurerLogo){
+      try {
+        const maxH = 5, maxW = 22;
+        let logoW = insurerLogo.w * maxH / insurerLogo.h, logoH = maxH;
+        if (logoW > maxW){ logoW = maxW; logoH = insurerLogo.h * maxW / insurerLogo.w; }
+        const labelW = doc.getTextWidth(label);
+        const startX = cx - (labelW + logoW + 2) / 2;
+        doc.text(label, startX, y);
+        doc.addImage(insurerLogo.src, 'PNG', startX + labelW + 2, y - logoH + 1.6, logoW, logoH);
+        placedLogo = true;
+      } catch(e) { /* fall back to text-only line below */ }
+    }
+    if (!placedLogo) doc.text(label + (q.company || ''), cx, y, { align:'center' });
+    doc.setDrawColor(52,80,107); doc.setLineWidth(0.2); doc.setTextColor(30,30,30);
+    return y + 12;
+  }
   function renderCotizaciones(){
     const el = document.querySelector('.page[data-page="cotizaciones"]');
     if (!el.dataset.init){
@@ -1935,18 +1965,8 @@
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
     const client = state.clients.find(c => c.id === q.clientId);
-    pdfHeader(doc);
-    const insurerLogo = INSURER_LOGOS[q.company];
-    if (insurerLogo){
-      try {
-        const maxW = 30, maxH = 8;
-        let logoW = insurerLogo.w * maxH / insurerLogo.h, logoH = maxH;
-        if (logoW > maxW){ logoW = maxW; logoH = insurerLogo.h * maxW / insurerLogo.w; }
-        doc.addImage(insurerLogo.src, 'PNG', 196 - logoW, 10 + (maxH - logoH) / 2, logoW, logoH);
-      } catch(e) { /* logo is best-effort */ }
-    }
-    let y = 40;
-    doc.setFont('helvetica','bold'); doc.setFontSize(14); doc.text('Cotización de seguro', 14, y); y += 10;
+    let y = quotePdfHeader(doc, q);
+    y += 6;
     doc.setFont('helvetica','normal'); doc.setFontSize(11);
     const rows = [
       ['Cliente', clientName(q.clientId)],
@@ -1984,6 +2004,9 @@
     doc.setDrawColor(220,220,220); doc.line(14, y, 196, y); y += 8;
     doc.setFontSize(9); doc.setTextColor(120,120,120);
     doc.text('Cotización orientativa, sujeta a análisis y aprobación de la compañía aseguradora.', 14, y);
+    y += 18;
+    doc.setFont('helvetica','bold'); doc.setFontSize(12); doc.setTextColor(52,80,107);
+    doc.text('Guido Bonifati', 196, y, { align:'right' });
     const blob = doc.output('blob');
     const downloads = await claude.use('downloads');
     if (!downloads){ toast('La descarga no está disponible en esta vista.'); return; }
