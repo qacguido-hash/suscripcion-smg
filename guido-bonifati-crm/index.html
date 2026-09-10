@@ -1976,7 +1976,13 @@
       ['Suma asegurada', q.sumInsured ? fmtMoney(q.sumInsured) : '—'],
       ['Fecha', fmtDate(new Date().toISOString().slice(0,10))],
     ];
-    rows.forEach(([k,v]) => { doc.setFont('helvetica','bold'); doc.text(k + ':', 14, y); doc.setFont('helvetica','normal'); doc.text(String(v), 60, y); y += 8; });
+    rows.forEach(([k,v]) => {
+      doc.setFont('helvetica','bold'); doc.text(k + ':', 14, y);
+      doc.setFont('helvetica','normal'); doc.text(String(v), 60, y);
+      y += 3;
+      doc.setDrawColor(230,230,230); doc.setLineWidth(0.15); doc.line(14, y, 196, y); doc.setLineWidth(0.2);
+      y += 5;
+    });
     y += 4;
     const hasRealPremio = !!q.premioTotal;
     doc.setFont('helvetica','bold'); doc.setFontSize(12); doc.text(`Detalle de costos${hasRealPremio ? '' : ' (estimado)'}`, 14, y); y += 8;
