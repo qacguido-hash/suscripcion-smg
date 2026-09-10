@@ -581,22 +581,63 @@
   }
 
   function crossSellSuggestions(c, pols){
-    const ramos = new Set(pols.filter(p => p.status !== 'cancelada').map(p => p.ramo));
+    const active = pols.filter(p => p.status !== 'cancelada');
+    const ramos = new Set(active.map(p => p.ramo));
     const suggestions = [];
+    const add = (ramo, text) => suggestions.push({ ramo, text });
     if (c.type === 'empresa'){
-      if (pols.length && !ramos.has('Seguro de ART')) suggestions.push('Es empresa y no tiene ART contratada.');
+      if (active.length && !ramos.has('Seguro de ART')) add('Seguro de ART', 'Es empresa y no tiene ART contratada.');
+      if (active.length && !ramos.has('Responsabilidad Civil')) add('Responsabilidad Civil', 'No tiene Responsabilidad Civil contratada.');
+      if (ramos.has('Todo Riesgo Operativo') && !ramos.has('Seguro Técnico')) add('Seguro Técnico', 'Tiene Todo Riesgo Operativo, pero no Seguro Técnico.');
     } else {
       const hasVehicle = ramos.has('Seguro de Auto') || ramos.has('Seguro de Moto');
-      if (hasVehicle && ramos.has('Combinado Familiar')){
-        if (!ramos.has('Accidentes Personales')) suggestions.push('Tiene auto/moto y combinado familiar, pero no Accidentes Personales.');
-        if (!ramos.has('Seguro de Vida')) suggestions.push('Tiene auto/moto y combinado familiar, pero no Seguro de Vida.');
-      }
+      const hasHome = ramos.has('Combinado Familiar');
+      if (hasVehicle && !hasHome) add('Combinado Familiar', 'Tiene auto/moto, pero no seguro del hogar (Combinado Familiar).');
+      if (hasVehicle && hasHome && !ramos.has('Accidentes Personales')) add('Accidentes Personales', 'Tiene auto/moto y combinado familiar, pero no Accidentes Personales.');
+      if (hasVehicle && hasHome && !ramos.has('Seguro de Vida')) add('Seguro de Vida', 'Tiene auto/moto y combinado familiar, pero no Seguro de Vida.');
+      if (ramos.has('Seguro de Vida') && !ramos.has('Accidentes Personales')) add('Accidentes Personales', 'Tiene Seguro de Vida, pero no Accidentes Personales.');
       if (c.birthday){
         const age = Math.floor((Date.now() - new Date(c.birthday + 'T00:00:00').getTime()) / (365.25*24*3600*1000));
-        if (age > 45 && !ramos.has('Seguro de Retiro')) suggestions.push(`Tiene ${age} años y no tiene Seguro de Retiro.`);
+        if (age > 45 && !ramos.has('Seguro de Retiro')) add('Seguro de Retiro', `Tiene ${age} años y no tiene Seguro de Retiro.`);
       }
     }
-    return suggestions;
+    const seen = new Set();
+    return suggestions.filter(s => { if (seen.has(s.ramo)) return false; seen.add(s.ramo); return true; });
+  }
+  function phoneToWhatsApp(phone){
+    let digits = String(phone||'').replace(/\D/g, '');
+    if (!digits) return null;
+    digits = digits.replace(/^0+/, '');
+    if (!digits.startsWith('54')) digits = '54' + digits;
+    return digits;
+  }
+  function defaultWhatsAppMessage(client, suggestion){
+    const firstName = (client.name||'').trim().split(/\s+/)[0] || '';
+    if (suggestion) return `Hola ${firstName}! Soy Guido, tu asesor de seguros. Viendo tu cobertura actual, se me ocurrió que te puede convenir sumar un ${suggestion.ramo}. ¿Te interesa que te pase una cotización sin compromiso?`;
+    return `Hola ${firstName}! Soy Guido, tu asesor de seguros. Te escribo para saber cómo estás y si necesitás revisar alguna cobertura. ¡Cualquier cosa, contame!`;
+  }
+  function openWhatsAppComposer(client, suggestion){
+    const waNumber = phoneToWhatsApp(client.phone);
+    if (!waNumber){ toast('Este cliente no tiene teléfono cargado.'); return; }
+    const backdrop = document.createElement('div');
+    backdrop.className = 'modal-backdrop';
+    backdrop.innerHTML = `
+      <div class="modal">
+        <h2>WhatsApp — ${esc(client.name)}</h2>
+        <div class="field"><label>Mensaje</label><textarea id="waMessageInput" style="min-height:120px;">${esc(defaultWhatsAppMessage(client, suggestion))}</textarea></div>
+        <p class="sub" style="margin:-4px 0 6px;">Se abre WhatsApp con este mensaje cargado — todavía lo podés editar ahí antes de enviarlo.</p>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-outline" data-act="close">Cerrar</button>
+          <button type="button" class="btn btn-primary" data-act="open-wa">Abrir WhatsApp</button>
+        </div>
+      </div>`;
+    document.body.appendChild(backdrop);
+    backdrop.querySelector('[data-act="close"]').addEventListener('click', () => backdrop.remove());
+    backdrop.querySelector('[data-act="open-wa"]').addEventListener('click', () => {
+      const text = backdrop.querySelector('#waMessageInput').value;
+      window.open(`https://wa.me/${waNumber}?text=${encodeURIComponent(text)}`, '_blank');
+      backdrop.remove();
+    });
   }
 
   /* ---------- Drawer (detail view for a client, with related records) ---------- */
@@ -623,10 +664,8 @@
         <div class="kv"><span>Medio de pago</span><span>${esc(c.paymentMethod || '—')}</span></div>
         <div class="kv"><span>Cumpleaños</span><span>${c.birthday ? fmtDate(c.birthday) : '—'}</span></div>
         ${suggestions.length ? `<div style="margin-top:14px;background:var(--warn-bg);border:1px solid var(--warn);border-radius:8px;padding:10px 12px;">
-          <b style="font-size:12.5px;color:var(--warn);">💡 Oportunidades de venta</b>
-          <ul style="margin:6px 0 0 18px;font-size:12.5px;">
-            ${suggestions.map(s => `<li>${esc(s)}</li>`).join('')}
-          </ul>
+          <b style="font-size:12.5px;color:var(--warn);">💡 Oportunidades de venta cruzada</b>
+          ${suggestions.map((s,idx) => `<div class="kv" style="font-size:12.5px;padding:4px 0;"><span>${esc(s.text)}</span>${c.phone ? `<button type="button" class="btn btn-sm btn-outline drawer-wa-suggestion" data-idx="${idx}">WhatsApp</button>` : ''}</div>`).join('')}
         </div>` : ''}
         <div style="margin-top:20px;">
           <h2 style="font-size:15px;">Pólizas (${pols.length})</h2>
@@ -657,6 +696,7 @@
         <div style="margin-top:22px;display:flex;gap:8px;flex-wrap:wrap;">
           <button class="btn btn-outline btn-sm" id="editClientBtn">Editar cliente</button>
           <button class="btn btn-outline btn-sm" id="downloadClientPdfBtn">Descargar ficha (PDF)</button>
+          ${c.phone ? '<button class="btn btn-outline btn-sm" id="waClientBtn">Enviar WhatsApp</button>' : ''}
         </div>
       </div>`;
     document.body.appendChild(backdrop);
@@ -664,12 +704,18 @@
     backdrop.querySelector('.close-drawer').addEventListener('click', () => backdrop.remove());
     backdrop.querySelector('#editClientBtn').addEventListener('click', () => { backdrop.remove(); openClientForm(c); });
     backdrop.querySelector('#downloadClientPdfBtn').addEventListener('click', () => generateClientPdf(c));
+    if (c.phone){
+      backdrop.querySelector('#waClientBtn').addEventListener('click', () => openWhatsAppComposer(c, suggestions[0]));
+    }
     backdrop.querySelector('#addInterBtn').addEventListener('click', () => {
       openInteractionForm(clientId, () => { backdrop.remove(); openClientDrawer(clientId); });
     });
     backdrop.querySelectorAll('.drawer-view-doc-files').forEach(b => b.addEventListener('click', () => {
       const d = state.documents.find(x => x.id === b.dataset.id);
       if (d) openFilesListModal(`Archivos — ${d.name} · ${clientName(d.clientId)}`, docFiles(d));
+    }));
+    backdrop.querySelectorAll('.drawer-wa-suggestion').forEach(b => b.addEventListener('click', () => {
+      openWhatsAppComposer(c, suggestions[Number(b.dataset.idx)]);
     }));
   }
 
@@ -1004,6 +1050,7 @@
             <button class="btn btn-primary" id="newClientBtn">+ Nuevo cliente</button>
           </div>
         </div>
+        <div id="crossSellPanel"></div>
         <div class="toolbar">
           <input type="search" id="clientSearch" placeholder="Buscar por nombre, email o teléfono…" style="min-width:260px;">
           <select id="clientTagFilter"><option value="">Todas las etiquetas</option></select>
@@ -1020,8 +1067,35 @@
     }
     renderClientRows();
   }
+  function renderCrossSellPanel(el){
+    const panel = el.querySelector('#crossSellPanel');
+    const opportunities = [];
+    state.clients.forEach(c => {
+      const pols = state.policies.filter(p => p.clientId === c.id);
+      crossSellSuggestions(c, pols).forEach(s => opportunities.push({ client: c, suggestion: s }));
+    });
+    if (!opportunities.length){ panel.innerHTML = ''; return; }
+    panel.innerHTML = `
+      <div class="panel" style="margin-bottom:16px;">
+        <h2>💡 Oportunidades de venta cruzada (${opportunities.length})</h2>
+        ${opportunities.map(({client, suggestion}) => `
+          <div class="kv" style="border-bottom:1px solid var(--border);padding:8px 0;font-size:13px;">
+            <span><a href="#" class="cross-sell-client" data-id="${client.id}" style="font-weight:600;color:var(--blue);">${esc(client.name)}</a> — ${esc(suggestion.text)}</span>
+            ${client.phone ? `<button type="button" class="btn btn-sm btn-outline cross-sell-wa" data-id="${client.id}" data-ramo="${esc(suggestion.ramo)}">WhatsApp</button>` : ''}
+          </div>`).join('')}
+      </div>
+    `;
+    panel.querySelectorAll('.cross-sell-client').forEach(a => a.addEventListener('click', e => { e.preventDefault(); openClientDrawer(a.dataset.id); }));
+    panel.querySelectorAll('.cross-sell-wa').forEach(b => b.addEventListener('click', () => {
+      const client = state.clients.find(x => x.id === b.dataset.id);
+      const pols = state.policies.filter(p => p.clientId === client.id);
+      const suggestion = crossSellSuggestions(client, pols).find(s => s.ramo === b.dataset.ramo);
+      openWhatsAppComposer(client, suggestion);
+    }));
+  }
   function renderClientRows(){
     const el = document.querySelector('.page[data-page="clientes"]');
+    renderCrossSellPanel(el);
     const q = (el.querySelector('#clientSearch').value || '').toLowerCase();
     const tagSelect = el.querySelector('#clientTagFilter');
     const allTags = Array.from(new Set(state.clients.flatMap(c => c.tags || []))).sort((a,b) => a.localeCompare(b));
@@ -1047,6 +1121,7 @@
         <td data-label="Pólizas">${nPol}</td>
         <td data-label="Cumpleaños">${c.birthday ? fmtDate(c.birthday) : '—'}</td>
         <td class="no-label"><div class="row-actions">
+          ${c.phone ? `<button class="icon-btn wa-client" data-id="${c.id}" title="Enviar WhatsApp">💬</button>` : ''}
           <button class="icon-btn edit-client" data-id="${c.id}" title="Editar">✎</button>
         </div></td>
       </tr>`;
@@ -1054,6 +1129,12 @@
     tbody.querySelectorAll('.open-client').forEach(a => a.addEventListener('click', e => { e.preventDefault(); openClientDrawer(a.dataset.id); }));
     tbody.querySelectorAll('.edit-client').forEach(b => b.addEventListener('click', () => {
       const c = state.clients.find(x => x.id === b.dataset.id); if (c) openClientForm(c);
+    }));
+    tbody.querySelectorAll('.wa-client').forEach(b => b.addEventListener('click', () => {
+      const c = state.clients.find(x => x.id === b.dataset.id);
+      if (!c) return;
+      const pols = state.policies.filter(p => p.clientId === c.id);
+      openWhatsAppComposer(c, crossSellSuggestions(c, pols)[0]);
     }));
   }
   function openClientForm(existing){
