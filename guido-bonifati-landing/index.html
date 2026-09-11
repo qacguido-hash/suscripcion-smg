@@ -5,6 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Guido Bonifati — Asesor de Seguros</title>
 <meta name="description" content="Asesoramiento personalizado en seguros para personas y empresas. Trabajo con las principales aseguradoras del país para conseguirte la cobertura que realmente necesitás.">
+<link id="manifestLink" rel="manifest">
+<link id="appleIconLink" rel="apple-touch-icon">
+<link id="faviconLink" rel="icon">
+<meta name="theme-color" content="#34506B">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Guido Bonifati">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Saira:wght@200;300;400;500;600;700&family=Saira+Condensed:wght@500;600;700&display=swap" rel="stylesheet">
@@ -78,9 +85,9 @@
     border-bottom:1px solid var(--border);
   }
   .nav{display:flex;align-items:center;justify-content:space-between;padding:16px 28px;max-width:1180px;margin:0 auto;}
-  .brand{display:flex;align-items:center;gap:10px;line-height:1;}
+  .brand{display:flex;align-items:center;gap:10px;line-height:1;min-width:0;flex-shrink:1;}
   .brand-mark{height:38px;width:auto;display:block;}
-  .brand-text{display:flex;flex-direction:column;align-items:center;text-align:center;}
+  .brand-text{display:flex;flex-direction:column;align-items:center;text-align:center;min-width:0;}
   .brand-name{font-family:var(--font-cond);font-weight:600;font-size:22px;color:var(--wine);letter-spacing:0.3px;}
   .brand-tag{font-size:9px;font-weight:700;letter-spacing:2.5px;color:var(--yellow-deep);margin-top:3px;}
   .nav-links{display:flex;align-items:center;gap:24px;}
@@ -95,6 +102,17 @@
   .nav-actions{display:flex;align-items:center;gap:16px;}
   .nav-toggle{display:none;background:none;border:none;cursor:pointer;padding:6px;}
   .nav-toggle span{display:block;width:22px;height:2px;background:var(--wine);margin:5px 0;border-radius:2px;}
+
+  /* Language toggle */
+  .lang-toggle{
+    display:inline-flex;align-items:center;border:1.5px solid var(--border);border-radius:20px;
+    overflow:hidden;background:var(--surface);cursor:pointer;padding:0;flex-shrink:0;
+  }
+  .lang-toggle .lang-opt{
+    padding:6px 12px;font-size:12px;font-weight:700;letter-spacing:0.4px;color:var(--muted);
+    transition:background .15s,color .15s;
+  }
+  .lang-toggle .lang-opt.active{background:var(--wine);color:#fff;}
 
   /* Hero */
   .hero{padding:0;}
@@ -131,9 +149,29 @@
     padding:26px 24px;text-align:left;
   }
   .hero-revision-badge{
-    display:inline-block;font-size:11px;font-weight:700;letter-spacing:0.6px;text-transform:uppercase;
-    color:#40390c;background:var(--yellow);padding:4px 11px;border-radius:20px;margin-bottom:12px;
+    display:inline-block;font-size:14px;font-weight:700;letter-spacing:0.6px;text-transform:uppercase;
+    color:#40390c;background:var(--yellow);padding:7px 16px;border-radius:20px;margin-bottom:14px;
+    box-shadow:0 4px 12px rgba(201,162,39,0.4);
   }
+
+  /* Hero floating cards */
+  .hero{position:relative;}
+  .hero-floats{display:flex;flex-direction:column;gap:12px;position:absolute;top:24px;right:5%;z-index:3;}
+  .hero-float-card{
+    display:flex;align-items:center;gap:10px;background:#fff;border-radius:10px;
+    box-shadow:0 10px 24px rgba(30,40,55,0.22);padding:11px 16px;max-width:230px;
+    font-size:12.5px;font-weight:600;color:var(--text);transition:transform .18s ease,box-shadow .18s ease;
+  }
+  .hero-float-card:hover{transform:translateY(-3px);box-shadow:0 14px 30px rgba(30,40,55,0.28);}
+  .hero-float-card:nth-child(1){transform:rotate(-2deg);}
+  .hero-float-card:nth-child(2){transform:rotate(1.5deg);}
+  .hero-float-card:hover{transform:rotate(0deg) translateY(-3px);}
+  .hero-float-card .hf-icon{
+    width:30px;height:30px;border-radius:50%;background:var(--surface);color:var(--wine);
+    display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  }
+  .hero-float-card .hf-icon svg{width:15px;height:15px;}
+  @media (max-width:900px){ .hero-floats{display:none;} }
   .hero-revision h3{font-family:var(--font-cond);font-size:19px;font-weight:600;color:#000;margin-bottom:6px;}
   .hero-revision > p{font-size:13.5px;color:var(--text);margin-bottom:14px;}
   .hero-revision form{display:flex;flex-direction:column;gap:9px;}
@@ -269,6 +307,44 @@
   .sim-result.show{display:block;}
   .sim-result b{color:var(--wine);}
   .sim-result .sim-fine{display:block;margin-top:12px;font-size:12px;color:var(--muted);}
+  .sim-map-btn{margin-top:14px;}
+
+  /* Risk map modal */
+  .modal-backdrop{
+    position:fixed;inset:0;background:rgba(20,25,35,0.55);z-index:100;
+    display:flex;align-items:flex-start;justify-content:center;padding:6vh 16px;overflow:auto;
+  }
+  .modal-backdrop[hidden]{display:none;}
+  .risk-modal{
+    background:#fff;border-radius:var(--radius);max-width:520px;width:100%;
+    box-shadow:var(--shadow);padding:30px 28px 26px;position:relative;text-align:left;
+  }
+  .risk-modal .modal-close{
+    position:absolute;top:16px;right:16px;width:30px;height:30px;border-radius:50%;
+    border:1px solid var(--border);background:#fff;display:flex;align-items:center;justify-content:center;
+    cursor:pointer;color:var(--text);
+  }
+  .risk-modal h3{font-family:var(--font-cond);font-size:20px;font-weight:600;color:var(--wine);margin-bottom:4px;}
+  .risk-modal .rm-sub{font-size:13px;color:var(--muted);margin-bottom:18px;}
+  .risk-modal .rm-form{display:flex;gap:8px;margin-bottom:18px;}
+  .risk-modal .rm-form input{
+    flex:1;padding:11px 13px;border-radius:4px;border:1.5px solid var(--border);
+    font-family:var(--font);font-size:13.5px;outline:none;
+  }
+  .risk-modal .rm-form input:focus{border-color:var(--wine);}
+  .rm-bar-row{margin-bottom:14px;}
+  .rm-bar-row .rm-bar-label{display:flex;justify-content:space-between;font-size:12.5px;font-weight:600;color:var(--text);margin-bottom:5px;}
+  .rm-bar-track{height:10px;border-radius:5px;background:var(--surface);overflow:hidden;}
+  .rm-bar-fill{height:100%;border-radius:5px;}
+  .rm-bar-fill.robo{background:#c0392b;}
+  .rm-bar-fill.granizo{background:#a9871c;}
+  .rm-bar-fill.inundacion{background:var(--wine);}
+  .rm-bar-fill.otros{background:var(--mauve);}
+  .rm-chip-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:6px;}
+  .rm-chip{font-size:12px;font-weight:600;padding:6px 12px;border-radius:20px;background:var(--surface);color:var(--text);}
+  .risk-modal .rm-fine{font-size:11.5px;color:var(--muted);margin-top:14px;display:block;}
+  .risk-modal .rm-cta{width:100%;margin-top:16px;}
+  .rm-empty{font-size:13.5px;color:var(--text);}
 
   /* Aseguradoras — logo slider */
   .aseguradoras{background:var(--bg);text-align:center;}
@@ -361,13 +437,21 @@
   /* WhatsApp float */
   .wa-float{
     position:fixed;bottom:26px;right:26px;z-index:50;
-    width:60px;height:60px;border-radius:50%;background:var(--whatsapp);
+    width:70px;height:70px;border-radius:50%;background:var(--whatsapp);
     display:flex;align-items:center;justify-content:center;
     box-shadow:0 10px 26px rgba(37,211,102,0.45);
     transition:transform .15s ease;
   }
+  .wa-float::before{
+    content:"";position:absolute;inset:0;border-radius:50%;background:var(--whatsapp);
+    animation:wa-pulse 2.4s ease-out infinite;z-index:-1;
+  }
   .wa-float:hover{transform:scale(1.07);}
   .wa-float:focus-visible{outline:2.5px solid #fff;outline-offset:3px;}
+  @keyframes wa-pulse{
+    0%{transform:scale(1);opacity:0.55;}
+    100%{transform:scale(1.6);opacity:0;}
+  }
 
   @media (prefers-reduced-motion:reduce){
     html{scroll-behavior:auto;}
@@ -406,6 +490,8 @@
     .nav-links a{display:block;padding:12px 0;border-bottom:1px solid var(--border);}
     .nav-links li:last-child a{border-bottom:none;}
     .nav-actions .btn-wine{display:none;}
+    .nav-actions{gap:8px;}
+    .lang-toggle .lang-opt{padding:5px 9px;font-size:11px;}
     .nav-toggle{display:block;}
     nav.nav{position:relative;}
     section{padding:64px 0;}
@@ -428,19 +514,22 @@
       <img src="assets/logo/logo-mark.png" alt="" class="brand-mark">
       <span class="brand-text">
         <span class="brand-name">Guido Bonifati</span>
-        <span class="brand-tag">— ASESOR&nbsp;DE&nbsp;SEGUROS —</span>
+        <span class="brand-tag" data-i18n="brandTag">— ASESOR&nbsp;DE&nbsp;SEGUROS —</span>
       </span>
     </a>
     <ul class="nav-links" id="navLinks">
-      <li><a href="#inicio" class="active">Inicio</a></li>
-      <li><a href="#nosotros">Nosotros</a></li>
-      <li><a href="#personas">Personas</a></li>
-      <li><a href="#empresas">Empresas</a></li>
-      <li><a href="#referidos">Referidos</a></li>
-      <li><a href="#contacto">Contacto</a></li>
+      <li><a href="#inicio" class="active" data-i18n="navInicio">Inicio</a></li>
+      <li><a href="#nosotros" data-i18n="navNosotros">Nosotros</a></li>
+      <li><a href="#personas" data-i18n="navPersonas">Personas</a></li>
+      <li><a href="#empresas" data-i18n="navEmpresas">Empresas</a></li>
+      <li><a href="#referidos" data-i18n="navReferidos">Referidos</a></li>
+      <li><a href="#contacto" data-i18n="navContacto">Contacto</a></li>
     </ul>
     <div class="nav-actions">
-      <a href="#contacto" class="btn btn-wine">Cotizar ahora</a>
+      <button class="lang-toggle" id="langToggle" type="button" aria-label="Switch language / Cambiar idioma">
+        <span class="lang-opt active" data-lang="es">ES</span><span class="lang-opt" data-lang="en">EN</span>
+      </button>
+      <a href="#contacto" class="btn btn-wine" data-i18n="navCotizar">Cotizar ahora</a>
       <button class="nav-toggle" id="navToggle" aria-label="Abrir menú" aria-expanded="false" aria-controls="navLinks">
         <span></span><span></span><span></span>
       </button>
@@ -450,33 +539,43 @@
 
 <section id="inicio" class="hero" data-page="inicio">
   <div class="hero-media" aria-hidden="true"></div>
+  <div class="hero-floats">
+    <a href="#revision" class="hero-float-card">
+      <span class="hf-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4"/><path d="M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9c1.5 0 2.9.37 4.14 1.02"/><path d="M21 5l-9 9"/></svg></span>
+      <span data-i18n="floatRevision">¿Ya tenés póliza?<br>Revisá tu cobertura gratis</span>
+    </a>
+    <a href="#personas" class="hero-float-card">
+      <span class="hf-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></span>
+      <span data-i18n="floatSim">Simulador de riesgo online</span>
+    </a>
+  </div>
   <div class="hero-box">
     <div class="hero-grid">
       <div class="hero-copy">
-        <h1>Asegurá hoy.</h1>
-        <p class="hero-sub">Viví tranquilo mañana</p>
-        <p class="hero-desc">Un seguro no debería ser simplemente una póliza. Mi trabajo es ayudarte a entender qué estás contratando, qué cobertura necesitás y qué opción se adapta mejor a vos. Desde la elección de la compañía y la cobertura hasta la gestión y el seguimiento de tu póliza, te acompaño durante todo el proceso.</p>
+        <h1 data-i18n="heroH1">Asegurá hoy.</h1>
+        <p class="hero-sub" data-i18n="heroSub">Viví tranquilo mañana</p>
+        <p class="hero-desc" data-i18n="heroDesc">Un seguro no debería ser simplemente una póliza. Mi trabajo es ayudarte a entender qué estás contratando, qué cobertura necesitás y qué opción se adapta mejor a vos. Desde la elección de la compañía y la cobertura hasta la gestión y el seguimiento de tu póliza, te acompaño durante todo el proceso.</p>
         <div class="hero-actions">
-          <a href="#contacto" class="btn btn-wine">Cotizar ahora</a>
-          <a href="#personas" class="btn btn-outline">Ver coberturas</a>
+          <a href="#contacto" class="btn btn-wine" data-i18n="navCotizar">Cotizar ahora</a>
+          <a href="#personas" class="btn btn-outline" data-i18n="heroVerCoberturas">Ver coberturas</a>
         </div>
       </div>
 
       <div class="hero-revision" id="revision">
-        <span class="hero-revision-badge">Gratis</span>
-        <h3>Revisión de coberturas</h3>
-        <p>Te digo si tu póliza actual está bien cubierta o si estás pagando de más.</p>
+        <span class="hero-revision-badge" data-i18n="badgeGratis">Gratis</span>
+        <h3 data-i18n="revisionTitle">Revisión de coberturas</h3>
+        <p data-i18n="revisionDesc">Te digo si tu póliza actual está bien cubierta o si estás pagando de más.</p>
         <form id="revisionForm">
           <input type="hidden" name="access_key" value="TU_ACCESS_KEY_DE_WEB3FORMS">
           <input type="hidden" name="subject" value="Nueva solicitud de revisión de coberturas">
-          <input type="text" id="revNombre" name="Nombre" placeholder="Tu nombre" required>
-          <input type="email" id="revEmail" name="Email" placeholder="Tu correo" required>
+          <input type="text" id="revNombre" name="Nombre" data-i18n-ph="phTuNombre" placeholder="Tu nombre" required>
+          <input type="email" id="revEmail" name="Email" data-i18n-ph="phTuCorreo" placeholder="Tu correo" required>
           <div class="file-field">
-            <label for="revFile" class="file-field-btn">Elegir archivos</label>
-            <span class="file-field-name" id="revFileName">Ningún archivo seleccionado</span>
+            <label for="revFile" class="file-field-btn" data-i18n="elegirArchivos">Elegir archivos</label>
+            <span class="file-field-name" id="revFileName" data-i18n="ningunArchivo">Ningún archivo seleccionado</span>
             <input type="file" id="revFile" name="Póliza" accept="application/pdf" multiple required>
           </div>
-          <button type="submit" class="btn btn-wine btn-sm">Enviar pólizas</button>
+          <button type="submit" class="btn btn-wine btn-sm" data-i18n="enviarPolizas">Enviar pólizas</button>
         </form>
         <p class="revision-note" id="revisionNote"></p>
       </div>
@@ -489,15 +588,15 @@
     <a href="#personas" class="quick-card quick-card--personas">
       <img class="quick-illustration" src="assets/quick/personas.jpg" alt="" aria-hidden="true">
       <div class="quick-copy">
-        <h3>Seguros para Personas</h3>
-        <span>Auto, vida, hogar y más →</span>
+        <h3 data-i18n="quickPersonasTitle">Seguros para Personas</h3>
+        <span data-i18n="quickPersonasSub">Auto, vida, hogar y más →</span>
       </div>
     </a>
     <a href="#empresas" class="quick-card quick-card--empresas">
       <img class="quick-illustration" src="assets/quick/empresas.jpg" alt="" aria-hidden="true">
       <div class="quick-copy">
-        <h3>Seguros para Empresas</h3>
-        <span>ART, RC, caución y más →</span>
+        <h3 data-i18n="quickEmpresasTitle">Seguros para Empresas</h3>
+        <span data-i18n="quickEmpresasSub">ART, RC, caución y más →</span>
       </div>
     </a>
   </div>
@@ -505,18 +604,18 @@
 
 <section class="stats" data-page="inicio">
   <div class="container stats-grid">
-    <div class="stat"><b data-count="100">0</b><span>Asegurados</span></div>
-    <div class="stat"><b data-count="5">0</b><span>Años de trayectoria</span></div>
-    <div class="stat"><b data-count="10">0</b><span>Aseguradoras aliadas</span></div>
+    <div class="stat"><b data-count="100">0</b><span data-i18n="statAsegurados">Asegurados</span></div>
+    <div class="stat"><b data-count="5">0</b><span data-i18n="statAnios">Años de trayectoria</span></div>
+    <div class="stat"><b data-count="10">0</b><span data-i18n="statAseguradoras">Aseguradoras aliadas</span></div>
   </div>
 </section>
 
 <section id="aseguradoras" class="aseguradoras" data-page="inicio">
   <div class="container">
     <div class="aseg-divider"></div>
-    <div class="aseg-label">Confiamos en estas</div>
-    <div class="aseg-title">Aseguradoras</div>
-    <p>Mi trayectoria me permitió elegir las aseguradoras que mejores beneficios brindan a mis clientes.</p>
+    <div class="aseg-label" data-i18n="asegConfiamos">Confiamos en estas</div>
+    <div class="aseg-title" data-i18n="asegTitulo">Aseguradoras</div>
+    <p data-i18n="asegIntro">Mi trayectoria me permitió elegir las aseguradoras que mejores beneficios brindan a mis clientes.</p>
   </div>
   <div class="slider">
     <div class="slider-track">
@@ -547,16 +646,16 @@
 <section id="nosotros" class="nosotros" data-page="nosotros">
   <div class="container nosotros-grid">
     <div class="nosotros-text">
-      <span class="eyebrow">Nosotros</span>
-      <p>Mi recorrido en el mundo de los seguros comenzó en 2022, cuando ingresé a Boston Seguros como emisor de caución. Tras un año en ese rol, pasé al sector de suscripción, donde aprendí a recibir y analizar un negocio, y a comprender la mirada de la compañía.</p>
-      <p>En mayo de 2024 me sumé al equipo de suscripción de caución de Swiss Medical Seguros. Allí profundicé mi formación, incorporé nuevos conceptos y descubrí la importancia de construir relaciones comerciales sólidas y vínculos de confianza entre suscriptor y PAS, algo fundamental en este ramo.</p>
-      <p>Después de varios años del lado de las compañías, y con la tecnicatura en seguros terminada, di el paso hacia el otro lado del mostrador. Hoy asesoro de forma independiente a quienes necesitan un seguro: los acompaño, les brindo el mejor servicio y la máxima transparencia, y les muestro las mejores opciones del mercado para que puedan delegar esa responsabilidad y vivir con mayor tranquilidad.</p>
+      <span class="eyebrow" data-i18n="nosotrosEyebrow">Nosotros</span>
+      <p data-i18n="nosotrosP1">Mi recorrido en el mundo de los seguros comenzó en 2022, cuando ingresé a Boston Seguros como emisor de caución. Tras un año en ese rol, pasé al sector de suscripción, donde aprendí a recibir y analizar un negocio, y a comprender la mirada de la compañía.</p>
+      <p data-i18n="nosotrosP2">En mayo de 2024 me sumé al equipo de suscripción de caución de Swiss Medical Seguros. Allí profundicé mi formación, incorporé nuevos conceptos y descubrí la importancia de construir relaciones comerciales sólidas y vínculos de confianza entre suscriptor y PAS, algo fundamental en este ramo.</p>
+      <p data-i18n="nosotrosP3">Después de varios años del lado de las compañías, y con la tecnicatura en seguros terminada, di el paso hacia el otro lado del mostrador. Hoy asesoro de forma independiente a quienes necesitan un seguro: los acompaño, les brindo el mejor servicio y la máxima transparencia, y les muestro las mejores opciones del mercado para que puedan delegar esa responsabilidad y vivir con mayor tranquilidad.</p>
     </div>
 
     <div class="cv-card">
       <div class="avatar-photo"><img src="assets/guido/guido-bonifati.jpg" alt="Guido Bonifati"></div>
       <div class="cv-name">TEC. GUIDO BONIFATI</div>
-      <div class="cv-role">Asesor de Seguros</div>
+      <div class="cv-role" data-i18n="cvRole">Asesor de Seguros</div>
       <div class="bio-social">
         <a href="mailto:guidobonifatiseguros@gmail.com" aria-label="Email">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 6 12 13 2 6"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg>
@@ -573,8 +672,8 @@
 
   <div class="container" style="text-align:center;">
     <div class="aseg-divider"></div>
-    <div class="aseg-label">Confiamos en estas</div>
-    <div class="aseg-title" style="font-size:clamp(24px,3vw,32px);">Aseguradoras</div>
+    <div class="aseg-label" data-i18n="asegConfiamos">Confiamos en estas</div>
+    <div class="aseg-title" style="font-size:clamp(24px,3vw,32px);" data-i18n="asegTitulo">Aseguradoras</div>
   </div>
   <div class="slider">
     <div class="slider-track">
@@ -605,72 +704,73 @@
 <section id="personas" class="productos-personas" data-page="personas">
   <div class="container">
     <div class="section-head center">
-      <span class="eyebrow">Seguros para Personas</span>
-      <h2>Cobertura para vos y tu familia</h2>
-      <p>Elegí lo que necesitás proteger y pedime una cotización directa, sin vueltas.</p>
+      <span class="eyebrow" data-i18n="quickPersonasTitle">Seguros para Personas</span>
+      <h2 data-i18n="personasH2">Cobertura para vos y tu familia</h2>
+      <p data-i18n="personasP">Elegí lo que necesitás proteger y pedime una cotización directa, sin vueltas.</p>
     </div>
     <div class="prod-grid">
       <div class="prod-card">
         <div class="prod-icon"><img src="assets/products/retiro.jpg" alt=""></div>
-        <h3>Seguro de Retiro</h3>
-        <p>Ahorro planificado para tu jubilación, con beneficios impositivos.</p>
-        <a href="#contacto" class="prod-quote" data-product="Seguro de Retiro">Cotizar →</a>
+        <h3 data-i18n="prodRetiroTitle">Seguro de Retiro</h3>
+        <p data-i18n="prodRetiroDesc">Ahorro planificado para tu jubilación, con beneficios impositivos.</p>
+        <a href="#contacto" class="prod-quote" data-product="Seguro de Retiro" data-i18n="cotizarFlecha">Cotizar →</a>
       </div>
       <div class="prod-card">
         <div class="prod-icon"><img src="assets/products/vida.jpg" alt=""></div>
-        <h3>Seguro de Vida</h3>
-        <p>Protección económica para tu familia ante imprevistos.</p>
-        <a href="#contacto" class="prod-quote" data-product="Seguro de Vida">Cotizar →</a>
+        <h3 data-i18n="prodVidaTitle">Seguro de Vida</h3>
+        <p data-i18n="prodVidaDesc">Protección económica para tu familia ante imprevistos.</p>
+        <a href="#contacto" class="prod-quote" data-product="Seguro de Vida" data-i18n="cotizarFlecha">Cotizar →</a>
       </div>
       <div class="prod-card">
         <div class="prod-icon"><img src="assets/products/combinado-familiar.jpg" alt=""></div>
-        <h3>Combinado Familiar</h3>
-        <p>Incendio, robo y responsabilidad civil para tu hogar.</p>
-        <a href="#contacto" class="prod-quote" data-product="Seguro Combinado Familiar">Cotizar →</a>
+        <h3 data-i18n="prodCombinadoTitle">Combinado Familiar</h3>
+        <p data-i18n="prodCombinadoDesc">Incendio, robo y responsabilidad civil para tu hogar.</p>
+        <a href="#contacto" class="prod-quote" data-product="Seguro Combinado Familiar" data-i18n="cotizarFlecha">Cotizar →</a>
       </div>
       <div class="prod-card">
         <div class="prod-icon"><img src="assets/products/rc-mala-praxis.jpg" alt=""></div>
-        <h3>RC por Mala Praxis</h3>
-        <p>Cobertura profesional ante reclamos por tu actividad.</p>
-        <a href="#contacto" class="prod-quote" data-product="RC por Mala Praxis">Cotizar →</a>
+        <h3 data-i18n="prodMalaPraxisTitle">RC por Mala Praxis</h3>
+        <p data-i18n="prodMalaPraxisDesc">Cobertura profesional ante reclamos por tu actividad.</p>
+        <a href="#contacto" class="prod-quote" data-product="RC por Mala Praxis" data-i18n="cotizarFlecha">Cotizar →</a>
       </div>
       <div class="prod-card">
         <div class="prod-icon"><img src="assets/products/auto.jpg" alt=""></div>
-        <h3>Seguro de Auto</h3>
-        <p>Terceros, terceros completo o todo riesgo para tu vehículo.</p>
-        <a href="#contacto" class="prod-quote" data-product="Seguro de Auto">Cotizar →</a>
+        <h3 data-i18n="prodAutoTitle">Seguro de Auto</h3>
+        <p data-i18n="prodAutoDesc">Terceros, terceros completo o todo riesgo para tu vehículo.</p>
+        <a href="#contacto" class="prod-quote" data-product="Seguro de Auto" data-i18n="cotizarFlecha">Cotizar →</a>
       </div>
       <div class="prod-card">
         <div class="prod-icon"><img src="assets/products/moto.jpg" alt=""></div>
-        <h3>Seguro de Moto</h3>
-        <p>Cobertura a medida para tu moto o ciclomotor.</p>
-        <a href="#contacto" class="prod-quote" data-product="Seguro de Moto">Cotizar →</a>
+        <h3 data-i18n="prodMotoTitle">Seguro de Moto</h3>
+        <p data-i18n="prodMotoDesc">Cobertura a medida para tu moto o ciclomotor.</p>
+        <a href="#contacto" class="prod-quote" data-product="Seguro de Moto" data-i18n="cotizarFlecha">Cotizar →</a>
       </div>
       <div class="prod-card">
         <div class="prod-icon"><img src="assets/products/accidentes-personales.jpg" alt=""></div>
-        <h3>Accidentes Personales</h3>
-        <p>Indemnización por incapacidad o fallecimiento accidental.</p>
-        <a href="#contacto" class="prod-quote" data-product="Accidentes Personales">Cotizar →</a>
+        <h3 data-i18n="prodAPTitle">Accidentes Personales</h3>
+        <p data-i18n="prodAPDesc">Indemnización por incapacidad o fallecimiento accidental.</p>
+        <a href="#contacto" class="prod-quote" data-product="Accidentes Personales" data-i18n="cotizarFlecha">Cotizar →</a>
       </div>
       <div class="prod-card">
         <div class="prod-icon"><img src="assets/products/caucion.jpg" alt=""></div>
-        <h3>Seguro de Caución</h3>
-        <p>Garantías para alquileres y obras.</p>
-        <a href="#contacto" class="prod-quote" data-product="Seguro de Caución">Cotizar →</a>
+        <h3 data-i18n="prodCaucionTitle">Seguro de Caución</h3>
+        <p data-i18n="prodCaucionDesc">Garantías para alquileres y obras.</p>
+        <a href="#contacto" class="prod-quote" data-product="Seguro de Caución" data-i18n="cotizarFlecha">Cotizar →</a>
       </div>
     </div>
 
     <div class="sim-panel" style="margin-top:56px;">
-      <h2 style="font-size:clamp(24px,3vw,32px);">Simulador de Riesgo por Zona</h2>
-      <p style="color:var(--text);margin-top:12px;">Ingresá tu dirección y te muestro los riesgos más frecuentes de tu zona — robo, granizo, inundación — para ayudarte a elegir la cobertura correcta antes de que la necesites.</p>
+      <h2 style="font-size:clamp(24px,3vw,32px);" data-i18n="simH2">Simulador de Riesgo por Zona</h2>
+      <p style="color:var(--text);margin-top:12px;" data-i18n="simIntro">Ingresá tu dirección y te muestro los riesgos más frecuentes de tu zona — robo, granizo, inundación — para ayudarte a elegir la cobertura correcta antes de que la necesites.</p>
       <form class="sim-form" id="simForm">
-        <input type="text" id="simAddress" placeholder="Tu dirección o barrio" required>
-        <button type="submit" class="btn btn-wine">Consultar</button>
+        <input type="text" id="simAddress" data-i18n-ph="phDireccion" placeholder="Tu dirección o barrio" required>
+        <button type="submit" class="btn btn-wine" data-i18n="simConsultar">Consultar</button>
       </form>
       <div class="sim-result" id="simResult">
         <p id="simResultText"></p>
         <span class="sim-fine" id="simResultFine"></span>
       </div>
+      <button type="button" class="btn btn-outline sim-map-btn" id="openRiskMapBtn" data-i18n="verMapaRiesgo">Ver mapa de riesgos de tu zona</button>
     </div>
   </div>
 </section>
@@ -678,58 +778,58 @@
 <section id="empresas" class="productos-empresas" data-page="empresas">
   <div class="container">
     <div class="section-head center">
-      <span class="eyebrow">Seguros para Empresas</span>
-      <h2>Cobertura para tu negocio</h2>
-      <p>Protección para tu operación, tu equipo y tus activos. Pedime una cotización directa.</p>
+      <span class="eyebrow" data-i18n="quickEmpresasTitle">Seguros para Empresas</span>
+      <h2 data-i18n="empresasH2">Cobertura para tu negocio</h2>
+      <p data-i18n="empresasP">Protección para tu operación, tu equipo y tus activos. Pedime una cotización directa.</p>
     </div>
     <div class="prod-grid">
       <div class="prod-card">
         <div class="prod-icon"><img src="assets/products/art.jpg" alt=""></div>
-        <h3>Seguro de ART</h3>
-        <p>Riesgos del trabajo, cumpliendo con la normativa vigente.</p>
-        <a href="#contacto" class="prod-quote" data-product="Seguro de ART">Cotizar →</a>
+        <h3 data-i18n="prodARTTitle">Seguro de ART</h3>
+        <p data-i18n="prodARTDesc">Riesgos del trabajo, cumpliendo con la normativa vigente.</p>
+        <a href="#contacto" class="prod-quote" data-product="Seguro de ART" data-i18n="cotizarFlecha">Cotizar →</a>
       </div>
       <div class="prod-card">
         <div class="prod-icon"><img src="assets/products/caucion-empresa.jpg" alt=""></div>
-        <h3>Seguro de Caución</h3>
-        <p>Garantías comerciales, judiciales y de obra.</p>
-        <a href="#contacto" class="prod-quote" data-product="Seguro de Caución (empresa)">Cotizar →</a>
+        <h3 data-i18n="prodCaucionEmpTitle">Seguro de Caución</h3>
+        <p data-i18n="prodCaucionEmpDesc">Garantías comerciales, judiciales y de obra.</p>
+        <a href="#contacto" class="prod-quote" data-product="Seguro de Caución (empresa)" data-i18n="cotizarFlecha">Cotizar →</a>
       </div>
       <div class="prod-card">
         <div class="prod-icon"><img src="assets/products/todo-riesgo-operativo.jpg" alt=""></div>
-        <h3>Todo Riesgo Operativo</h3>
-        <p>Cobertura integral para maquinaria, bienes e instalaciones.</p>
-        <a href="#contacto" class="prod-quote" data-product="Todo Riesgo Operativo">Cotizar →</a>
+        <h3 data-i18n="prodTRTitle">Todo Riesgo Operativo</h3>
+        <p data-i18n="prodTRDesc">Cobertura integral para maquinaria, bienes e instalaciones.</p>
+        <a href="#contacto" class="prod-quote" data-product="Todo Riesgo Operativo" data-i18n="cotizarFlecha">Cotizar →</a>
       </div>
       <div class="prod-card">
         <div class="prod-icon"><img src="assets/products/rc-empresas.jpg" alt=""></div>
-        <h3>Responsabilidad Civil</h3>
-        <p>Protección ante reclamos de terceros por tu actividad.</p>
-        <a href="#contacto" class="prod-quote" data-product="RC Empresas">Cotizar →</a>
+        <h3 data-i18n="prodRCTitle">Responsabilidad Civil</h3>
+        <p data-i18n="prodRCDesc">Protección ante reclamos de terceros por tu actividad.</p>
+        <a href="#contacto" class="prod-quote" data-product="RC Empresas" data-i18n="cotizarFlecha">Cotizar →</a>
       </div>
       <div class="prod-card">
         <div class="prod-icon"><img src="assets/products/seguro-tecnico.jpg" alt=""></div>
-        <h3>Seguro Técnico</h3>
-        <p>Cobertura para equipos, montajes y obras civiles.</p>
-        <a href="#contacto" class="prod-quote" data-product="Seguro Técnico">Cotizar →</a>
+        <h3 data-i18n="prodTecnicoTitle">Seguro Técnico</h3>
+        <p data-i18n="prodTecnicoDesc">Cobertura para equipos, montajes y obras civiles.</p>
+        <a href="#contacto" class="prod-quote" data-product="Seguro Técnico" data-i18n="cotizarFlecha">Cotizar →</a>
       </div>
       <div class="prod-card">
         <div class="prod-icon"><img src="assets/products/vida-colectivo.jpg" alt=""></div>
-        <h3>Vida Colectivo</h3>
-        <p>Beneficio de vida para todo tu equipo de trabajo.</p>
-        <a href="#contacto" class="prod-quote" data-product="Vida Colectivo">Cotizar →</a>
+        <h3 data-i18n="prodVidaColTitle">Vida Colectivo</h3>
+        <p data-i18n="prodVidaColDesc">Beneficio de vida para todo tu equipo de trabajo.</p>
+        <a href="#contacto" class="prod-quote" data-product="Vida Colectivo" data-i18n="cotizarFlecha">Cotizar →</a>
       </div>
       <div class="prod-card">
         <div class="prod-icon"><img src="assets/products/accidentes-personales-empresa.jpg" alt=""></div>
-        <h3>Accidentes Personales</h3>
-        <p>Cobertura para tu personal ante accidentes.</p>
-        <a href="#contacto" class="prod-quote" data-product="Accidentes Personales (empresa)">Cotizar →</a>
+        <h3 data-i18n="prodAPEmpTitle">Accidentes Personales</h3>
+        <p data-i18n="prodAPEmpDesc">Cobertura para tu personal ante accidentes.</p>
+        <a href="#contacto" class="prod-quote" data-product="Accidentes Personales (empresa)" data-i18n="cotizarFlecha">Cotizar →</a>
       </div>
       <div class="prod-card">
         <div class="prod-icon"><img src="assets/products/integral-comercio.jpg" alt=""></div>
-        <h3>Integral de Comercio</h3>
-        <p>Protección completa para tu local: incendio, robo y RC.</p>
-        <a href="#contacto" class="prod-quote" data-product="Integral de Comercio">Cotizar →</a>
+        <h3 data-i18n="prodIntegralTitle">Integral de Comercio</h3>
+        <p data-i18n="prodIntegralDesc">Protección completa para tu local: incendio, robo y RC.</p>
+        <a href="#contacto" class="prod-quote" data-product="Integral de Comercio" data-i18n="cotizarFlecha">Cotizar →</a>
       </div>
     </div>
   </div>
@@ -738,30 +838,30 @@
 <section id="referidos" class="referidos" data-page="referidos">
   <div class="container">
     <div class="section-head center">
-      <span class="eyebrow">Programa de referidos</span>
-      <h2>Recomendame y ganás vos también</h2>
-      <p>¿Conocés a alguien que necesita un seguro? Referilo y, si termina asegurándose, los dos salen ganando.</p>
+      <span class="eyebrow" data-i18n="refEyebrow">Programa de referidos</span>
+      <h2 data-i18n="refH2">Recomendame y ganás vos también</h2>
+      <p data-i18n="refP">¿Conocés a alguien que necesita un seguro? Referilo y, si termina asegurándose, los dos salen ganando.</p>
     </div>
     <div class="ref-steps">
       <div class="ref-step">
         <div class="ref-num">1</div>
-        <h3>Referís</h3>
-        <p>Me contás quién necesita un seguro y por qué medio prefiere que lo contacte.</p>
+        <h3 data-i18n="ref1Title">Referís</h3>
+        <p data-i18n="ref1Desc">Me contás quién necesita un seguro y por qué medio prefiere que lo contacte.</p>
       </div>
       <div class="ref-step">
         <div class="ref-num">2</div>
-        <h3>Se asegura</h3>
-        <p>Si esa persona contrata una póliza conmigo, la referencia se hace efectiva.</p>
+        <h3 data-i18n="ref2Title">Se asegura</h3>
+        <p data-i18n="ref2Desc">Si esa persona contrata una póliza conmigo, la referencia se hace efectiva.</p>
       </div>
       <div class="ref-step">
         <div class="ref-num">3</div>
-        <h3>Ganan los dos</h3>
-        <p>Vos recibís una bonificación en tu próxima renovación, y la persona referida arranca con condiciones preferenciales.</p>
+        <h3 data-i18n="ref3Title">Ganan los dos</h3>
+        <p data-i18n="ref3Desc">Vos recibís una bonificación en tu próxima renovación, y la persona referida arranca con condiciones preferenciales.</p>
       </div>
     </div>
     <div style="text-align:center;">
-      <a href="#contacto" class="btn btn-outline prod-quote" data-product="Quiero referir a alguien">Quiero referir a alguien</a>
-      <p class="ref-note">* Porcentaje o monto de la bonificación a definir.</p>
+      <a href="#contacto" class="btn btn-outline prod-quote" data-product="Quiero referir a alguien" data-i18n="refCta">Quiero referir a alguien</a>
+      <p class="ref-note" data-i18n="refNote">* Porcentaje o monto de la bonificación a definir.</p>
     </div>
   </div>
 </section>
@@ -769,87 +869,87 @@
 <section id="contacto" class="contacto" data-page="contacto">
   <div class="container contact-grid">
     <div>
-      <span class="eyebrow">Contacto</span>
-      <h2>Pedime tu cotización</h2>
-      <p style="margin:16px 0 32px;font-size:16px;">Contame qué necesitás asegurar y te respondo con opciones concretas, sin compromiso.</p>
+      <span class="eyebrow" data-i18n="contactoEyebrow">Contacto</span>
+      <h2 data-i18n="contactoH2">Pedime tu cotización</h2>
+      <p style="margin:16px 0 32px;font-size:16px;" data-i18n="contactoP">Contame qué necesitás asegurar y te respondo con opciones concretas, sin compromiso.</p>
 
       <a class="contact-info-item" href="https://wa.me/5491173669857" target="_blank" rel="noopener">
         <div class="contact-info-icon">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.47 14.38c-.29-.15-1.72-.85-1.99-.95-.27-.1-.46-.15-.66.15-.2.29-.76.95-.93 1.15-.17.2-.34.22-.63.07-.29-.15-1.22-.45-2.33-1.44-.86-.77-1.44-1.71-1.61-2-.17-.29-.02-.45.13-.6.13-.13.29-.34.44-.51.15-.17.2-.29.29-.49.1-.2.05-.37-.02-.51-.07-.15-.66-1.59-.9-2.18-.24-.57-.48-.5-.66-.51h-.56c-.2 0-.51.07-.78.37-.27.29-1.02.99-1.02 2.43s1.04 2.82 1.19 3.02c.15.2 2.06 3.15 5 4.42.7.3 1.24.48 1.67.61.7.22 1.34.19 1.84.12.56-.08 1.72-.7 1.97-1.38.24-.68.24-1.26.17-1.38-.07-.12-.27-.2-.56-.35z"/><path d="M12.02 2C6.5 2 2.02 6.48 2.02 12c0 1.87.5 3.62 1.38 5.13L2 22l4.99-1.31A9.96 9.96 0 0 0 12.02 22C17.53 22 22 17.52 22 12S17.53 2 12.02 2zm0 18.11c-1.7 0-3.29-.47-4.65-1.28l-.33-.2-3.09.81.82-3.02-.22-.31A8.09 8.09 0 0 1 3.91 12c0-4.47 3.64-8.1 8.11-8.1 4.47 0 8.1 3.63 8.1 8.1s-3.63 8.11-8.1 8.11z"/></svg>
         </div>
-        <div><b>11 7366-9857 · WhatsApp</b><span>Lunes a viernes, 9 a 18 hs</span></div>
+        <div><b>11 7366-9857 · WhatsApp</b><span data-i18n="horarioLV">Lunes a viernes, 9 a 18 hs</span></div>
       </a>
       <a class="contact-info-item" href="mailto:guidobonifatiseguros@gmail.com">
         <div class="contact-info-icon">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z" opacity="0"/><path d="M22 6 12 13 2 6"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg>
         </div>
-        <div><b>guidobonifatiseguros@gmail.com</b><span>Respondo en el día</span></div>
+        <div><b>guidobonifatiseguros@gmail.com</b><span data-i18n="respondoDia">Respondo en el día</span></div>
       </a>
       <a class="contact-info-item" href="https://www.linkedin.com/in/guidobonifati" target="_blank" rel="noopener">
         <div class="contact-info-icon">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
         </div>
-        <div><b>LinkedIn</b><span>Conectemos profesionalmente</span></div>
+        <div><b>LinkedIn</b><span data-i18n="conectemos">Conectemos profesionalmente</span></div>
       </a>
       <a class="contact-info-item" href="mailto:guidobonifatiseguros@gmail.com?subject=Quiero%20agendar%20una%20reuni%C3%B3n" target="_blank" rel="noopener">
         <div class="contact-info-icon">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
         </div>
-        <div><b>Quilmes, Buenos Aires</b><span>Click para agendar una reunión — virtual o presencial</span></div>
+        <div><b>Quilmes, Buenos Aires</b><span data-i18n="clickAgendar">Click para agendar una reunión — virtual o presencial</span></div>
       </a>
       <div class="contact-map">
         <iframe src="https://www.google.com/maps?q=Quilmes,+Buenos+Aires,+Argentina&output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Ubicación"></iframe>
       </div>
-      <a class="map-link" href="https://www.google.com/maps/search/?api=1&query=Quilmes,+Buenos+Aires,+Argentina" target="_blank" rel="noopener">Ver en Google Maps →</a>
+      <a class="map-link" href="https://www.google.com/maps/search/?api=1&query=Quilmes,+Buenos+Aires,+Argentina" target="_blank" rel="noopener" data-i18n="verEnMaps">Ver en Google Maps →</a>
     </div>
 
     <form class="contact-form" id="quoteForm">
       <div class="form-row">
         <div class="field">
-          <label for="nombre">Nombre</label>
-          <input type="text" id="nombre" name="nombre" placeholder="Tu nombre" required>
+          <label for="nombre" data-i18n="labelNombre">Nombre</label>
+          <input type="text" id="nombre" name="nombre" data-i18n-ph="phTuNombre" placeholder="Tu nombre" required>
         </div>
         <div class="field">
-          <label for="telefono">Teléfono</label>
+          <label for="telefono" data-i18n="labelTelefono">Teléfono</label>
           <input type="tel" id="telefono" name="telefono" placeholder="11 1234 5678" required>
         </div>
       </div>
       <div class="field">
-        <label for="email">Correo</label>
+        <label for="email" data-i18n="labelCorreo">Correo</label>
         <input type="email" id="email" name="email" placeholder="tu@email.com">
       </div>
       <div class="field">
-        <label for="producto">¿Qué querés cotizar?</label>
+        <label for="producto" data-i18n="labelProducto">¿Qué querés cotizar?</label>
         <select id="producto" name="producto">
-          <optgroup label="Personas">
-            <option>Seguro de Retiro</option>
-            <option>Seguro de Vida</option>
-            <option>Seguro Combinado Familiar</option>
-            <option>RC por Mala Praxis</option>
-            <option>Seguro de Auto</option>
-            <option>Seguro de Moto</option>
-            <option>Accidentes Personales</option>
-            <option>Seguro de Caución</option>
+          <optgroup label="Personas" data-i18n-attr="label:optgroupPersonas">
+            <option data-i18n="prodRetiroTitle">Seguro de Retiro</option>
+            <option data-i18n="prodVidaTitle">Seguro de Vida</option>
+            <option data-i18n="prodCombinadoOptTitle">Seguro Combinado Familiar</option>
+            <option data-i18n="prodMalaPraxisTitle">RC por Mala Praxis</option>
+            <option data-i18n="prodAutoTitle">Seguro de Auto</option>
+            <option data-i18n="prodMotoTitle">Seguro de Moto</option>
+            <option data-i18n="prodAPTitle">Accidentes Personales</option>
+            <option data-i18n="prodCaucionTitle">Seguro de Caución</option>
           </optgroup>
-          <optgroup label="Empresas">
-            <option>Seguro de ART</option>
-            <option>Seguro de Caución (empresa)</option>
-            <option>Todo Riesgo Operativo</option>
-            <option>RC Empresas</option>
-            <option>Seguro Técnico</option>
-            <option>Vida Colectivo</option>
-            <option>Accidentes Personales (empresa)</option>
-            <option>Integral de Comercio</option>
+          <optgroup label="Empresas" data-i18n-attr="label:optgroupEmpresas">
+            <option data-i18n="prodARTTitle">Seguro de ART</option>
+            <option data-i18n="prodCaucionEmpOptTitle">Seguro de Caución (empresa)</option>
+            <option data-i18n="prodTRTitle">Todo Riesgo Operativo</option>
+            <option data-i18n="prodRCOptTitle">RC Empresas</option>
+            <option data-i18n="prodTecnicoTitle">Seguro Técnico</option>
+            <option data-i18n="prodVidaColTitle">Vida Colectivo</option>
+            <option data-i18n="prodAPEmpOptTitle">Accidentes Personales (empresa)</option>
+            <option data-i18n="prodIntegralTitle">Integral de Comercio</option>
           </optgroup>
-          <option>Revisión de coberturas gratis</option>
-          <option>Otro</option>
+          <option data-i18n="revisionGratisOpt">Revisión de coberturas gratis</option>
+          <option data-i18n="otroOpt">Otro</option>
         </select>
       </div>
       <div class="field">
-        <label for="mensaje">Contanos más</label>
-        <textarea id="mensaje" name="mensaje" placeholder="Marca, modelo, ubicación, lo que sirva para cotizar más rápido"></textarea>
+        <label for="mensaje" data-i18n="labelContanos">Contanos más</label>
+        <textarea id="mensaje" name="mensaje" data-i18n-ph="phMensaje" placeholder="Marca, modelo, ubicación, lo que sirva para cotizar más rápido"></textarea>
       </div>
-      <button type="submit" class="btn btn-white">Solicitar cotización</button>
+      <button type="submit" class="btn btn-white" data-i18n="solicitarCotizacion">Solicitar cotización</button>
     </form>
   </div>
 </section>
@@ -857,9 +957,9 @@
 <footer>
   <div class="container footer-main">
     <div class="footer-grid">
-      <div class="footer-tagline">Brindándote<br><b>seguridad y tranquilidad</b></div>
+      <div class="footer-tagline" data-i18n-html="footerTagline">Brindándote<br><b>seguridad y tranquilidad</b></div>
       <div class="footer-col">
-        <h4>Contactanos</h4>
+        <h4 data-i18n="footerContactanos">Contactanos</h4>
         <ul>
           <li><a href="mailto:guidobonifatiseguros@gmail.com">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z" opacity="0"/><path d="M22 6 12 13 2 6"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg>
@@ -870,37 +970,227 @@
         </ul>
       </div>
       <div class="footer-col">
-        <h4>Dónde estamos</h4>
+        <h4 data-i18n="footerDondeEstamos">Dónde estamos</h4>
         <ul>
           <li><a href="mailto:guidobonifatiseguros@gmail.com?subject=Quiero%20agendar%20una%20reuni%C3%B3n">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
             Quilmes, Buenos Aires</a></li>
-          <li><span>Coordinar entrevista previa</span></li>
+          <li><span data-i18n="footerCoordinar">Coordinar entrevista previa</span></li>
         </ul>
       </div>
       <div class="footer-col">
         <h4>Guido Bonifati</h4>
         <ul>
-          <li><span>© <span id="year"></span> · Todos los derechos reservados</span></li>
+          <li><span>© <span id="year"></span> · <span data-i18n="footerDerechos">Todos los derechos reservados</span></span></li>
         </ul>
       </div>
       <div class="footer-col">
-        <h4>Seguinos</h4>
+        <h4 data-i18n="footerSeguinos">Seguinos</h4>
         <div class="footer-social">
           <a href="https://www.linkedin.com/in/guidobonifati" target="_blank" rel="noopener" aria-label="LinkedIn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg></a>
         </div>
       </div>
     </div>
   </div>
-  <div class="footer-bar">Productor Asesor de Seguros — Matrícula N° [completar] ante la Superintendencia de Seguros de la Nación</div>
+  <div class="footer-bar" data-i18n="footerBar">Productor Asesor de Seguros — Matrícula N° [completar] ante la Superintendencia de Seguros de la Nación</div>
 </footer>
 
+<div class="modal-backdrop" id="riskMapBackdrop" hidden>
+  <div class="risk-modal">
+    <button type="button" class="modal-close" id="riskMapClose" aria-label="Cerrar">✕</button>
+    <h3 data-i18n="rmTitle">Mapa de riesgos de tu zona</h3>
+    <p class="rm-sub" data-i18n="rmSub">Estimación ilustrativa por zona — no es un mapa satelital en vivo.</p>
+    <form class="rm-form" id="riskMapForm">
+      <input type="text" id="riskMapAddress" data-i18n-ph="phDireccion" placeholder="Tu dirección o barrio" required>
+      <button type="submit" class="btn btn-wine btn-sm" data-i18n="simConsultar">Consultar</button>
+    </form>
+    <div id="riskMapResult"></div>
+  </div>
+</div>
+
 <a class="wa-float" id="waFloat" href="https://wa.me/5491173669857?text=Hola%20Guido%2C%20quiero%20consultar%20por%20un%20seguro" target="_blank" rel="noopener" aria-label="Escribir por WhatsApp">
-  <svg width="30" height="30" viewBox="0 0 24 24" fill="#fff"><path d="M17.47 14.38c-.29-.15-1.72-.85-1.99-.95-.27-.1-.46-.15-.66.15-.2.29-.76.95-.93 1.15-.17.2-.34.22-.63.07-.29-.15-1.22-.45-2.33-1.44-.86-.77-1.44-1.71-1.61-2-.17-.29-.02-.45.13-.6.13-.13.29-.34.44-.51.15-.17.2-.29.29-.49.1-.2.05-.37-.02-.51-.07-.15-.66-1.59-.9-2.18-.24-.57-.48-.5-.66-.51h-.56c-.2 0-.51.07-.78.37-.27.29-1.02.99-1.02 2.43s1.04 2.82 1.19 3.02c.15.2 2.06 3.15 5 4.42.7.3 1.24.48 1.67.61.7.22 1.34.19 1.84.12.56-.08 1.72-.7 1.97-1.38.24-.68.24-1.26.17-1.38-.07-.12-.27-.2-.56-.35z"/><path d="M12.02 2C6.5 2 2.02 6.48 2.02 12c0 1.87.5 3.62 1.38 5.13L2 22l4.99-1.31A9.96 9.96 0 0 0 12.02 22C17.53 22 22 17.52 22 12S17.53 2 12.02 2zm0 18.11c-1.7 0-3.29-.47-4.65-1.28l-.33-.2-3.09.81.82-3.02-.22-.31A8.09 8.09 0 0 1 3.91 12c0-4.47 3.64-8.1 8.11-8.1 4.47 0 8.1 3.63 8.1 8.1s-3.63 8.11-8.1 8.11z"/></svg>
+  <svg width="34" height="34" viewBox="0 0 24 24" fill="#fff"><path d="M17.47 14.38c-.29-.15-1.72-.85-1.99-.95-.27-.1-.46-.15-.66.15-.2.29-.76.95-.93 1.15-.17.2-.34.22-.63.07-.29-.15-1.22-.45-2.33-1.44-.86-.77-1.44-1.71-1.61-2-.17-.29-.02-.45.13-.6.13-.13.29-.34.44-.51.15-.17.2-.29.29-.49.1-.2.05-.37-.02-.51-.07-.15-.66-1.59-.9-2.18-.24-.57-.48-.5-.66-.51h-.56c-.2 0-.51.07-.78.37-.27.29-1.02.99-1.02 2.43s1.04 2.82 1.19 3.02c.15.2 2.06 3.15 5 4.42.7.3 1.24.48 1.67.61.7.22 1.34.19 1.84.12.56-.08 1.72-.7 1.97-1.38.24-.68.24-1.26.17-1.38-.07-.12-.27-.2-.56-.35z"/><path d="M12.02 2C6.5 2 2.02 6.48 2.02 12c0 1.87.5 3.62 1.38 5.13L2 22l4.99-1.31A9.96 9.96 0 0 0 12.02 22C17.53 22 22 17.52 22 12S17.53 2 12.02 2zm0 18.11c-1.7 0-3.29-.47-4.65-1.28l-.33-.2-3.09.81.82-3.02-.22-.31A8.09 8.09 0 0 1 3.91 12c0-4.47 3.64-8.1 8.11-8.1 4.47 0 8.1 3.63 8.1 8.1s-3.63 8.11-8.1 8.11z"/></svg>
 </a>
 
 <script>
   document.getElementById('year').textContent = new Date().getFullYear();
+
+  // Favicon + PWA icons/manifest — generados en tiempo real a partir del isotipo
+  // ya embebido en la página (el mismo <img class="brand-mark">), sin descargar nada.
+  (function () {
+    const markImg = document.querySelector('.brand-mark');
+    if (!markImg) return;
+    function makeIcon(size, srcImg) {
+      const c = document.createElement('canvas');
+      c.width = size; c.height = size;
+      const ctx = c.getContext('2d');
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, size, size);
+      const pad = size * 0.16;
+      const maxW = size - pad * 2, maxH = size - pad * 2;
+      const ratio = Math.min(maxW / srcImg.naturalWidth, maxH / srcImg.naturalHeight);
+      const w = srcImg.naturalWidth * ratio, h = srcImg.naturalHeight * ratio;
+      ctx.drawImage(srcImg, (size - w) / 2, (size - h) / 2, w, h);
+      return c.toDataURL('image/png');
+    }
+    function applyIcons() {
+      try {
+        const icon32 = makeIcon(32, markImg);
+        const icon192 = makeIcon(192, markImg);
+        const icon512 = makeIcon(512, markImg);
+        document.getElementById('faviconLink').href = icon32;
+        document.getElementById('appleIconLink').href = icon192;
+        const manifest = {
+          name: 'Guido Bonifati — Asesor de Seguros',
+          short_name: 'Guido Bonifati',
+          start_url: location.href,
+          display: 'standalone',
+          background_color: '#F6F7F9',
+          theme_color: '#34506B',
+          icons: [
+            { src: icon192, sizes: '192x192', type: 'image/png' },
+            { src: icon512, sizes: '512x512', type: 'image/png' },
+          ],
+        };
+        const blob = new Blob([JSON.stringify(manifest)], { type: 'application/manifest+json' });
+        document.getElementById('manifestLink').href = URL.createObjectURL(blob);
+      } catch (e) { /* icon generation is best-effort */ }
+    }
+    if (markImg.complete && markImg.naturalWidth) applyIcons();
+    else markImg.addEventListener('load', applyIcons, { once: true });
+  })();
+
+  // Toggle de idioma ES/EN — traducción manual vía atributos data-i18n.
+  // El español es el contenido original del HTML (fuente de verdad); al pasar a
+  // inglés se cachea ese texto y se reemplaza por el del diccionario, y viceversa.
+  const I18N_EN = {
+    navInicio: 'Home', navNosotros: 'About', navPersonas: 'For You', navEmpresas: 'Business',
+    navReferidos: 'Referrals', navContacto: 'Contact', navCotizar: 'Get a Quote',
+    brandTag: '— INSURANCE&nbsp;ADVISOR —',
+    floatRevision: 'Already have a policy?<br>Get a free coverage review',
+    floatSim: 'Online risk simulator',
+    heroH1: 'Get insured today.', heroSub: 'Live at ease tomorrow',
+    heroDesc: 'Insurance shouldn’t be just a policy. My job is to help you understand what you’re buying, what coverage you need, and which option fits you best. From choosing the company and the coverage to managing and following up on your policy, I’m with you the whole way.',
+    heroVerCoberturas: 'See coverage',
+    badgeGratis: 'Free', revisionTitle: 'Coverage Review',
+    revisionDesc: 'I’ll tell you if your current policy has the right coverage or if you’re overpaying.',
+    phTuNombre: 'Your name', phTuCorreo: 'Your email',
+    elegirArchivos: 'Choose files', ningunArchivo: 'No file selected', enviarPolizas: 'Send policies',
+    quickPersonasTitle: 'Insurance for Individuals', quickPersonasSub: 'Auto, life, home & more →',
+    quickEmpresasTitle: 'Insurance for Businesses', quickEmpresasSub: 'Workers’ comp, liability, surety & more →',
+    statAsegurados: 'Insured clients', statAnios: 'Years of experience', statAseguradoras: 'Partner insurers',
+    asegConfiamos: 'We work with', asegTitulo: 'Insurers',
+    asegIntro: 'My experience allowed me to choose the insurers that give my clients the best benefits.',
+    nosotrosEyebrow: 'About',
+    nosotrosP1: 'My journey in the insurance world began in 2022, when I joined Boston Seguros as a surety bond issuer. After a year in that role, I moved into underwriting, where I learned to receive and analyze a piece of business and to understand it from the insurer’s point of view.',
+    nosotrosP2: 'In May 2024 I joined the surety underwriting team at Swiss Medical Seguros. There I deepened my training, picked up new concepts, and discovered how important it is to build solid business relationships and trust between underwriter and broker — something essential in this field.',
+    nosotrosP3: 'After several years on the insurers’ side, and having finished my insurance degree, I stepped over to the other side of the counter. Today I advise people independently on their insurance needs: I guide them, give them the best service and full transparency, and show them the best options on the market so they can delegate that responsibility and live with more peace of mind.',
+    cvRole: 'Insurance Advisor',
+    personasH2: 'Coverage for you and your family',
+    personasP: 'Choose what you need to protect and ask me for a straightforward quote.',
+    prodRetiroTitle: 'Retirement Insurance', prodRetiroDesc: 'Planned savings for your retirement, with tax benefits.',
+    prodVidaTitle: 'Life Insurance', prodVidaDesc: 'Financial protection for your family in case of the unexpected.',
+    prodCombinadoTitle: 'Homeowners Package', prodCombinadoDesc: 'Fire, theft and liability coverage for your home.',
+    prodCombinadoOptTitle: 'Homeowners Package',
+    prodMalaPraxisTitle: 'Malpractice Liability', prodMalaPraxisDesc: 'Professional coverage against claims related to your work.',
+    prodAutoTitle: 'Auto Insurance', prodAutoDesc: 'Third-party, extended third-party or full coverage for your vehicle.',
+    prodMotoTitle: 'Motorcycle Insurance', prodMotoDesc: 'Tailored coverage for your motorcycle or scooter.',
+    prodAPTitle: 'Personal Accident Insurance', prodAPDesc: 'Compensation for accidental disability or death.',
+    prodCaucionTitle: 'Surety Bond', prodCaucionDesc: 'Guarantees for rentals and construction projects.',
+    cotizarFlecha: 'Get a quote →',
+    simH2: 'Risk Simulator by Area',
+    simIntro: 'Enter your address and I’ll show you the most frequent risks in your area — theft, hail, flooding — to help you choose the right coverage before you need it.',
+    phDireccion: 'Your address or neighborhood', simConsultar: 'Check',
+    verMapaRiesgo: 'View risk map for your area',
+    empresasH2: 'Coverage for your business',
+    empresasP: 'Protection for your operations, your team and your assets. Ask me for a direct quote.',
+    prodARTTitle: 'Workers’ Compensation', prodARTDesc: 'Occupational risk coverage, compliant with current regulations.',
+    prodCaucionEmpTitle: 'Surety Bond', prodCaucionEmpDesc: 'Commercial, judicial and construction guarantees.',
+    prodCaucionEmpOptTitle: 'Surety Bond (business)',
+    prodTRTitle: 'All-Risk Operations Coverage', prodTRDesc: 'Comprehensive coverage for machinery, assets and facilities.',
+    prodRCTitle: 'General Liability', prodRCDesc: 'Protection against third-party claims related to your activity.',
+    prodRCOptTitle: 'General Liability (Business)',
+    prodTecnicoTitle: 'Technical/Engineering Insurance', prodTecnicoDesc: 'Coverage for equipment, installations and civil works.',
+    prodVidaColTitle: 'Group Life Insurance', prodVidaColDesc: 'Life insurance benefit for your entire team.',
+    prodAPEmpTitle: 'Personal Accident Insurance', prodAPEmpDesc: 'Coverage for your staff in case of accidents.',
+    prodAPEmpOptTitle: 'Personal Accident Insurance (Business)',
+    prodIntegralTitle: 'Commercial Package Insurance', prodIntegralDesc: 'Complete protection for your store: fire, theft and liability.',
+    refEyebrow: 'Referral Program', refH2: 'Refer me and you win too',
+    refP: 'Know someone who needs insurance? Refer them, and if they end up getting insured, you both win.',
+    ref1Title: 'You refer', ref1Desc: 'Tell me who needs insurance and how they’d prefer to be contacted.',
+    ref2Title: 'They get insured', ref2Desc: 'If that person takes out a policy with me, the referral becomes valid.',
+    ref3Title: 'You both win', ref3Desc: 'You get a bonus on your next renewal, and the referred person starts with preferential terms.',
+    refCta: 'I want to refer someone', refNote: '* Bonus percentage or amount to be defined.',
+    contactoEyebrow: 'Contact', contactoH2: 'Request your quote',
+    contactoP: 'Tell me what you need to insure and I’ll get back to you with concrete options, no obligation.',
+    horarioLV: 'Monday to Friday, 9am–6pm', respondoDia: 'I reply within the day',
+    conectemos: 'Let’s connect professionally', clickAgendar: 'Click to schedule a meeting — virtual or in person',
+    verEnMaps: 'View on Google Maps →',
+    labelNombre: 'Name', labelTelefono: 'Phone', labelCorreo: 'Email',
+    labelProducto: 'What would you like a quote for?', labelContanos: 'Tell us more',
+    phMensaje: 'Make, model, location — anything that helps me quote faster',
+    optgroupPersonas: 'Individuals', optgroupEmpresas: 'Businesses',
+    revisionGratisOpt: 'Free coverage review', otroOpt: 'Other',
+    solicitarCotizacion: 'Request quote',
+    footerTagline: 'Bringing you<br><b>security and peace of mind</b>',
+    footerContactanos: 'Contact us', footerDondeEstamos: 'Where we are',
+    footerCoordinar: 'Schedule a preliminary meeting', footerDerechos: 'All rights reserved',
+    footerSeguinos: 'Follow us',
+    footerBar: 'Licensed Insurance Advisor — License No. [pending] with the Argentine Insurance Regulator (SSN)',
+    rmTitle: 'Risk map for your area', rmSub: 'Illustrative estimate by area — not a live satellite map.',
+  };
+  const langToggle = document.getElementById('langToggle');
+  function setLang(lang) {
+    document.documentElement.lang = lang;
+    if (langToggle) {
+      langToggle.querySelectorAll('.lang-opt').forEach(o => o.classList.toggle('active', o.dataset.lang === lang));
+    }
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.getAttribute('data-i18n');
+      if (lang === 'en') {
+        if (el.dataset.esCache === undefined) el.dataset.esCache = el.innerHTML;
+        if (I18N_EN[key] !== undefined) el.innerHTML = I18N_EN[key];
+      } else if (el.dataset.esCache !== undefined) {
+        el.innerHTML = el.dataset.esCache;
+      }
+    });
+    document.querySelectorAll('[data-i18n-html]').forEach(el => {
+      const key = el.getAttribute('data-i18n-html');
+      if (lang === 'en') {
+        if (el.dataset.esCache === undefined) el.dataset.esCache = el.innerHTML;
+        if (I18N_EN[key] !== undefined) el.innerHTML = I18N_EN[key];
+      } else if (el.dataset.esCache !== undefined) {
+        el.innerHTML = el.dataset.esCache;
+      }
+    });
+    document.querySelectorAll('[data-i18n-ph]').forEach(el => {
+      const key = el.getAttribute('data-i18n-ph');
+      if (lang === 'en') {
+        if (el.dataset.esPh === undefined) el.dataset.esPh = el.placeholder;
+        if (I18N_EN[key] !== undefined) el.placeholder = I18N_EN[key];
+      } else if (el.dataset.esPh !== undefined) {
+        el.placeholder = el.dataset.esPh;
+      }
+    });
+    document.querySelectorAll('[data-i18n-attr]').forEach(el => {
+      el.getAttribute('data-i18n-attr').split(',').forEach(pair => {
+        const [attr, key] = pair.split(':').map(s => s.trim());
+        const cacheKey = 'esAttr_' + attr;
+        if (lang === 'en') {
+          if (el.dataset[cacheKey] === undefined) el.dataset[cacheKey] = el.getAttribute(attr) || '';
+          if (I18N_EN[key] !== undefined) el.setAttribute(attr, I18N_EN[key]);
+        } else if (el.dataset[cacheKey] !== undefined) {
+          el.setAttribute(attr, el.dataset[cacheKey]);
+        }
+      });
+    });
+    if (typeof updateWaFloatText === 'function') updateWaFloatText();
+  }
+  if (langToggle) {
+    langToggle.addEventListener('click', () => {
+      setLang(document.documentElement.lang === 'en' ? 'es' : 'en');
+    });
+  }
 
   const navToggle = document.getElementById('navToggle');
   const navLinks = document.getElementById('navLinks');
@@ -924,6 +1214,7 @@
     pageSections[key] = Array.from(document.querySelectorAll('[data-page="' + key + '"]'));
   });
 
+  let currentPageKey = 'inicio';
   function showPage(key, opts) {
     opts = opts || {};
     if (!pageSections[key]) return;
@@ -935,7 +1226,54 @@
     });
     if (!opts.skipScroll) window.scrollTo({ top: 0, behavior: 'auto' });
     history.replaceState(null, '', '#' + key);
+    currentPageKey = key;
+    updateWaFloatText();
   }
+
+  // WhatsApp float — texto pre-cargado distinto según la página activa, y en el idioma actual
+  const WA_TEXT_BY_PAGE = {
+    es: {
+      inicio: 'Hola Guido, quiero consultar por un seguro',
+      nosotros: 'Hola Guido, quiero saber más sobre vos y tus servicios',
+      personas: 'Hola Guido, quiero cotizar un seguro para mí',
+      empresas: 'Hola Guido, quiero cotizar un seguro para mi empresa',
+      referidos: 'Hola Guido, quiero referir a alguien',
+      contacto: 'Hola Guido, quiero pedir una cotización',
+    },
+    en: {
+      inicio: 'Hi Guido, I would like to ask about insurance',
+      nosotros: 'Hi Guido, I would like to know more about your services',
+      personas: 'Hi Guido, I would like a quote for myself',
+      empresas: 'Hi Guido, I would like a quote for my business',
+      referidos: 'Hi Guido, I would like to refer someone',
+      contacto: 'Hi Guido, I would like to request a quote',
+    },
+  };
+  const waFloat = document.getElementById('waFloat');
+  function updateWaFloatText() {
+    if (!waFloat) return;
+    const lang = document.documentElement.lang === 'en' ? 'en' : 'es';
+    const dict = WA_TEXT_BY_PAGE[lang] || WA_TEXT_BY_PAGE.es;
+    const text = dict[currentPageKey] || dict.inicio;
+    waFloat.href = 'https://wa.me/5491173669857?text=' + encodeURIComponent(text);
+  }
+  // Soft click sound (synthesized — no external audio file/network request needed)
+  function playWaSound() {
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type = 'sine';
+      o.frequency.setValueAtTime(720, ctx.currentTime);
+      o.frequency.exponentialRampToValueAtTime(420, ctx.currentTime + 0.12);
+      g.gain.setValueAtTime(0.0001, ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.12, ctx.currentTime + 0.01);
+      g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.18);
+      o.connect(g); g.connect(ctx.destination);
+      o.start(); o.stop(ctx.currentTime + 0.2);
+    } catch (e) { /* WebAudio unavailable — sound is best-effort, never blocks the click */ }
+  }
+  if (waFloat) waFloat.addEventListener('click', playWaSound);
 
   document.addEventListener('click', (e) => {
     const link = e.target.closest('a[href^="#"]');
@@ -1000,15 +1338,24 @@
   // Simulador de riesgo — resultado por zona (estimación propia, no un dato en vivo)
   // Nivel 1: partidos del GBA y grandes ciudades, con un resultado específico por zona.
   const riskZones = [
-    { match: ['quilmes'], text: 'el <b>28%</b> de los reclamos son por robo de auto y el <b>15%</b> por daños de granizo.', tip: 'Te recomiendo evaluar cobertura contra robo total/parcial y daños climáticos.' },
-    { match: ['caba', 'capital federal', 'ciudad de buenos aires', 'palermo', 'belgrano', 'recoleta', 'caballito', 'flores', 'almagro'], text: 'el <b>35%</b> de los reclamos son por robo/hurto y el <b>20%</b> por daños a terceros en la vía pública.', tip: 'Te recomiendo priorizar cobertura contra robo total/parcial y responsabilidad civil.' },
-    { match: ['la plata'], text: 'el <b>25%</b> de los reclamos son por inundación y el <b>22%</b> por granizo.', tip: 'Te recomiendo evaluar cobertura contra daños climáticos e inundación.' },
-    { match: ['avellaneda', 'lanús', 'lanus', 'lomas de zamora', 'banfield'], text: 'el <b>30%</b> de los reclamos son por robo de auto y el <b>17%</b> por incendio/daños eléctricos.', tip: 'Te recomiendo evaluar cobertura contra robo total/parcial e incendio.' },
-    { match: ['san isidro', 'vicente lópez', 'vicente lopez', 'tigre', 'san fernando', 'olivos', 'martinez', 'martínez'], text: 'el <b>26%</b> de los reclamos son por inundación (zonas costeras) y el <b>18%</b> por robo.', tip: 'Te recomiendo evaluar cobertura contra inundación y robo total/parcial.' },
-    { match: ['moreno', 'merlo', 'moron', 'morón', 'ituzaingó', 'ituzaingo', 'hurlingham'], text: 'el <b>32%</b> de los reclamos son por robo total y el <b>14%</b> por daños por granizo.', tip: 'Te recomiendo priorizar cobertura contra robo total/parcial.' },
-    { match: ['mar del plata'], text: 'el <b>24%</b> de los reclamos son por daños climáticos (viento y granizo) y el <b>16%</b> por robo.', tip: 'Te recomiendo evaluar cobertura contra daños climáticos.' },
-    { match: ['córdoba capital', 'cordoba capital', 'córdoba', 'cordoba'], text: 'el <b>27%</b> de los reclamos son por granizo y el <b>19%</b> por robo de auto.', tip: 'Te recomiendo priorizar cobertura contra granizo y robo total/parcial.' },
-    { match: ['rosario'], text: 'el <b>29%</b> de los reclamos son por robo de auto y el <b>16%</b> por daños a terceros.', tip: 'Te recomiendo evaluar cobertura contra robo total/parcial y responsabilidad civil.' },
+    { match: ['quilmes'], text: 'el <b>28%</b> de los reclamos son por robo de auto y el <b>15%</b> por daños de granizo.', tip: 'Te recomiendo evaluar cobertura contra robo total/parcial y daños climáticos.',
+      stats: [{ label: 'Robo de auto', pct: 28, type: 'robo' }, { label: 'Daños de granizo', pct: 15, type: 'granizo' }] },
+    { match: ['caba', 'capital federal', 'ciudad de buenos aires', 'palermo', 'belgrano', 'recoleta', 'caballito', 'flores', 'almagro'], text: 'el <b>35%</b> de los reclamos son por robo/hurto y el <b>20%</b> por daños a terceros en la vía pública.', tip: 'Te recomiendo priorizar cobertura contra robo total/parcial y responsabilidad civil.',
+      stats: [{ label: 'Robo/hurto', pct: 35, type: 'robo' }, { label: 'Daños a terceros en la vía pública', pct: 20, type: 'otros' }] },
+    { match: ['la plata'], text: 'el <b>25%</b> de los reclamos son por inundación y el <b>22%</b> por granizo.', tip: 'Te recomiendo evaluar cobertura contra daños climáticos e inundación.',
+      stats: [{ label: 'Inundación', pct: 25, type: 'inundacion' }, { label: 'Granizo', pct: 22, type: 'granizo' }] },
+    { match: ['avellaneda', 'lanús', 'lanus', 'lomas de zamora', 'banfield'], text: 'el <b>30%</b> de los reclamos son por robo de auto y el <b>17%</b> por incendio/daños eléctricos.', tip: 'Te recomiendo evaluar cobertura contra robo total/parcial e incendio.',
+      stats: [{ label: 'Robo de auto', pct: 30, type: 'robo' }, { label: 'Incendio/daños eléctricos', pct: 17, type: 'otros' }] },
+    { match: ['san isidro', 'vicente lópez', 'vicente lopez', 'tigre', 'san fernando', 'olivos', 'martinez', 'martínez'], text: 'el <b>26%</b> de los reclamos son por inundación (zonas costeras) y el <b>18%</b> por robo.', tip: 'Te recomiendo evaluar cobertura contra inundación y robo total/parcial.',
+      stats: [{ label: 'Inundación (zonas costeras)', pct: 26, type: 'inundacion' }, { label: 'Robo', pct: 18, type: 'robo' }] },
+    { match: ['moreno', 'merlo', 'moron', 'morón', 'ituzaingó', 'ituzaingo', 'hurlingham'], text: 'el <b>32%</b> de los reclamos son por robo total y el <b>14%</b> por daños por granizo.', tip: 'Te recomiendo priorizar cobertura contra robo total/parcial.',
+      stats: [{ label: 'Robo total', pct: 32, type: 'robo' }, { label: 'Daños por granizo', pct: 14, type: 'granizo' }] },
+    { match: ['mar del plata'], text: 'el <b>24%</b> de los reclamos son por daños climáticos (viento y granizo) y el <b>16%</b> por robo.', tip: 'Te recomiendo evaluar cobertura contra daños climáticos.',
+      stats: [{ label: 'Daños climáticos (viento y granizo)', pct: 24, type: 'granizo' }, { label: 'Robo', pct: 16, type: 'robo' }] },
+    { match: ['córdoba capital', 'cordoba capital', 'córdoba', 'cordoba'], text: 'el <b>27%</b> de los reclamos son por granizo y el <b>19%</b> por robo de auto.', tip: 'Te recomiendo priorizar cobertura contra granizo y robo total/parcial.',
+      stats: [{ label: 'Granizo', pct: 27, type: 'granizo' }, { label: 'Robo de auto', pct: 19, type: 'robo' }] },
+    { match: ['rosario'], text: 'el <b>29%</b> de los reclamos son por robo de auto y el <b>16%</b> por daños a terceros.', tip: 'Te recomiendo evaluar cobertura contra robo total/parcial y responsabilidad civil.',
+      stats: [{ label: 'Robo de auto', pct: 29, type: 'robo' }, { label: 'Daños a terceros', pct: 16, type: 'otros' }] },
   ];
 
   // Nivel 2: el resto del país, agrupado por región — no es un dato hiperlocal, es un
@@ -1016,22 +1363,28 @@
   const riskRegions = [
     { name: 'Cuyo', match: ['mendoza', 'san juan', 'san luis', 'san rafael', 'godoy cruz'],
       text: 'los riesgos más comunes en tu región son <b>sismo</b> y <b>granizo</b> (tormentas de verano en la zona serrana).',
-      tip: 'Te recomiendo evaluar cobertura contra granizo y una cláusula de riesgo sísmico si corresponde.' },
+      tip: 'Te recomiendo evaluar cobertura contra granizo y una cláusula de riesgo sísmico si corresponde.',
+      chips: ['Sismo', 'Granizo'] },
     { name: 'Litoral / NEA', match: ['santa fe', 'paraná', 'parana', 'entre ríos', 'entre rios', 'concordia', 'gualeguaychú', 'corrientes', 'resistencia', 'chaco', 'formosa', 'posadas', 'misiones', 'santo tomé'],
       text: 'los riesgos más comunes en tu región son <b>inundación</b> por crecida de ríos y <b>daños eléctricos por tormenta</b>.',
-      tip: 'Te recomiendo priorizar cobertura contra inundación y daños eléctricos.' },
+      tip: 'Te recomiendo priorizar cobertura contra inundación y daños eléctricos.',
+      chips: ['Inundación', 'Daños eléctricos por tormenta'] },
     { name: 'NOA', match: ['salta', 'jujuy', 'tucumán', 'tucuman', 'santiago del estero', 'catamarca', 'la rioja'],
       text: 'los riesgos más comunes en tu región son <b>granizo</b> y <b>tormentas de verano</b>.',
-      tip: 'Te recomiendo priorizar cobertura contra granizo y daños climáticos.' },
+      tip: 'Te recomiendo priorizar cobertura contra granizo y daños climáticos.',
+      chips: ['Granizo', 'Tormentas de verano'] },
     { name: 'Patagonia', match: ['neuquén', 'neuquen', 'río negro', 'rio negro', 'bariloche', 'viedma', 'chubut', 'rawson', 'trelew', 'comodoro rivadavia', 'santa cruz', 'río gallegos', 'rio gallegos', 'tierra del fuego', 'ushuaia', 'río grande'],
       text: 'los riesgos más comunes en tu región son <b>viento fuerte</b> y <b>daños por nieve/heladas</b> en temporada.',
-      tip: 'Te recomiendo evaluar cobertura contra daños climáticos (viento y nieve).' },
+      tip: 'Te recomiendo evaluar cobertura contra daños climáticos (viento y nieve).',
+      chips: ['Viento fuerte', 'Nieve/heladas'] },
     { name: 'Costa atlántica bonaerense', match: ['pinamar', 'villa gesell', 'necochea', 'bahía blanca', 'bahia blanca', 'tandil'],
       text: 'los riesgos más comunes en tu región son <b>temporales/viento</b> y <b>robo</b> en temporada alta.',
-      tip: 'Te recomiendo evaluar cobertura contra daños climáticos y robo total/parcial.' },
+      tip: 'Te recomiendo evaluar cobertura contra daños climáticos y robo total/parcial.',
+      chips: ['Temporales/viento', 'Robo (temporada alta)'] },
     { name: 'Buenos Aires / La Pampa (región pampeana)', match: ['buenos aires', 'provincia de buenos aires', 'gba', 'conurbano', 'la pampa', 'santa rosa'],
       text: 'los riesgos más comunes en tu región son <b>robo de auto</b> y <b>granizo</b>.',
-      tip: 'Te recomiendo evaluar cobertura contra robo total/parcial y daños climáticos.' },
+      tip: 'Te recomiendo evaluar cobertura contra robo total/parcial y daños climáticos.',
+      chips: ['Robo de auto', 'Granizo'] },
   ];
 
   const simForm = document.getElementById('simForm');
@@ -1057,6 +1410,58 @@
       }
       simResult.classList.add('show');
       simResult.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    });
+  }
+
+  // Mapa de riesgos de tu zona (modal) — estimación ilustrativa por zona, reutiliza
+  // los mismos datos del simulador de arriba pero mostrados como barras/chips de riesgo.
+  // No es un mapa satelital/leaflet real: este sitio no hace pedidos de red a servicios
+  // de mapas de terceros, así que en vez de tiles mostramos los datos de forma visual.
+  const riskMapBackdrop = document.getElementById('riskMapBackdrop');
+  const riskMapForm = document.getElementById('riskMapForm');
+  const riskMapResult = document.getElementById('riskMapResult');
+  const openRiskMapBtn = document.getElementById('openRiskMapBtn');
+  const riskMapClose = document.getElementById('riskMapClose');
+  const riskMapAddress = document.getElementById('riskMapAddress');
+
+  function renderRiskMapResult(input) {
+    const normalized = input.toLowerCase();
+    const zone = riskZones.find(z => z.match.some(name => normalized.includes(name)));
+    const region = !zone && riskRegions.find(r => r.match.some(name => normalized.includes(name)));
+    if (zone) {
+      const max = Math.max(...zone.stats.map(s => s.pct));
+      riskMapResult.innerHTML = zone.stats.map(s => `
+        <div class="rm-bar-row">
+          <div class="rm-bar-label"><span>${s.label}</span><span>${s.pct}%</span></div>
+          <div class="rm-bar-track"><div class="rm-bar-fill ${s.type}" style="width:${Math.round(s.pct / max * 100)}%;"></div></div>
+        </div>`).join('')
+        + `<span class="rm-fine">* Estimación propia por zona — no proviene de un dato en vivo. Para un análisis exacto de tu dirección, escribime por WhatsApp.</span>
+           <a class="btn btn-wine rm-cta" target="_blank" rel="noopener" href="https://wa.me/5491173669857?text=${encodeURIComponent('Hola Guido, quiero un análisis exacto de riesgo para mi dirección: ' + input)}">Escribime por WhatsApp</a>`;
+    } else if (region) {
+      riskMapResult.innerHTML = `<p style="font-size:13.5px;margin-bottom:10px;">Región: <b>${region.name}</b></p>
+        <div class="rm-chip-row">${region.chips.map(c => `<span class="rm-chip">${c}</span>`).join('')}</div>
+        <span class="rm-fine">* Patrón general de la región, no un dato hiperlocal — para un análisis exacto de tu dirección, escribime por WhatsApp.</span>
+        <a class="btn btn-wine rm-cta" target="_blank" rel="noopener" href="https://wa.me/5491173669857?text=${encodeURIComponent('Hola Guido, quiero un análisis exacto de riesgo para mi dirección: ' + input)}">Escribime por WhatsApp</a>`;
+    } else {
+      riskMapResult.innerHTML = `<p class="rm-empty">Todavía no tengo datos cargados para "<b>${input}</b>" en particular. Escribime tu dirección por WhatsApp y te cuento los riesgos típicos de tu zona.</p>
+        <a class="btn btn-wine rm-cta" target="_blank" rel="noopener" href="https://wa.me/5491173669857?text=${encodeURIComponent('Hola Guido, quiero saber los riesgos típicos de mi zona: ' + input)}">Escribime por WhatsApp</a>`;
+    }
+  }
+  function openRiskMap() {
+    if (!riskMapBackdrop) return;
+    riskMapAddress.value = (document.getElementById('simAddress') || {}).value || '';
+    riskMapResult.innerHTML = '';
+    riskMapBackdrop.hidden = false;
+  }
+  function closeRiskMap() { if (riskMapBackdrop) riskMapBackdrop.hidden = true; }
+  if (openRiskMapBtn) openRiskMapBtn.addEventListener('click', openRiskMap);
+  if (riskMapClose) riskMapClose.addEventListener('click', closeRiskMap);
+  if (riskMapBackdrop) riskMapBackdrop.addEventListener('click', (e) => { if (e.target === riskMapBackdrop) closeRiskMap(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeRiskMap(); });
+  if (riskMapForm) {
+    riskMapForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      renderRiskMapResult(riskMapAddress.value.trim());
     });
   }
 

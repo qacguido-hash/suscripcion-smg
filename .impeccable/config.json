@@ -11,6 +11,14 @@
         ],
         "createdAt": "2026-09-03T18:11:27.208Z",
         "reason": "user confirmed: explicitly requested a logo slider ('Debe ser un logo slider digamos') for the aseguradoras section, matching the auto-scrolling carousel pattern on the reference site (Alcion); pauses on hover, brand-logo content not reading content"
+      },
+      {
+        "rule": "broken-image",
+        "value": "*",
+        "files": [
+          "guido-bonifati-landing/index.html"
+        ],
+        "createdAt": "2026-09-11T02:35:27.679Z"
       }
     ]
   }
