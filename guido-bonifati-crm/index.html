@@ -136,6 +136,29 @@
   .bar-row .val{width:56px;text-align:right;flex-shrink:0;color:var(--muted);font-variant-numeric:tabular-nums;}
   .empty{color:var(--muted);font-size:13px;padding:18px 0;text-align:center;}
 
+  /* Mapa de cartera (esquemático) */
+  .arg-map{display:grid;grid-template-columns:repeat(6,1fr);grid-auto-rows:34px;gap:4px;max-width:340px;margin:0 auto 4px;}
+  .arg-tile{
+    border-radius:5px;background:var(--surface2);border:1px solid var(--border);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    cursor:pointer;transition:transform .1s,box-shadow .1s;padding:2px;overflow:hidden;
+  }
+  .arg-tile:hover{transform:scale(1.06);box-shadow:0 2px 8px rgba(40,55,70,0.18);z-index:2;position:relative;}
+  .arg-tile.selected{outline:2px solid var(--blue);outline-offset:1px;}
+  .arg-tile .abbr{font-size:9px;font-weight:700;letter-spacing:.3px;line-height:1;}
+  .arg-tile .n{font-size:10px;line-height:1.2;font-variant-numeric:tabular-nums;}
+  .arg-tile.empty-zone .abbr,.arg-tile.empty-zone .n{color:var(--muted);}
+  .arg-tile.has-data .abbr,.arg-tile.has-data .n{color:#fff;}
+  .arg-map-legend{display:flex;align-items:center;justify-content:center;gap:14px;font-size:11px;color:var(--muted);margin-bottom:10px;flex-wrap:wrap;}
+  .arg-map-legend .sw{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:4px;vertical-align:-1px;}
+  #mapDetail{border-top:1px solid var(--border);padding-top:12px;margin-top:4px;}
+  #mapDetail .empty{padding:8px 0;}
+
+  /* Backups */
+  .backup-row{display:flex;justify-content:space-between;align-items:center;gap:10px;border-bottom:1px solid var(--border);padding:9px 0;font-size:12.5px;}
+  .backup-row:last-child{border-bottom:none;}
+  .backup-row .meta{color:var(--muted);}
+
   /* Tables / lists */
   .toolbar{display:flex;gap:10px;align-items:center;margin-bottom:14px;flex-wrap:wrap;}
   .toolbar input[type="search"],.toolbar select{
@@ -442,6 +465,12 @@
     if (isNaN(dt)) return d;
     return dt.toLocaleDateString('es-AR', { day:'2-digit', month:'2-digit', year:'numeric' });
   }
+  function fmtDateTime(iso){
+    if (!iso) return '—';
+    const dt = new Date(iso);
+    if (isNaN(dt)) return iso;
+    return dt.toLocaleString('es-AR', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
+  }
   function daysUntil(d){
     if (!d) return null;
     const today = new Date(); today.setHours(0,0,0,0);
@@ -454,6 +483,7 @@
   /* ---------- State ---------- */
   const state = {
     clients: [], policies: [], quotes: [], tasks: [], interactions: [], documents: [], claims: [], insurers: [],
+    backups: [],
   };
   let db = null;
   let currentTab = 'dashboard';
@@ -461,6 +491,75 @@
   let cobPaymentFilter = '';
   let cobSearch = '';
   let goals = { monthlyPremiumGoal: 0, monthlyPolicyGoal: 0 };
+  let backupMeta = { lastBackupAt: null, lastBackupAuto: false };
+  let selectedMapProvince = null;
+
+  /* ---------- Mapa de cartera (esquemático por provincia) ---------- */
+  const PROVINCES = [
+    { key:'jujuy', label:'Jujuy', abbr:'JY', col:2, row:1 },
+    { key:'salta', label:'Salta', abbr:'SA', col:3, row:1 },
+    { key:'formosa', label:'Formosa', abbr:'FM', col:5, row:1 },
+    { key:'misiones', label:'Misiones', abbr:'MN', col:6, row:2 },
+    { key:'catamarca', label:'Catamarca', abbr:'CT', col:2, row:2 },
+    { key:'tucuman', label:'Tucumán', abbr:'TU', col:3, row:2 },
+    { key:'chaco', label:'Chaco', abbr:'CH', col:4, row:2 },
+    { key:'santiago', label:'Santiago del Estero', abbr:'SE', col:3, row:3 },
+    { key:'corrientes', label:'Corrientes', abbr:'CR', col:5, row:3 },
+    { key:'larioja', label:'La Rioja', abbr:'LR', col:2, row:3 },
+    { key:'sanjuan', label:'San Juan', abbr:'SJ', col:1, row:4 },
+    { key:'cordoba', label:'Córdoba', abbr:'CB', col:3, row:4 },
+    { key:'santafe', label:'Santa Fe', abbr:'SF', col:4, row:4 },
+    { key:'entrerios', label:'Entre Ríos', abbr:'ER', col:5, row:4 },
+    { key:'mendoza', label:'Mendoza', abbr:'MZ', col:1, row:5 },
+    { key:'sanluis', label:'San Luis', abbr:'SL', col:2, row:5 },
+    { key:'buenosaires', label:'Buenos Aires', abbr:'BA', col:4, row:5 },
+    { key:'caba', label:'CABA', abbr:'CABA', col:5, row:5 },
+    { key:'lapampa', label:'La Pampa', abbr:'LP', col:2, row:6 },
+    { key:'neuquen', label:'Neuquén', abbr:'NQ', col:1, row:6 },
+    { key:'rionegro', label:'Río Negro', abbr:'RN', col:2, row:7 },
+    { key:'chubut', label:'Chubut', abbr:'CU', col:2, row:8 },
+    { key:'santacruz', label:'Santa Cruz', abbr:'SC', col:2, row:9 },
+    { key:'tierradelfuego', label:'Tierra del Fuego', abbr:'TF', col:2, row:10 },
+  ];
+  const LOCALITY_TO_PROVINCE = {
+    'caba':'caba','capital federal':'caba','ciudad autonoma de buenos aires':'caba','ciudad de buenos aires':'caba',
+    'la plata':'buenosaires','mar del plata':'buenosaires','bahia blanca':'buenosaires','tandil':'buenosaires',
+    'quilmes':'buenosaires','lomas de zamora':'buenosaires','san isidro':'buenosaires','tigre':'buenosaires',
+    'moron':'buenosaires','avellaneda':'buenosaires','pilar':'buenosaires','escobar':'buenosaires','lanus':'buenosaires',
+    'banfield':'buenosaires','olavarria':'buenosaires','junin':'buenosaires','necochea':'buenosaires',
+    'zarate':'buenosaires','campana':'buenosaires','chascomus':'buenosaires','moreno':'buenosaires',
+    'merlo':'buenosaires','san justo':'buenosaires','ramos mejia':'buenosaires','vicente lopez':'buenosaires',
+    'cordoba':'cordoba','villa carlos paz':'cordoba','rio cuarto':'cordoba','villa maria':'cordoba','alta gracia':'cordoba',
+    'rosario':'santafe','santa fe':'santafe','rafaela':'santafe','venado tuerto':'santafe','reconquista':'santafe',
+    'mendoza':'mendoza','san rafael':'mendoza','godoy cruz':'mendoza','lujan de cuyo':'mendoza','maipu':'mendoza',
+    'tucuman':'tucuman','san miguel de tucuman':'tucuman','tafi viejo':'tucuman','yerba buena':'tucuman',
+    'salta':'salta','tartagal':'salta','oran':'salta',
+    'parana':'entrerios','concordia':'entrerios','gualeguaychu':'entrerios','concepcion del uruguay':'entrerios',
+    'resistencia':'chaco','presidencia roque saenz peña':'chaco','saenz peña':'chaco',
+    'corrientes':'corrientes','goya':'corrientes',
+    'posadas':'misiones','puerto iguazu':'misiones','obera':'misiones','eldorado':'misiones',
+    'san juan':'sanjuan','rivadavia':'sanjuan',
+    'san luis':'sanluis','villa mercedes':'sanluis',
+    'santiago del estero':'santiago','la banda':'santiago',
+    'catamarca':'catamarca','san fernando del valle de catamarca':'catamarca',
+    'la rioja':'larioja','chilecito':'larioja',
+    'jujuy':'jujuy','san salvador de jujuy':'jujuy',
+    'formosa':'formosa',
+    'neuquen':'neuquen','cutral co':'neuquen','plottier':'neuquen',
+    'bariloche':'rionegro','san carlos de bariloche':'rionegro','viedma':'rionegro','cipolletti':'rionegro','general roca':'rionegro',
+    'trelew':'chubut','comodoro rivadavia':'chubut','puerto madryn':'chubut','esquel':'chubut','rawson':'chubut',
+    'rio gallegos':'santacruz','caleta olivia':'santacruz','el calafate':'santacruz',
+    'ushuaia':'tierradelfuego','rio grande':'tierradelfuego',
+    'santa rosa':'lapampa','general pico':'lapampa',
+  };
+  function normalizeLocality(s){
+    return String(s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').trim();
+  }
+  function inferProvince(client){
+    if (!client) return null;
+    if (client.province) return client.province;
+    return LOCALITY_TO_PROVINCE[normalizeLocality(client.locality)] || null;
+  }
 
   function clientName(id){
     const c = state.clients.find(c => c.id === id);
@@ -862,6 +961,66 @@
 
     const upcomingTasks = openTasks.slice().sort((a,b)=>(a.dueDate||'9999').localeCompare(b.dueDate||'9999')).slice(0,6);
 
+    const mapCounts = {};
+    activePolicies.forEach(p => {
+      const c = state.clients.find(x => x.id === p.clientId);
+      const prov = inferProvince(c);
+      if (!prov) return;
+      if (!mapCounts[prov]) mapCounts[prov] = { clients: new Set(), policies: 0 };
+      mapCounts[prov].clients.add(p.clientId);
+      mapCounts[prov].policies++;
+    });
+    const mapMax = Math.max(1, ...PROVINCES.map(p => (mapCounts[p.key]||{policies:0}).policies));
+    const mapUnmapped = state.clients.filter(c => !inferProvince(c)).length;
+    function portfolioMapHtml(){
+      const tiles = PROVINCES.map(p => {
+        const d = mapCounts[p.key];
+        const has = !!(d && d.policies > 0);
+        const opacity = has ? (0.35 + 0.65*(d.policies/mapMax)) : 0;
+        const style = `grid-column:${p.col};grid-row:${p.row};` + (has ? `background:rgba(52,80,107,${opacity.toFixed(2)});border-color:rgba(52,80,107,${opacity.toFixed(2)});` : '');
+        const tip = has ? `${p.label}: ${d.policies} pólizas · ${d.clients.size} clientes` : `${p.label}: sin cartera`;
+        return `<div class="arg-tile ${has?'has-data':'empty-zone'} ${selectedMapProvince===p.key?'selected':''}" data-prov="${esc(p.key)}" style="${style}" title="${esc(tip)}">
+          <span class="abbr">${esc(p.abbr)}</span><span class="n">${has ? d.policies : '—'}</span>
+        </div>`;
+      }).join('');
+      return `
+        <div class="arg-map">${tiles}</div>
+        <div class="arg-map-legend">
+          <span><span class="sw" style="background:rgba(52,80,107,0.85);"></span>Con cartera</span>
+          <span><span class="sw" style="background:var(--surface2);border:1px solid var(--border);"></span>Sin cartera</span>
+        </div>
+        ${mapUnmapped ? `<p class="empty" style="padding:0 0 10px;font-size:11.5px;">${mapUnmapped} cliente${mapUnmapped===1?'':'s'} sin provincia/localidad reconocida — completá "Provincia" en su ficha para verlo${mapUnmapped===1?'':'s'} en el mapa.</p>` : ''}
+        <div id="mapDetail">${mapDetailHtml()}</div>
+      `;
+    }
+    function mapDetailHtml(){
+      if (!selectedMapProvince) return '<p class="empty">Tocá una provincia para ver el detalle.</p>';
+      const prov = PROVINCES.find(p => p.key === selectedMapProvince);
+      const d = mapCounts[selectedMapProvince];
+      if (!prov) return '';
+      if (!d || !d.policies) return `<p class="empty">${esc(prov.label)}: sin cartera vigente todavía.</p>`;
+      const clients = Array.from(d.clients).map(id => state.clients.find(c => c.id === id)).filter(Boolean);
+      return `
+        <h3 style="font-size:13px;font-weight:600;margin-bottom:8px;color:var(--text);">${esc(prov.label)} — ${d.policies} pólizas vigentes · ${d.clients.size} clientes</h3>
+        ${clients.map(c => `<div class="kv" style="padding:4px 0;font-size:12.5px;border-bottom:1px solid var(--border);"><span>${esc(c.name)}${c.locality?' · '+esc(c.locality):''}</span><span class="badge badge-muted">${activePolicies.filter(p=>p.clientId===c.id).length} pól.</span></div>`).join('')}
+      `;
+    }
+    function backupPanelHtml(){
+      const recent = state.backups.slice().sort((a,b)=>(b.createdAt||'').localeCompare(a.createdAt||'')).slice(0,8);
+      return `
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+          <h2 style="margin-bottom:0;">Copias de seguridad</h2>
+          <button class="btn btn-sm btn-outline" id="createBackupBtn">Crear backup</button>
+        </div>
+        <p class="empty" style="text-align:left;padding:6px 0 10px;font-size:11.5px;">Último backup: ${esc(backupMeta.lastBackupAt ? fmtDateTime(backupMeta.lastBackupAt) : 'nunca')}${backupMeta.lastBackupAt ? (backupMeta.lastBackupAuto ? ' (automático)' : ' (manual)') : ''}. Se revisa solo al abrir el CRM y cada hora mientras lo tengas abierto en el navegador (no hay un servidor propio corriendo un cron 24/7); si pasaron más de 24 hs desde el último, se crea uno nuevo en la base del CRM, aparte del respaldo JSON que descargás vos.</p>
+        ${recent.length ? recent.map(b => `
+          <div class="backup-row">
+            <span>${esc(fmtDateTime(b.createdAt))} <span class="badge badge-muted" style="margin-left:6px;">${b.auto?'auto':'manual'}</span></span>
+            <span class="row-actions"><button class="btn btn-sm btn-outline backup-dl" data-id="${esc(b.id)}">Descargar</button></span>
+          </div>`).join('') : '<p class="empty">Todavía no hay backups guardados en la base.</p>'}
+      `;
+    }
+
     el.innerHTML = `
       <div class="page-head">
         <div>
@@ -893,6 +1052,14 @@
         ${hasUSD ? `<div class="stat-card"><b>${fmtMoney(totalPremiumUSD,'USD')}</b><span>Prima total cartera (USD)</span></div>` : ''}
         <div class="stat-card"><b style="color:var(--danger);">${inArrears.length}</b><span>Pólizas en mora</span></div>
         <div class="stat-card"><b>${pendingQuotes.length}</b><span>Cotizaciones abiertas</span></div>
+      </div>
+      <div class="panel">
+        <h2>Mapa de cartera</h2>
+        <p class="empty" style="text-align:left;padding:0 0 10px;font-size:11.5px;">Vista esquemática por provincia (no es un mapa geográfico real: este CRM no hace pedidos de red a servicios de mapas de terceros). El color indica pólizas vigentes; tocá una provincia para ver el detalle.</p>
+        ${portfolioMapHtml()}
+      </div>
+      <div class="panel">
+        ${backupPanelHtml()}
       </div>
       <div class="dash-grid">
         <div>
@@ -939,6 +1106,12 @@
     `;
     el.querySelector('#exportBtn').addEventListener('click', exportBackup);
     el.querySelector('#editGoalsBtn').addEventListener('click', openGoalsForm);
+    el.querySelectorAll('.arg-tile').forEach(t => t.addEventListener('click', () => {
+      selectedMapProvince = selectedMapProvince === t.dataset.prov ? null : t.dataset.prov;
+      renderDashboard();
+    }));
+    el.querySelector('#createBackupBtn').addEventListener('click', () => createBackup(false));
+    el.querySelectorAll('.backup-dl').forEach(b => b.addEventListener('click', () => downloadBackup(b.dataset.id)));
   }
   function openGoalsForm(){
     openModal('Meta del mes', `
@@ -965,6 +1138,79 @@
       await downloads.save({ filename: `crm-guido-bonifati-respaldo-${new Date().toISOString().slice(0,10)}.json`, data: json });
       toast('Respaldo descargado.');
     } catch (e) { if (e && e.code !== 'declined') toast('No se pudo generar el respaldo.'); }
+  }
+
+  const BACKUP_CHUNK_CHARS = 250000;
+  const BACKUPS_TO_KEEP = 30;
+  async function createBackup(auto){
+    if (!db) return;
+    try {
+      const dump = {
+        exportedAt: new Date().toISOString(),
+        clients: state.clients, policies: state.policies, quotes: state.quotes,
+        tasks: state.tasks, interactions: state.interactions, documents: state.documents, claims: state.claims,
+        insurers: state.insurers, goals,
+      };
+      const json = JSON.stringify(dump);
+      const createdAt = new Date().toISOString();
+      let ref;
+      if (json.length <= BACKUP_CHUNK_CHARS){
+        ref = await db.collection('backups').add({ createdAt, auto: !!auto, size: json.length, chunked: false, data: json });
+      } else {
+        ref = await db.collection('backups').add({ createdAt, auto: !!auto, size: json.length, chunked: true, chunkCount: 0 });
+        const total = Math.ceil(json.length / BACKUP_CHUNK_CHARS);
+        for (let i = 0; i < total; i++){
+          await db.collection('backupChunks').add({ backupId: ref.id, index: i, data: json.slice(i*BACKUP_CHUNK_CHARS, (i+1)*BACKUP_CHUNK_CHARS) });
+        }
+        await db.collection('backups').doc(ref.id).update({ chunkCount: total });
+      }
+      backupMeta = { lastBackupAt: createdAt, lastBackupAuto: !!auto };
+      await db.doc('settings/backupMeta').set(backupMeta);
+      await pruneOldBackups();
+      if (!auto) toast('Backup creado.');
+    } catch (e) {
+      console.error('createBackup', e);
+      if (!auto) toast('No se pudo crear el backup.');
+    }
+  }
+  async function pruneOldBackups(){
+    const sorted = state.backups.slice().sort((a,b) => (b.createdAt||'').localeCompare(a.createdAt||''));
+    const toDelete = sorted.slice(BACKUPS_TO_KEEP);
+    for (const b of toDelete){
+      try {
+        if (b.chunked){
+          const snap = await db.collection('backupChunks').where('backupId','==',b.id).get();
+          for (const s of snap.docs){ await db.collection('backupChunks').doc(s.id).delete(); }
+        }
+        await db.collection('backups').doc(b.id).delete();
+      } catch (e) { console.error('pruneOldBackups', e); }
+    }
+  }
+  async function downloadBackup(id){
+    const b = state.backups.find(x => x.id === id);
+    if (!b) return;
+    let json;
+    try {
+      if (b.chunked){
+        const snap = await db.collection('backupChunks').where('backupId','==',id).orderBy('index').get();
+        json = snap.docs.map(s => s.data().data).join('');
+      } else {
+        json = b.data;
+      }
+    } catch (e) { toast('No se pudo leer ese backup.'); return; }
+    const downloads = await claude.use('downloads');
+    if (!downloads){ toast('La descarga no está disponible en esta vista.'); return; }
+    try {
+      await downloads.save({ filename: `crm-guido-bonifati-backup-${(b.createdAt||'').replace(/[:.]/g,'-')}.json`, data: json });
+      toast('Backup descargado.');
+    } catch (e) { if (e && e.code !== 'declined') toast('No se pudo descargar el backup.'); }
+  }
+  async function checkAutoBackup(){
+    if (!db) return;
+    const last = backupMeta.lastBackupAt ? new Date(backupMeta.lastBackupAt).getTime() : 0;
+    if (Date.now() - last > 24 * 3600 * 1000){
+      await createBackup(true);
+    }
   }
 
   function csvCell(v){
@@ -1035,6 +1281,7 @@
         const iPhone = idx('teléfono') >= 0 ? idx('teléfono') : idx('telefono');
         const iAddr = idx('dirección') >= 0 ? idx('dirección') : idx('direccion');
         const iLocality = idx('localidad');
+        const iProvince = idx('provincia');
         const iBday = idx('cumpleaños') >= 0 ? idx('cumpleaños') : idx('cumpleanos');
         const iTags = idx('etiquetas'), iNotes = idx('notas');
         if (iName < 0){ summary.textContent = 'Falta la columna "Nombre".'; return; }
@@ -1050,6 +1297,7 @@
             name, type: iType >= 0 && (r[iType]||'').trim().toLowerCase() === 'empresa' ? 'empresa' : 'persona',
             docId, email: iEmail>=0?(r[iEmail]||'').trim():'', phone: iPhone>=0?(r[iPhone]||'').trim():'',
             address: iAddr>=0?(r[iAddr]||'').trim():'', locality: iLocality>=0?(r[iLocality]||'').trim():'',
+            province: iProvince>=0 ? (PROVINCES.find(p => p.label.toLowerCase() === (r[iProvince]||'').trim().toLowerCase())||{}).key || '' : '',
             birthday: iBday>=0?(r[iBday]||'').trim():'',
             tags: iTags>=0 ? (r[iTags]||'').split(';').map(s=>s.trim()).filter(Boolean) : [],
             notes: iNotes>=0?(r[iNotes]||'').trim():'', createdAt: new Date().toISOString(),
@@ -1245,11 +1493,15 @@
       </div>
       <div class="field-row">
         <div class="field"><label>Localidad</label><input name="locality" placeholder="Ej: Mar del Plata" value="${esc(c.locality||'')}"></div>
-        <div class="field"><label>Medio de pago</label><select name="paymentMethod">
-          <option value="">—</option>
-          ${PAYMENT_METHODS.map(m => `<option value="${esc(m)}" ${c.paymentMethod===m?'selected':''}>${esc(m)}</option>`).join('')}
+        <div class="field"><label>Provincia</label><select name="province">
+          <option value="">— Sin especificar —</option>
+          ${PROVINCES.map(p => `<option value="${esc(p.key)}" ${c.province===p.key?'selected':''}>${esc(p.label)}</option>`).join('')}
         </select></div>
       </div>
+      <div class="field"><label>Medio de pago</label><select name="paymentMethod">
+        <option value="">—</option>
+        ${PAYMENT_METHODS.map(m => `<option value="${esc(m)}" ${c.paymentMethod===m?'selected':''}>${esc(m)}</option>`).join('')}
+      </select></div>
       <div class="field"><label>Recomendado por</label><select name="referredBy">
         <option value="">— Nadie / no sabe —</option>
         ${clientOptions(c.referredBy, existing ? existing.id : null)}
@@ -2748,7 +3000,7 @@
       </div>
       <div class="panel">
         <h2>Distribución por localidad</h2>
-        <p class="sub" style="margin-bottom:8px;">Cargá la localidad en cada cliente para ver esta distribución. No es un mapa geográfico real: dibujar un mapa con calles requeriría un servicio externo de mapas que este CRM no puede llamar (por seguridad, no hace pedidos de red a servicios de terceros).</p>
+        <p class="sub" style="margin-bottom:8px;">Cargá la localidad en cada cliente para ver esta distribución. Para una vista por provincia con mapa esquemático, mirá el panel "Mapa de cartera" en el Dashboard.</p>
         ${localityRows.length ? localityRows.map(([name,val]) => `<div class="bar-row"><span class="label">${esc(name)}</span><span class="bar-track"><span class="bar-fill" style="width:${Math.round(val/(localityRows[0][1]||1)*100)}%"></span></span><span class="val">${val}</span></div>`).join('') : '<p class="empty">Todavía no cargaste localidades.</p>'}
       </div>
     `;
@@ -2906,7 +3158,7 @@
     const cols = [
       ['clients','clients'], ['policies','policies'], ['quotes','quotes'],
       ['tasks','tasks'], ['interactions','interactions'], ['documents','documents'], ['claims','claims'],
-      ['insurers','insurers'],
+      ['insurers','insurers'], ['backups','backups'],
     ];
     cols.forEach(([path, key]) => {
       db.collection(path).onSnapshot(snap => {
@@ -2921,6 +3173,11 @@
       goals = Object.assign({ monthlyPremiumGoal:0, monthlyPolicyGoal:0 }, snap.exists ? snap.data() : {});
       renderCurrentTab();
     }, err => console.error('goals', err));
+    db.doc('settings/backupMeta').onSnapshot(snap => {
+      backupMeta = Object.assign({ lastBackupAt:null, lastBackupAuto:false }, snap.exists ? snap.data() : {});
+      renderCurrentTab();
+      checkAutoBackup();
+    }, err => console.error('backupMeta', err));
   }
   function setSyncStatus(cls, label){
     document.getElementById('syncDot').className = 'sync-dot ' + cls;
@@ -2944,6 +3201,7 @@
     }
     setSyncStatus('ok', 'Sincronizado');
     subscribeAll();
+    setInterval(checkAutoBackup, 60 * 60 * 1000);
   }
 
   boot();
