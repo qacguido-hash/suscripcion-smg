@@ -1476,7 +1476,7 @@
   }
   function openImportProspectsForm(){
     const backdrop = openModal('Importar contactos de prospección (CSV)', `
-      <p class="sub" style="margin-bottom:10px;">Columnas esperadas (en cualquier orden): Nombre (o "Inmobiliaria"), Zona, WhatsApp/Telefono, Email, Via de contacto, Estado, Notas.</p>
+      <p class="sub" style="margin-bottom:10px;">Columnas esperadas (en cualquier orden): Nombre (o "Inmobiliaria"), Zona, WhatsApp/Telefono, Email, Via de contacto, Estado, Notas. Si un nombre ya existe en la base, se actualiza con los datos de este archivo (no se duplica).</p>
       <div class="field"><label>Categoría para todos los contactos de este archivo</label><select id="importCategory">${PROSPECT_CATEGORIES.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('')}</select></div>
       <div class="field"><input type="file" id="importFile" accept=".csv,text/csv"></div>
       <p id="importSummary" class="sub" style="margin-top:10px;"></p>
@@ -1501,29 +1501,35 @@
         const iStatus = idx('estado');
         const iNotes = idx('notas');
         if (iName < 0){ summary.textContent = 'Falta la columna "Nombre" (o "Inmobiliaria").'; return; }
-        let created = 0, skipped = 0;
+        let created = 0, updated = 0;
         for (let i = 1; i < rows.length; i++){
           const r = rows[i];
           const name = (r[iName]||'').trim();
           if (!name) continue;
-          const email = iEmail>=0?(r[iEmail]||'').trim():'';
-          const whatsapp = iPhone>=0?(r[iPhone]||'').trim():'';
-          const exists = state.prospects.some(x => x.name.toLowerCase() === name.toLowerCase() && (x.email||'') === email && (x.whatsapp||'') === whatsapp);
-          if (exists){ skipped++; continue; }
           const zoneRaw = iZone>=0?(r[iZone]||'').trim():'';
+          const zone = zoneRaw === '-' ? '' : zoneRaw;
           const data = {
-            name, category,
-            zone: zoneRaw === '-' ? '' : zoneRaw,
-            whatsapp, email,
+            name, category, zone,
+            whatsapp: iPhone>=0?(r[iPhone]||'').trim():'',
+            email: iEmail>=0?(r[iEmail]||'').trim():'',
             channel: iChannel>=0?(r[iChannel]||'').trim():'',
             status: iStatus>=0 ? normalizeProspectStatus(r[iStatus]) : 'contactado',
             notes: iNotes>=0?(r[iNotes]||'').trim():'',
-            createdAt: new Date().toISOString(),
           };
-          await db.collection('prospects').add(data);
-          created++;
+          const nameLower = name.toLowerCase();
+          const candidates = state.prospects.filter(x => (x.name||'').toLowerCase() === nameLower);
+          const existing = candidates.length <= 1 ? candidates[0]
+            : (candidates.find(x => (x.zone||'').toLowerCase() === zone.toLowerCase()) || candidates[0]);
+          if (existing){
+            await db.collection('prospects').doc(existing.id).update(data);
+            updated++;
+          } else {
+            data.createdAt = new Date().toISOString();
+            await db.collection('prospects').add(data);
+            created++;
+          }
         }
-        summary.textContent = `Listo: ${created} contactos importados, ${skipped} omitidos (ya existían).`;
+        summary.textContent = `Listo: ${created} contactos nuevos, ${updated} actualizados con los datos del archivo.`;
         toast('Importación de prospección finalizada.');
       } catch (err){
         summary.textContent = 'Error al importar: ' + (err && err.message ? err.message : 'revisá el archivo.');
