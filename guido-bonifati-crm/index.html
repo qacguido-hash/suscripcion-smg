@@ -1365,6 +1365,33 @@
     }
     return null;
   }
+  async function mergeDuplicateProspects(){
+    const isPlaceholder = n => /nombre a confirmar/i.test(n||'');
+    const groups = {};
+    state.prospects.forEach(p => {
+      const key = (p.email||'').trim().toLowerCase() || (p.whatsapp||'').trim();
+      if (!key) return; // sin email ni whatsapp no se puede agrupar con seguridad
+      (groups[key] = groups[key] || []).push(p);
+    });
+    const dupGroups = Object.values(groups).filter(g => g.length > 1);
+    if (!dupGroups.length){ toast('No se encontraron duplicados por email o WhatsApp.'); return; }
+    let merged = 0, deleted = 0;
+    for (const group of dupGroups){
+      const keep = group.find(p => !isPlaceholder(p.name)) || group[0];
+      const rest = group.filter(p => p.id !== keep.id);
+      const patch = {};
+      ['name','category','zone','whatsapp','email','channel','notes'].forEach(field => {
+        if (!keep[field] || (field === 'name' && isPlaceholder(keep[field]))){
+          const better = group.find(p => p[field] && !(field === 'name' && isPlaceholder(p[field])));
+          if (better && better[field] !== keep[field]) patch[field] = better[field];
+        }
+      });
+      if (Object.keys(patch).length) await db.collection('prospects').doc(keep.id).update(patch);
+      for (const p of rest){ await db.collection('prospects').doc(p.id).delete(); deleted++; }
+      merged++;
+    }
+    toast(`Se fusionaron ${merged} contacto(s) duplicado(s), se eliminaron ${deleted} registro(s) repetidos.`);
+  }
   function defaultProspectWhatsAppMessage(p){
     if (p.status === 'interesado') return `Hola! Soy Guido, tu asesor de seguros. Te escribo para seguir la conversación sobre trabajar juntos derivando clientes.`;
     return `Hola! Soy Guido Bonifati, asesor de seguros. Te escribo porque me gustaría proponerte trabajar juntos: cuando tengas un cliente que necesite un seguro te lo derivo a mí, o yo te derivo a vos, y coordinamos una comisión. ¿Te interesa charlarlo?`;
@@ -1377,6 +1404,7 @@
         <div class="page-head">
           <div><h1>Prospección</h1><p>Inmobiliarias, constructoras, lavaderos, contadores y otros contactos B2B para referidos</p></div>
           <div style="display:flex;gap:8px;">
+            <button class="btn btn-outline" id="mergeProspectsBtn" title="Junta en un solo registro los contactos repetidos que comparten email o WhatsApp">Fusionar duplicados</button>
             <button class="btn btn-outline" id="importProspectsBtn">Importar CSV</button>
             <button class="btn btn-primary" id="newProspectBtn">+ Nuevo contacto</button>
           </div>
@@ -1400,6 +1428,7 @@
       `;
       el.querySelector('#newProspectBtn').addEventListener('click', () => openProspectForm());
       el.querySelector('#importProspectsBtn').addEventListener('click', () => openImportProspectsForm());
+      el.querySelector('#mergeProspectsBtn').addEventListener('click', () => mergeDuplicateProspects());
       el.querySelector('#prospectSearch').addEventListener('input', () => renderProspectRows());
       el.querySelector('#prospectCategoryFilter').addEventListener('input', () => renderProspectRows());
       el.querySelector('#prospectZoneFilter').addEventListener('input', () => renderProspectRows());
