@@ -1340,22 +1340,28 @@
     return 'contactado';
   }
   function findExistingProspectForImport(name, zone, email, whatsapp){
+    // Prioridad 1: email/WhatsApp exacto. Es más confiable que el nombre para reconocer al
+    // mismo contacto, sobre todo cuando muchos registros comparten un nombre placeholder como
+    // "(nombre a confirmar)" — ahí matchear primero por nombre nunca llega a mirar el email.
     const nameLower = name.toLowerCase();
+    if (email){
+      const byEmail = state.prospects.filter(x => (x.email||'').trim().toLowerCase() === email.trim().toLowerCase());
+      if (byEmail.length === 1) return byEmail[0];
+      if (byEmail.length > 1){
+        const sameName = byEmail.find(x => (x.name||'').toLowerCase() === nameLower);
+        if (sameName) return sameName;
+      }
+    }
+    if (whatsapp){
+      const byPhone = state.prospects.filter(x => (x.whatsapp||'').trim() === whatsapp.trim());
+      if (byPhone.length === 1) return byPhone[0];
+    }
+    // Prioridad 2: nombre (desambiguando por zona si hay más de un contacto con ese nombre).
     const byName = state.prospects.filter(x => (x.name||'').toLowerCase() === nameLower);
     if (byName.length === 1) return byName[0];
     if (byName.length > 1){
       const zoneLower = (zone||'').toLowerCase();
       return byName.find(x => (x.zone||'').toLowerCase() === zoneLower) || byName[0];
-    }
-    // Sin coincidencia por nombre (por ej. se corrigió un "(nombre a confirmar)" por el nombre real):
-    // buscamos por email o WhatsApp para reconocer que es el mismo contacto y no duplicarlo.
-    if (email){
-      const byEmail = state.prospects.filter(x => (x.email||'').toLowerCase() === email.toLowerCase());
-      if (byEmail.length === 1) return byEmail[0];
-    }
-    if (whatsapp){
-      const byPhone = state.prospects.filter(x => (x.whatsapp||'') === whatsapp);
-      if (byPhone.length === 1) return byPhone[0];
     }
     return null;
   }
