@@ -527,6 +527,20 @@
     const c = state.clients.find(c => c.id === id);
     return c ? c.name : '—';
   }
+  function prospectName(id){
+    const p = state.prospects.find(p => p.id === id);
+    return p ? p.name : '—';
+  }
+  function nextWeekBusinessDays(){
+    const days = [];
+    const d = new Date(); d.setHours(0,0,0,0);
+    d.setDate(d.getDate() + (8 - d.getDay()) % 7 || 7); // próximo lunes
+    for (let i = 0; i < 5; i++){
+      const day = new Date(d); day.setDate(d.getDate() + i);
+      days.push(day.toISOString().slice(0,10));
+    }
+    return days;
+  }
 
   /* ---------- Router ---------- */
   function showTab(key){
@@ -1409,6 +1423,21 @@
     if (p.status === 'interesado') return `Hola! Soy Guido, tu asesor de seguros. Te escribo para seguir la conversación sobre trabajar juntos derivando clientes.`;
     return `Hola! Soy Guido Bonifati, asesor de seguros. Te escribo porque me gustaría proponerte trabajar juntos: cuando tengas un cliente que necesite un seguro te lo derivo a mí, o yo te derivo a vos, y coordinamos una comisión. ¿Te interesa charlarlo?`;
   }
+  async function createFollowupTasksForInterested(){
+    const interested = state.prospects.filter(p => p.status === 'interesado');
+    if (!interested.length){ toast('No hay contactos marcados como Interesado.'); return; }
+    const pending = interested.filter(p => !state.tasks.some(t => t.prospectId === p.id && !t.done));
+    if (!pending.length){ toast('Todos los interesados ya tienen una tarea de seguimiento pendiente.'); return; }
+    const days = nextWeekBusinessDays();
+    for (let i = 0; i < pending.length; i++){
+      const p = pending[i];
+      await db.collection('tasks').add({
+        title: `Seguimiento — ${p.name}`, type: 'llamado', dueDate: days[i % days.length],
+        prospectId: p.id, notes: p.notes || '', done: false, createdAt: new Date().toISOString(),
+      });
+    }
+    toast(`Se crearon ${pending.length} tarea(s) de seguimiento para la semana que viene.`);
+  }
   function renderProspeccion(){
     const el = document.querySelector('.page[data-page="prospeccion"]');
     if (!el.dataset.init){
@@ -1457,6 +1486,7 @@
       <details class="panel collapse-panel" style="margin-bottom:16px;">
         <summary><span class="chev">▶</span><h2>🎯 Interesados — seguimiento pendiente (${interested.length})</h2></summary>
         <div style="margin-top:10px;">
+          <button type="button" class="btn btn-sm btn-outline" id="createFollowupTasksBtn" style="margin-bottom:10px;">+ Crear tareas de seguimiento (semana que viene)</button>
           ${interested.map(p => `
             <div class="kv" style="border-bottom:1px solid var(--border);padding:8px 0;font-size:13px;">
               <span><a href="#" class="open-prospect" data-id="${p.id}" style="font-weight:600;color:var(--blue);">${esc(p.name)}</a>${p.notes ? ' — ' + esc(p.notes) : ''}</span>
@@ -1464,6 +1494,8 @@
             </div>`).join('')}
         </div>
       </details>` : '';
+    const followupBtn = interestedPanel.querySelector('#createFollowupTasksBtn');
+    if (followupBtn) followupBtn.addEventListener('click', createFollowupTasksForInterested);
     interestedPanel.querySelectorAll('.open-prospect').forEach(a => a.addEventListener('click', e => { e.preventDefault(); const p = state.prospects.find(x => x.id === a.dataset.id); if (p) openProspectForm(p); }));
     interestedPanel.querySelectorAll('.prospect-wa').forEach(b => b.addEventListener('click', () => {
       const p = state.prospects.find(x => x.id === b.dataset.id);
@@ -2877,7 +2909,7 @@
         <div class="top-row">
           <div>
             <h3 style="${t.done ? 'text-decoration:line-through;color:var(--muted);' : ''}">${esc(t.title)}</h3>
-            <p>${TASK_TYPE_LABEL[t.type]||'Otro'}${t.clientId ? ' · ' + esc(clientName(t.clientId)) : ''}</p>
+            <p>${TASK_TYPE_LABEL[t.type]||'Otro'}${t.clientId ? ' · ' + esc(clientName(t.clientId)) : ''}${t.prospectId ? ' · ' + esc(prospectName(t.prospectId)) + ' (prospección)' : ''}</p>
           </div>
           <span class="badge ${t.done ? 'badge-ok' : overdue ? 'badge-danger' : 'badge-muted'}">${t.done ? 'Hecha' : fmtDate(t.dueDate)}</span>
         </div>
