@@ -172,6 +172,27 @@
   .badge-danger{background:var(--danger-bg);color:var(--danger);}
   .badge-muted{background:var(--surface2);color:var(--muted);}
 
+  .star-btn{color:var(--border);}
+  .icon-btn.active{color:var(--yellow-deep);border-color:var(--yellow-deep);}
+  .star-inline{color:var(--yellow-deep);margin-right:4px;}
+
+  /* Comisiones: mini bloque de aseguradoras (comisión + reclamos) */
+  .aseg-mini{margin-bottom:18px;}
+  .aseg-mini summary{
+    cursor:pointer;list-style:none;display:flex;align-items:center;justify-content:space-between;
+    gap:10px;padding:2px 0;
+  }
+  .aseg-mini summary::-webkit-details-marker{display:none;}
+  .aseg-mini summary .lbl{font-family:var(--font-cond);font-size:15px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:8px;}
+  .aseg-mini summary .chev{color:var(--muted);font-size:11px;transition:transform .15s;flex-shrink:0;}
+  .aseg-mini[open] summary .chev{transform:rotate(90deg);}
+  .aseg-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);font-size:12.5px;flex-wrap:wrap;}
+  .aseg-row:last-child{border-bottom:none;}
+  .aseg-row .name{flex:1;min-width:160px;display:flex;align-items:center;gap:8px;color:var(--text);font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .aseg-row .pct{width:90px;flex-shrink:0;color:var(--muted);text-align:right;font-variant-numeric:tabular-nums;}
+  .aseg-row .claims{flex-shrink:0;}
+  .aseg-mini-note{font-size:11px;color:var(--muted);margin-top:10px;}
+
   /* Cards (mobile list fallback / kanban-ish) */
   .card-list{display:grid;gap:10px;}
   .item-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;}
@@ -352,8 +373,6 @@
     { key:'siniestros', label:'Siniestros' },
     { key:'comisiones', label:'Comisiones' },
     { key:'analisis', label:'Análisis' },
-    { key:'aseguradoras', label:'Aseguradoras' },
-    { key:'argumentario', label:'Argumentario' },
   ];
 
   app.innerHTML = `
@@ -463,6 +482,20 @@
     const dt = new Date(d + 'T00:00:00');
     return Math.round((dt - today) / 86400000);
   }
+  function nextBirthdayInfo(birthday){
+    if (!birthday) return null;
+    const b = new Date(birthday + 'T00:00:00');
+    if (isNaN(b)) return null;
+    const today = new Date(); today.setHours(0,0,0,0);
+    let next = new Date(today.getFullYear(), b.getMonth(), b.getDate());
+    if (next < today) next = new Date(today.getFullYear()+1, b.getMonth(), b.getDate());
+    return {
+      days: Math.round((next - today) / 86400000),
+      year: next.getFullYear(),
+      turningAge: next.getFullYear() - b.getFullYear(),
+      label: next.toLocaleDateString('es-AR', { day:'2-digit', month:'2-digit' }),
+    };
+  }
   function uid(){ return Math.random().toString(36).slice(2,10) + Date.now().toString(36); }
   function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 
@@ -508,8 +541,6 @@
     else if (currentTab === 'siniestros') renderSiniestros();
     else if (currentTab === 'comisiones') renderComisiones();
     else if (currentTab === 'analisis') renderAnalisis();
-    else if (currentTab === 'aseguradoras') renderAseguradoras();
-    else if (currentTab === 'argumentario') renderArgumentario();
   }
   /* ---------- Modal ---------- */
   function openModal(title, fieldsHtml, onSubmit, opts){
@@ -719,6 +750,17 @@
     }));
   }
 
+  function clientBirthdayRowsHtml(c){
+    if (!c.birthday) return `<div class="kv"><span>Cumpleaños</span><span>—</span></div>`;
+    const nb = nextBirthdayInfo(c.birthday);
+    const giftSent = c.giftSentYear === nb.year;
+    return `
+      <div class="kv"><span>Cumpleaños</span><span>${fmtDate(c.birthday)} · cumple ${nb.turningAge} ${nb.days === 0 ? 'hoy' : 'en ' + nb.days + ' días'}</span></div>
+      <div class="kv"><span>Regalo ${nb.year}</span><span style="display:flex;align-items:center;gap:8px;">
+        <span class="badge ${giftSent ? 'badge-ok' : 'badge-muted'}">${giftSent ? 'Enviado' : 'Pendiente'}</span>
+        <button type="button" class="btn btn-sm btn-outline drawer-toggle-gift" data-id="${c.id}" data-year="${nb.year}">${giftSent ? 'Desmarcar' : 'Marcar enviado'}</button>
+      </span></div>`;
+  }
   /* ---------- Drawer (detail view for a client, with related records) ---------- */
   function openClientDrawer(clientId){
     const c = state.clients.find(x => x.id === clientId);
@@ -734,14 +776,14 @@
     backdrop.innerHTML = `
       <div id="drawer" style="position:relative;">
         <button class="icon-btn close-drawer" aria-label="Cerrar">✕</button>
-        <h2>${esc(c.name)}</h2>
+        <h2>${c.highPotential ? '<span class="star-inline" title="Alto potencial">★</span>' : ''}${esc(c.name)}</h2>
         <div class="sub">${esc(c.type === 'empresa' ? 'Empresa' : 'Persona')} · ${esc(c.docId || 'sin documento')}</div>
         ${(c.tags||[]).length ? `<div style="margin:8px 0;">${c.tags.map(t => `<span class="badge badge-muted" style="margin:1px 4px 1px 0;">${esc(t)}</span>`).join('')}</div>` : ''}
         <div class="kv"><span>Email</span><span>${esc(c.email || '—')}</span></div>
         <div class="kv"><span>Teléfono</span><span>${esc(c.phone || '—')}</span></div>
         <div class="kv"><span>Dirección</span><span>${esc(c.address || '—')}</span></div>
         <div class="kv"><span>Medio de pago</span><span>${esc(c.paymentMethod || '—')}</span></div>
-        <div class="kv"><span>Cumpleaños</span><span>${c.birthday ? fmtDate(c.birthday) : '—'}</span></div>
+        ${clientBirthdayRowsHtml(c)}
         ${c.referredBy ? `<div class="kv"><span>Recomendado por</span><span>${esc(clientName(c.referredBy))}</span></div>` : ''}
         ${suggestions.length ? `<div style="margin-top:14px;background:var(--warn-bg);border:1px solid var(--warn);border-radius:8px;padding:10px 12px;">
           <b style="font-size:12.5px;color:var(--warn);">💡 Oportunidades de venta cruzada</b>
@@ -797,6 +839,15 @@
     backdrop.querySelectorAll('.drawer-wa-suggestion').forEach(b => b.addEventListener('click', () => {
       openWhatsAppComposer(c, suggestions[Number(b.dataset.idx)]);
     }));
+    const giftBtn = backdrop.querySelector('.drawer-toggle-gift');
+    if (giftBtn){
+      giftBtn.addEventListener('click', async () => {
+        const alreadySent = c.giftSentYear === Number(giftBtn.dataset.year);
+        await db.collection('clients').doc(c.id).update({ giftSentYear: alreadySent ? null : Number(giftBtn.dataset.year) });
+        backdrop.remove();
+        openClientDrawer(clientId);
+      });
+    }
   }
 
   /* ==================== DASHBOARD ==================== */
@@ -878,6 +929,11 @@
     const ramoRows = Object.entries(byRamo).sort((a,b)=>b[1]-a[1]);
 
     const upcomingTasks = openTasks.slice().sort((a,b)=>(a.dueDate||'9999').localeCompare(b.dueDate||'9999')).slice(0,6);
+
+    const upcomingBirthdays = state.clients
+      .map(c => ({ client: c, nb: nextBirthdayInfo(c.birthday) }))
+      .filter(x => x.nb && x.nb.days <= 30)
+      .sort((a,b) => a.nb.days - b.nb.days);
 
     function backupMiniHtml(){
       const recent = state.backups.slice().sort((a,b)=>(b.createdAt||'').localeCompare(a.createdAt||'')).slice(0,5);
@@ -968,6 +1024,20 @@
                 <span class="badge badge-muted">${fmtDate(t.dueDate)}</span>
               </div>`).join('') : '<p class="empty">No tenés tareas pendientes.</p>'}
           </div>
+          <div class="panel">
+            <h2>🎂 Cumpleaños próximos (30 días)</h2>
+            ${upcomingBirthdays.length ? upcomingBirthdays.map(({client, nb}) => {
+              const giftSent = client.giftSentYear === nb.year;
+              return `
+              <div class="kv" style="border-bottom:1px solid var(--border);padding:8px 0;display:flex;justify-content:space-between;align-items:center;font-size:13px;gap:8px;">
+                <span>${client.highPotential ? '<span class="star-inline" title="Alto potencial">★</span>' : ''}${esc(client.name)} <span class="sub">cumple ${nb.turningAge}</span></span>
+                <span style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
+                  <span class="badge badge-warn">${nb.days === 0 ? 'hoy' : nb.label}</span>
+                  <button type="button" class="icon-btn dash-toggle-gift ${giftSent ? 'active' : ''}" data-id="${client.id}" data-year="${nb.year}" title="${giftSent ? 'Regalo enviado — click para desmarcar' : 'Marcar regalo enviado'}">🎁</button>
+                </span>
+              </div>`;
+            }).join('') : '<p class="empty">Sin cumpleaños en los próximos 30 días.</p>'}
+          </div>
         </div>
       </div>
       ${backupMiniHtml()}
@@ -976,6 +1046,11 @@
     el.querySelector('#editGoalsBtn').addEventListener('click', openGoalsForm);
     el.querySelector('#createBackupBtn').addEventListener('click', e => { e.preventDefault(); e.stopPropagation(); createBackup(false); });
     el.querySelectorAll('.backup-dl').forEach(b => b.addEventListener('click', () => downloadBackup(b.dataset.id)));
+    el.querySelectorAll('.dash-toggle-gift').forEach(b => b.addEventListener('click', async () => {
+      const c = state.clients.find(x => x.id === b.dataset.id); if (!c) return;
+      const alreadySent = c.giftSentYear === Number(b.dataset.year);
+      await db.collection('clients').doc(c.id).update({ giftSentYear: alreadySent ? null : Number(b.dataset.year) });
+    }));
   }
   function openGoalsForm(){
     openModal('Meta del mes', `
@@ -1253,6 +1328,9 @@
         <div class="toolbar">
           <input type="search" id="clientSearch" placeholder="Buscar por nombre, email o teléfono…" style="min-width:260px;">
           <select id="clientTagFilter"><option value="">Todas las etiquetas</option></select>
+          <label style="display:flex;align-items:center;gap:5px;font-size:13px;color:var(--muted);">
+            <input type="checkbox" id="clientPotentialFilter" style="width:auto;"> ⭐ Solo alto potencial
+          </label>
         </div>
         <div class="table-wrap"><table>
           <thead><tr><th>Nombre</th><th>Tipo</th><th>Contacto</th><th>Medio de pago</th><th>Etiquetas</th><th>Pólizas</th><th>Cumpleaños</th><th></th></tr></thead>
@@ -1263,6 +1341,7 @@
       el.querySelector('#importClientsBtn').addEventListener('click', () => openImportClientsForm());
       el.querySelector('#clientSearch').addEventListener('input', () => renderClientRows());
       el.querySelector('#clientTagFilter').addEventListener('input', () => renderClientRows());
+      el.querySelector('#clientPotentialFilter').addEventListener('change', () => renderClientRows());
     }
     renderClientRows();
   }
@@ -1302,10 +1381,12 @@
     const currentTag = tagSelect.value;
     tagSelect.innerHTML = '<option value="">Todas las etiquetas</option>' + allTags.map(t => `<option value="${esc(t)}" ${t===currentTag?'selected':''}>${esc(t)}</option>`).join('');
     const tagF = tagSelect.value;
+    const onlyPotential = el.querySelector('#clientPotentialFilter').checked;
     const rows = state.clients
       .filter(c => !q || (c.name||'').toLowerCase().includes(q) || (c.email||'').toLowerCase().includes(q) || (c.phone||'').includes(q))
       .filter(c => !tagF || (c.tags||[]).includes(tagF))
-      .sort((a,b) => a.name.localeCompare(b.name));
+      .filter(c => !onlyPotential || c.highPotential)
+      .sort((a,b) => (b.highPotential?1:0) - (a.highPotential?1:0) || a.name.localeCompare(b.name));
     const tbody = el.querySelector('#clientRows');
     if (!rows.length){ tbody.innerHTML = `<tr><td colspan="8" class="no-label"><p class="empty">No hay clientes que coincidan.</p></td></tr>`; return; }
     tbody.innerHTML = rows.map(c => {
@@ -1313,7 +1394,7 @@
       const tagsHtml = (c.tags||[]).length ? (c.tags||[]).map(t => `<span class="badge badge-muted" style="margin:1px 3px 1px 0;">${esc(t)}</span>`).join('') : '<span class="sub">—</span>';
       return `
       <tr data-id="${c.id}">
-        <td data-label="Nombre"><a href="#" class="open-client" data-id="${c.id}" style="font-weight:600;color:var(--blue);">${esc(c.name)}</a></td>
+        <td data-label="Nombre">${c.highPotential ? '<span class="star-inline" title="Alto potencial">★</span>' : ''}<a href="#" class="open-client" data-id="${c.id}" style="font-weight:600;color:var(--blue);">${esc(c.name)}</a></td>
         <td data-label="Tipo">${c.type === 'empresa' ? 'Empresa' : 'Persona'}</td>
         <td data-label="Contacto">${esc(c.phone || c.email || '—')}</td>
         <td data-label="Medio de pago">${esc(c.paymentMethod || '—')}</td>
@@ -1321,6 +1402,7 @@
         <td data-label="Pólizas">${nPol}</td>
         <td data-label="Cumpleaños">${c.birthday ? fmtDate(c.birthday) : '—'}</td>
         <td class="no-label"><div class="row-actions">
+          <button class="icon-btn star-btn ${c.highPotential ? 'active' : ''}" data-id="${c.id}" title="${c.highPotential ? 'Quitar de alto potencial' : 'Marcar como alto potencial'}">★</button>
           ${c.phone ? `<button class="icon-btn wa-client" data-id="${c.id}" title="Enviar WhatsApp">💬</button>` : ''}
           <button class="icon-btn edit-client" data-id="${c.id}" title="Editar">✎</button>
         </div></td>
@@ -1329,6 +1411,10 @@
     tbody.querySelectorAll('.open-client').forEach(a => a.addEventListener('click', e => { e.preventDefault(); openClientDrawer(a.dataset.id); }));
     tbody.querySelectorAll('.edit-client').forEach(b => b.addEventListener('click', () => {
       const c = state.clients.find(x => x.id === b.dataset.id); if (c) openClientForm(c);
+    }));
+    tbody.querySelectorAll('.star-btn').forEach(b => b.addEventListener('click', async () => {
+      const c = state.clients.find(x => x.id === b.dataset.id); if (!c) return;
+      await db.collection('clients').doc(c.id).update({ highPotential: !c.highPotential });
     }));
     tbody.querySelectorAll('.wa-client').forEach(b => b.addEventListener('click', () => {
       const c = state.clients.find(x => x.id === b.dataset.id);
@@ -1365,6 +1451,10 @@
         ${clientOptions(c.referredBy, existing ? existing.id : null)}
       </select></div>
       <div class="field"><label>Etiquetas</label><input name="tags" placeholder="VIP, Referido, Riesgo de fuga…" value="${esc((c.tags||[]).join(', '))}"></div>
+      <div class="field" style="display:flex;align-items:center;gap:8px;">
+        <input type="checkbox" name="highPotential" id="clientHighPotential" style="width:auto;" ${c.highPotential?'checked':''}>
+        <label for="clientHighPotential" style="margin:0;">⭐ Cliente de alto potencial — priorizar en el seguimiento</label>
+      </div>
       <div class="field"><label>Notas</label><textarea name="notes">${esc(c.notes||'')}</textarea></div>
     `, async data => {
       if (!db) throw new Error('sin conexión');
@@ -2753,13 +2843,45 @@
         </table></div>
       `;
     }
+    function insurerMiniHtml(){
+      const companies = COMPANIES.filter(c => c !== 'Otra');
+      let totalOpenClaims = 0;
+      const rows = companies.map(company => {
+        const rec = state.insurers.find(i => i.company === company);
+        const pct = rec && rec.defaultCommissionPct != null ? `${esc(rec.defaultCommissionPct)}% ${rec.commissionBase === 'premio' ? 'premio' : 'prima'}` : 'Sin cargar';
+        const claims = (rec && rec.internalClaims) || [];
+        const openClaims = claims.filter(c => c.status !== 'resuelto');
+        totalOpenClaims += openClaims.length;
+        return `<div class="aseg-row">
+          <span class="name">${insurerLogoHtml(company, 36, 18)} ${esc(company)}</span>
+          <span class="pct">${pct}</span>
+          <span class="claims"><button type="button" class="badge view-claims ${openClaims.length ? 'badge-danger' : 'badge-muted'}" style="border:none;cursor:pointer;" data-company="${esc(company)}">${openClaims.length} reclamo${openClaims.length===1?'':'s'}</button></span>
+          <span class="edit"><button class="icon-btn edit-insurer" data-company="${esc(company)}" title="Editar comisión y ejecutivo de cuentas">✎</button></span>
+        </div>`;
+      }).join('');
+      return `
+        <details class="aseg-mini">
+          <summary>
+            <span class="lbl"><span class="chev">▶</span> Aseguradoras — comisión y reclamos</span>
+            ${totalOpenClaims ? `<span class="badge badge-danger">${totalOpenClaims} reclamo${totalOpenClaims===1?'':'s'} abierto${totalOpenClaims===1?'':'s'}</span>` : `<span class="badge badge-muted">Sin reclamos abiertos</span>`}
+          </summary>
+          <div style="margin-top:10px;">
+            ${rows}
+            <p class="aseg-mini-note">El lápiz abre el contacto del ejecutivo de cuentas, el % de comisión y los reclamos internos de esa aseguradora.</p>
+          </div>
+        </details>
+      `;
+    }
     const ars = commDataFor('ARS');
     el.innerHTML = `
-      <div class="page-head"><div><h1>Comisiones</h1><p>Estimado según prima y % de comisión cargado en cada póliza (configurá el % y la base por defecto en Aseguradoras). Las marcadas "s/premio" comisionan sobre prima + impuestos, no solo sobre la prima. Se reparte ${RMASD_SPLIT_PCT}% para RMASD y ${100-RMASD_SPLIT_PCT}% para vos.</p></div></div>
+      <div class="page-head"><div><h1>Comisiones</h1><p>Estimado según prima y % de comisión cargado en cada póliza (configurá el % y la base por defecto más abajo). Las marcadas "s/premio" comisionan sobre prima + impuestos, no solo sobre la prima. Se reparte ${RMASD_SPLIT_PCT}% para RMASD y ${100-RMASD_SPLIT_PCT}% para vos.</p></div></div>
+      <div class="panel">${insurerMiniHtml()}</div>
       ${hasUSD ? '<h2 style="font-size:15px;margin-bottom:8px;">En pesos (ARS)</h2>' : ''}
       ${section(ars, 'ARS')}
       ${hasUSD ? `<h2 style="font-size:15px;margin:22px 0 8px;">En dólares (USD)</h2>${section(commDataFor('USD'), 'USD')}` : ''}
     `;
+    el.querySelectorAll('.edit-insurer').forEach(b => b.addEventListener('click', () => openInsurerContactsForm(b.dataset.company)));
+    el.querySelectorAll('.view-claims').forEach(b => b.addEventListener('click', () => openInsurerReclamosModal(b.dataset.company)));
   }
 
   /* ==================== ANÁLISIS ==================== */
@@ -2864,50 +2986,13 @@
     `;
   }
 
-  /* ==================== ASEGURADORAS ==================== */
+  /* ==================== ASEGURADORAS (comisión, contactos y reclamos) ==================== */
+  /* Sin pestaña propia: se editan desde el mini bloque "Aseguradoras — comisión y reclamos" en Comisiones. */
   const INSURER_ROLES = [
     { key:'accountExec', label:'Ejecutivo de cuentas' },
     { key:'underwriter', label:'Suscriptor' },
     { key:'incidents', label:'Siniestros' },
   ];
-  function renderAseguradoras(){
-    const el = document.querySelector('.page[data-page="aseguradoras"]');
-    el.innerHTML = `
-      <div class="page-head"><div><h1>Aseguradoras</h1><p>Contactos clave y reclamos internos por compañía</p></div></div>
-      <div class="card-list" id="insurerList"></div>
-    `;
-    const list = el.querySelector('#insurerList');
-    list.innerHTML = COMPANIES.filter(c => c !== 'Otra').map(company => {
-      const rec = state.insurers.find(i => i.company === company);
-      const contacts = (rec && rec.contacts) || {};
-      const claims = (rec && rec.internalClaims) || [];
-      const openClaims = claims.filter(c => c.status !== 'resuelto');
-      const closedCount = claims.length - openClaims.length;
-      const accountExec = contacts.accountExec;
-      const accountExecRow = (accountExec && (accountExec.name || accountExec.email || accountExec.phone))
-        ? `<div class="kv"><span>Ejecutivo de cuentas</span><span>${esc(accountExec.name||'—')} · ${esc(accountExec.phone||'—')} · ${esc(accountExec.email||'—')}</span></div>`
-        : '<p class="sub">Sin ejecutivo de cuentas cargado.</p>';
-      return `<div class="item-card">
-        <div class="top-row"><h3 style="display:flex;align-items:center;gap:10px;">${insurerLogoHtml(company, 56, 28)}${esc(company)}</h3><button class="btn btn-sm btn-outline edit-contacts" data-company="${esc(company)}">Editar contactos y comisión</button></div>
-        ${accountExecRow}
-        <div style="margin-top:10px;display:flex;justify-content:space-between;align-items:center;">
-          <b style="font-size:12.5px;">Reclamos internos (${openClaims.length} abiertos)</b>
-          <button class="btn btn-sm btn-outline new-claim" data-company="${esc(company)}">+ Nuevo reclamo</button>
-        </div>
-        ${openClaims.map(c => `<div class="kv" style="font-size:12.5px;">
-          <span>${esc(c.reason)}</span>
-          <span style="display:flex;align-items:center;gap:6px;">
-            <span class="badge badge-danger">${-daysUntil(c.openedAt)} días abierto</span>
-            <button class="icon-btn resolve-claim" data-company="${esc(company)}" data-claim="${esc(c.id)}" title="Marcar resuelto">✓</button>
-          </span>
-        </div>`).join('')}
-        ${closedCount ? `<p class="sub" style="margin-top:4px;">${closedCount} reclamo(s) resuelto(s).</p>` : ''}
-      </div>`;
-    }).join('');
-    list.querySelectorAll('.edit-contacts').forEach(b => b.addEventListener('click', () => openInsurerContactsForm(b.dataset.company)));
-    list.querySelectorAll('.new-claim').forEach(b => b.addEventListener('click', () => openInsurerClaimForm(b.dataset.company)));
-    list.querySelectorAll('.resolve-claim').forEach(b => b.addEventListener('click', () => resolveInsurerClaim(b.dataset.company, b.dataset.claim)));
-  }
   function openInsurerContactsForm(company){
     const existing = state.insurers.find(i => i.company === company);
     const contacts = (existing && existing.contacts) || {};
@@ -2947,20 +3032,41 @@
       toast('Contactos actualizados.');
     });
   }
-  function openInsurerClaimForm(company){
-    openModal(`Nuevo reclamo — ${company}`, `
-      <div class="field"><label>Motivo</label><textarea name="reason" required placeholder="Ej: pedí endoso hace 12 días y no contestan"></textarea></div>
+  function openInsurerReclamosModal(company){
+    const rec = state.insurers.find(i => i.company === company);
+    const claims = (rec && rec.internalClaims) || [];
+    const openClaims = claims.filter(c => c.status !== 'resuelto');
+    const closedCount = claims.length - openClaims.length;
+    const listHtml = openClaims.length ? openClaims.map(c => `
+      <div class="kv" style="font-size:12.5px;">
+        <span>${esc(c.reason)}</span>
+        <span style="display:flex;align-items:center;gap:6px;">
+          <span class="badge badge-danger">${-daysUntil(c.openedAt)} días abierto</span>
+          <button type="button" class="icon-btn resolve-claim-modal" data-claim="${esc(c.id)}" title="Marcar resuelto">✓</button>
+        </span>
+      </div>`).join('') : '<p class="empty">Sin reclamos abiertos.</p>';
+    const backdrop = openModal(`Reclamos internos — ${company}`, `
+      <div style="margin-bottom:14px;">
+        ${listHtml}
+        ${closedCount ? `<p class="sub" style="margin-top:6px;">${closedCount} reclamo(s) resuelto(s).</p>` : ''}
+      </div>
+      <div class="field"><label>Agregar nuevo reclamo</label><textarea name="reason" placeholder="Ej: pedí endoso hace 12 días y no contestan"></textarea></div>
     `, async data => {
+      if (!data.reason || !data.reason.trim()) return;
       const existing = state.insurers.find(i => i.company === company);
       const claim = { id: uid(), reason: data.reason, openedAt: new Date().toISOString().slice(0,10), status: 'abierto' };
       if (existing){
-        const claims = (existing.internalClaims||[]).concat([claim]);
-        await db.collection('insurers').doc(existing.id).update({ internalClaims: claims });
+        await db.collection('insurers').doc(existing.id).update({ internalClaims: (existing.internalClaims||[]).concat([claim]) });
       } else {
         await db.collection('insurers').add({ company, contacts:{}, hours:'', internalClaims:[claim] });
       }
       toast('Reclamo registrado.');
-    });
+    }, { submitLabel: 'Agregar reclamo' });
+    backdrop.querySelectorAll('.resolve-claim-modal').forEach(b => b.addEventListener('click', async () => {
+      await resolveInsurerClaim(company, b.dataset.claim);
+      backdrop.remove();
+      openInsurerReclamosModal(company);
+    }));
   }
   async function resolveInsurerClaim(company, claimId){
     const existing = state.insurers.find(i => i.company === company);
@@ -2968,44 +3074,6 @@
     const claims = (existing.internalClaims||[]).map(c => c.id === claimId ? Object.assign({}, c, { status:'resuelto', closedAt: new Date().toISOString().slice(0,10) }) : c);
     await db.collection('insurers').doc(existing.id).update({ internalClaims: claims });
     toast('Reclamo marcado como resuelto.');
-  }
-
-  /* ==================== ARGUMENTARIO ==================== */
-  const SALES_SCRIPTS = [
-    { tema:'Objeción: "Es muy caro"', texto:'Comparar el costo de la cuota contra el costo real de no tener cobertura (reparación, juicio, pérdida total). Ofrecer ajustar la suma asegurada o las cuotas antes que bajar la cobertura a lo mínimo. Preguntar "¿comparado con qué te parece caro?" para entender si es una objeción de precio real o de percepción.' },
-    { tema:'Objeción: "Ya tengo con otro"', texto:'Preguntar cuándo vence esa póliza y anotar la fecha como tarea de seguimiento. Ofrecer una cotización comparativa sin compromiso 30 días antes del vencimiento. Nunca desacreditar a la otra compañía; enfocarse en tu atención personalizada y tiempos de respuesta.' },
-    { tema:'Objeción: "No lo uso" (auto/moto de poco uso)', texto:'Aclarar que el riesgo no depende de cuánto uses el vehículo sino de terceros y de eventos como robo o granizo. Si la aseguradora lo ofrece, mencionar pólizas de uso limitado con prima reducida como alternativa intermedia.' },
-    { tema:'Objeción: "Lo voy a pensar"', texto:'Es casi siempre una objeción tapando otra (precio, desconfianza, no decide solo). Preguntar directamente "¿hay algo puntual que te genere dudas?". Ofrecer mandar un resumen por escrito (PDF de cotización) y fijar fecha concreta de seguimiento, nunca dejarlo abierto.' },
-    { tema:'Objeción: "No tengo tiempo ahora"', texto:'Ofrecer un resumen corto por WhatsApp con los 3 puntos clave (cobertura, precio, vigencia) en vez de insistir con una llamada larga. Proponer un horario alternativo concreto, no "cuando puedas".' },
-    { tema:'Ramo: Auto', texto:'Enfatizar asistencia en ruta 24hs, cobertura de terceros (lo que te puede reclamar otro, no solo tu auto) y franquicias claras. Buen momento para ofrecer combinado familiar si todavía no lo tiene.' },
-    { tema:'Ramo: Vida', texto:'Hablar en términos de tranquilidad familiar y continuidad económica, no de "por si te morís". Mencionar la baja burocracia de alta y, si aplica, el beneficio impositivo. Ideal para cross-sell con clientes con hijos o hipoteca.' },
-    { tema:'Ramo: ART (empresas)', texto:'Es una obligación legal, no una opción: remarcar el riesgo de multas e inspecciones sin cobertura vigente. Preguntar por la cantidad de empleados para dimensionar la cotización rápido.' },
-    { tema:'Ramo: Seguro de Retiro', texto:'Posicionar como ahorro sistemático con beneficio impositivo, complementario a la jubilación, no como un gasto. Funciona bien con clientes mayores de 45 sin retiro contratado (ver sugerencias de cross-sell en la ficha del cliente).' },
-    { tema:'Cierre general', texto:'Resumir en una frase la cobertura + el precio + la próxima acción concreta ("Te mando la póliza para firmar hoy y arranca el lunes"). Un cierre débil típico es terminar la charla sin una fecha o acción definida.' },
-  ];
-  function renderArgumentario(){
-    const el = document.querySelector('.page[data-page="argumentario"]');
-    if (!el.dataset.init){
-      el.dataset.init = '1';
-      el.innerHTML = `
-        <div class="page-head"><div><h1>Argumentario de ventas</h1><p>Respuestas a objeciones frecuentes y puntos clave por ramo</p></div></div>
-        <div class="toolbar"><input type="search" id="argSearch" placeholder="Buscar por palabra clave…" style="min-width:260px;"></div>
-        <div class="card-list" id="argList"></div>
-      `;
-      el.querySelector('#argSearch').addEventListener('input', renderArgList);
-    }
-    renderArgList();
-  }
-  function renderArgList(){
-    const el = document.querySelector('.page[data-page="argumentario"]');
-    const q = (el.querySelector('#argSearch').value||'').toLowerCase();
-    const rows = SALES_SCRIPTS.filter(s => !q || s.tema.toLowerCase().includes(q) || s.texto.toLowerCase().includes(q));
-    const list = el.querySelector('#argList');
-    list.innerHTML = rows.length ? rows.map(s => `
-      <div class="item-card">
-        <h3>${esc(s.tema)}</h3>
-        <p style="margin-top:6px;">${esc(s.texto)}</p>
-      </div>`).join('') : '<p class="empty">Sin resultados para esa búsqueda.</p>';
   }
 
   /* ---------- DB wiring ---------- */
