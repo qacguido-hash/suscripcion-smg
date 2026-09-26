@@ -1339,6 +1339,26 @@
     if (/borrador/.test(t)) return 'borrador';
     return 'contactado';
   }
+  function findExistingProspectForImport(name, zone, email, whatsapp){
+    const nameLower = name.toLowerCase();
+    const byName = state.prospects.filter(x => (x.name||'').toLowerCase() === nameLower);
+    if (byName.length === 1) return byName[0];
+    if (byName.length > 1){
+      const zoneLower = (zone||'').toLowerCase();
+      return byName.find(x => (x.zone||'').toLowerCase() === zoneLower) || byName[0];
+    }
+    // Sin coincidencia por nombre (por ej. se corrigió un "(nombre a confirmar)" por el nombre real):
+    // buscamos por email o WhatsApp para reconocer que es el mismo contacto y no duplicarlo.
+    if (email){
+      const byEmail = state.prospects.filter(x => (x.email||'').toLowerCase() === email.toLowerCase());
+      if (byEmail.length === 1) return byEmail[0];
+    }
+    if (whatsapp){
+      const byPhone = state.prospects.filter(x => (x.whatsapp||'') === whatsapp);
+      if (byPhone.length === 1) return byPhone[0];
+    }
+    return null;
+  }
   function defaultProspectWhatsAppMessage(p){
     if (p.status === 'interesado') return `Hola! Soy Guido, tu asesor de seguros. Te escribo para seguir la conversación sobre trabajar juntos derivando clientes.`;
     return `Hola! Soy Guido Bonifati, asesor de seguros. Te escribo porque me gustaría proponerte trabajar juntos: cuando tengas un cliente que necesite un seguro te lo derivo a mí, o yo te derivo a vos, y coordinamos una comisión. ¿Te interesa charlarlo?`;
@@ -1484,7 +1504,7 @@
   }
   function openImportProspectsForm(){
     const backdrop = openModal('Importar contactos de prospección (CSV)', `
-      <p class="sub" style="margin-bottom:10px;">Columnas esperadas (en cualquier orden): Nombre (o "Inmobiliaria"), Zona, WhatsApp/Telefono, Email, Via de contacto, Estado, Notas. Si un nombre ya existe en la base, se actualiza con los datos de este archivo (no se duplica).</p>
+      <p class="sub" style="margin-bottom:10px;">Columnas esperadas (en cualquier orden): Nombre (o "Inmobiliaria"), Zona, WhatsApp/Telefono, Email, Via de contacto, Estado, Notas. Si un nombre ya existe en la base, se actualiza con los datos de este archivo. Si corregiste un "(nombre a confirmar)" por el nombre real, también lo reconoce por el email o WhatsApp y corrige el nombre en el mismo registro, sin duplicarlo.</p>
       <div class="field"><label>Categoría para todos los contactos de este archivo</label><select id="importCategory">${PROSPECT_CATEGORIES.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('')}</select></div>
       <div class="field"><input type="file" id="importFile" accept=".csv,text/csv"></div>
       <p id="importSummary" class="sub" style="margin-top:10px;"></p>
@@ -1524,10 +1544,7 @@
             status: iStatus>=0 ? normalizeProspectStatus(r[iStatus]) : 'contactado',
             notes: iNotes>=0?(r[iNotes]||'').trim():'',
           };
-          const nameLower = name.toLowerCase();
-          const candidates = state.prospects.filter(x => (x.name||'').toLowerCase() === nameLower);
-          const existing = candidates.length <= 1 ? candidates[0]
-            : (candidates.find(x => (x.zone||'').toLowerCase() === zone.toLowerCase()) || candidates[0]);
+          const existing = findExistingProspectForImport(name, zone, data.email, data.whatsapp);
           if (existing){
             await db.collection('prospects').doc(existing.id).update(data);
             updated++;
