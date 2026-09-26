@@ -694,14 +694,28 @@
       <div class="modal">
         <h2>WhatsApp — ${esc(client.name)}</h2>
         <div class="field"><label>Mensaje</label><textarea id="waMessageInput" style="min-height:120px;">${esc(customMessage || defaultWhatsAppMessage(client, suggestion))}</textarea></div>
-        <p class="sub" style="margin:-4px 0 6px;">Se abre WhatsApp con este mensaje cargado — todavía lo podés editar ahí antes de enviarlo.</p>
-        <div class="modal-actions">
+        <p class="sub" style="margin:-4px 0 6px;">Se abre WhatsApp con este mensaje cargado — todavía lo podés editar ahí antes de enviarlo. Si el navegador te bloquea el link, probá "Abrir en la app" o copiá el mensaje y pegalo a mano.</p>
+        <div class="modal-actions" style="flex-wrap:wrap;">
           <button type="button" class="btn btn-outline" data-act="close">Cerrar</button>
-          <button type="button" class="btn btn-primary" data-act="open-wa">Abrir WhatsApp</button>
+          <button type="button" class="btn btn-outline" data-act="copy">Copiar mensaje</button>
+          <button type="button" class="btn btn-outline" data-act="open-app">Abrir en la app</button>
+          <button type="button" class="btn btn-primary" data-act="open-wa">Abrir WhatsApp (web)</button>
         </div>
       </div>`;
     document.body.appendChild(backdrop);
     backdrop.querySelector('[data-act="close"]').addEventListener('click', () => backdrop.remove());
+    backdrop.querySelector('[data-act="copy"]').addEventListener('click', async () => {
+      const text = backdrop.querySelector('#waMessageInput').value;
+      try {
+        await navigator.clipboard.writeText(text);
+        toast('Mensaje copiado. Pegalo en WhatsApp.');
+      } catch (e) { toast('No se pudo copiar. Seleccioná el texto a mano.'); }
+    });
+    backdrop.querySelector('[data-act="open-app"]').addEventListener('click', () => {
+      const text = backdrop.querySelector('#waMessageInput').value;
+      window.open(`whatsapp://send?phone=${waNumber}&text=${encodeURIComponent(text)}`, '_blank');
+      backdrop.remove();
+    });
     backdrop.querySelector('[data-act="open-wa"]').addEventListener('click', () => {
       const text = backdrop.querySelector('#waMessageInput').value;
       window.open(`https://wa.me/${waNumber}?text=${encodeURIComponent(text)}`, '_blank');
