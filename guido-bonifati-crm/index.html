@@ -369,6 +369,7 @@
     { key:'cotizaciones', label:'Cotizaciones' },
     { key:'cobranzas', label:'Cobranzas' },
     { key:'tareas', label:'Tareas' },
+    { key:'prospeccion', label:'Prospección' },
     { key:'documentos', label:'Documentos' },
     { key:'siniestros', label:'Siniestros' },
     { key:'comisiones', label:'Comisiones' },
@@ -502,7 +503,7 @@
   /* ---------- State ---------- */
   const state = {
     clients: [], policies: [], quotes: [], tasks: [], interactions: [], documents: [], claims: [], insurers: [],
-    backups: [],
+    backups: [], prospects: [],
   };
   let db = null;
   let currentTab = 'dashboard';
@@ -537,6 +538,7 @@
     else if (currentTab === 'cobranzas') renderCobranzas();
     else if (currentTab === 'cotizaciones') renderCotizaciones();
     else if (currentTab === 'tareas') renderTareas();
+    else if (currentTab === 'prospeccion') renderProspeccion();
     else if (currentTab === 'documentos') renderDocumentos();
     else if (currentTab === 'siniestros') renderSiniestros();
     else if (currentTab === 'comisiones') renderComisiones();
@@ -1068,7 +1070,7 @@
       exportedAt: new Date().toISOString(),
       clients: state.clients, policies: state.policies, quotes: state.quotes,
       tasks: state.tasks, interactions: state.interactions, documents: state.documents, claims: state.claims,
-      insurers: state.insurers, goals,
+      insurers: state.insurers, prospects: state.prospects, goals,
     };
     const json = JSON.stringify(dump, null, 2);
     const downloads = await claude.use('downloads');
@@ -1088,7 +1090,7 @@
         exportedAt: new Date().toISOString(),
         clients: state.clients, policies: state.policies, quotes: state.quotes,
         tasks: state.tasks, interactions: state.interactions, documents: state.documents, claims: state.claims,
-        insurers: state.insurers, goals,
+        insurers: state.insurers, prospects: state.prospects, goals,
       };
       const json = JSON.stringify(dump);
       const createdAt = new Date().toISOString();
@@ -1304,6 +1306,225 @@
         }
         summary.textContent = `Listo: ${created} pólizas importadas${clientsCreated?`, ${clientsCreated} clientes nuevos creados automáticamente`:''}.`;
         toast('Importación de pólizas finalizada.');
+      } catch (err){
+        summary.textContent = 'Error al importar: ' + (err && err.message ? err.message : 'revisá el archivo.');
+      }
+    });
+  }
+
+  /* ==================== PROSPECCIÓN (referidos B2B: inmobiliarias, constructoras, lavaderos, contadores…) ==================== */
+  const PROSPECT_CATEGORIES = ['Inmobiliaria','Constructora','Lavadero de autos','Contador','Otro'];
+  const PROSPECT_CHANNELS = ['Email','WhatsApp','Teléfono','Otro'];
+  const PROSPECT_STATUSES = [
+    { key:'borrador', label:'Borrador — no enviado', cls:'badge-muted' },
+    { key:'contactado', label:'Contactado — sin respuesta', cls:'badge-warn' },
+    { key:'interesado', label:'Interesado — en seguimiento', cls:'badge-ok' },
+    { key:'no_seguir', label:'Pidió no contactar', cls:'badge-danger' },
+    { key:'rebotado', label:'Dato inválido (rebotó)', cls:'badge-danger' },
+  ];
+  function prospectStatusInfo(key){
+    return PROSPECT_STATUSES.find(s => s.key === key) || PROSPECT_STATUSES[1];
+  }
+  function normalizeProspectStatus(text){
+    const t = String(text||'').toLowerCase();
+    if (/no seguir|no contactar/.test(t)) return 'no_seguir';
+    if (/interesad/.test(t)) return 'interesado';
+    if (/rebot/.test(t)) return 'rebotado';
+    if (/borrador/.test(t)) return 'borrador';
+    return 'contactado';
+  }
+  function defaultProspectWhatsAppMessage(p){
+    if (p.status === 'interesado') return `Hola! Soy Guido, tu asesor de seguros. Te escribo para seguir la conversación sobre trabajar juntos derivando clientes.`;
+    return `Hola! Soy Guido Bonifati, asesor de seguros. Te escribo porque me gustaría proponerte trabajar juntos: cuando tengas un cliente que necesite un seguro te lo derivo a mí, o yo te derivo a vos, y coordinamos una comisión. ¿Te interesa charlarlo?`;
+  }
+  function renderProspeccion(){
+    const el = document.querySelector('.page[data-page="prospeccion"]');
+    if (!el.dataset.init){
+      el.dataset.init = '1';
+      el.innerHTML = `
+        <div class="page-head">
+          <div><h1>Prospección</h1><p>Inmobiliarias, constructoras, lavaderos, contadores y otros contactos B2B para referidos</p></div>
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn-outline" id="importProspectsBtn">Importar CSV</button>
+            <button class="btn btn-primary" id="newProspectBtn">+ Nuevo contacto</button>
+          </div>
+        </div>
+        <div id="prospectInterestedPanel"></div>
+        <div class="stat-grid" id="prospectStats" style="margin-bottom:18px;"></div>
+        <div class="toolbar">
+          <input type="search" id="prospectSearch" placeholder="Buscar por nombre…" style="min-width:220px;">
+          <select id="prospectCategoryFilter"><option value="">Todas las categorías</option>${PROSPECT_CATEGORIES.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('')}</select>
+          <select id="prospectZoneFilter"><option value="">Todas las zonas</option></select>
+          <select id="prospectStatusFilter">
+            <option value="">Todos los estados</option>
+            <option value="_recontactar">⚠ A recontactar (borrador + sin respuesta)</option>
+            ${PROSPECT_STATUSES.map(s => `<option value="${esc(s.key)}">${esc(s.label)}</option>`).join('')}
+          </select>
+        </div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Nombre</th><th>Categoría</th><th>Zona</th><th>Contacto</th><th>Estado</th><th>Notas</th><th></th></tr></thead>
+          <tbody id="prospectRows"></tbody>
+        </table></div>
+      `;
+      el.querySelector('#newProspectBtn').addEventListener('click', () => openProspectForm());
+      el.querySelector('#importProspectsBtn').addEventListener('click', () => openImportProspectsForm());
+      el.querySelector('#prospectSearch').addEventListener('input', () => renderProspectRows());
+      el.querySelector('#prospectCategoryFilter').addEventListener('input', () => renderProspectRows());
+      el.querySelector('#prospectZoneFilter').addEventListener('input', () => renderProspectRows());
+      el.querySelector('#prospectStatusFilter').addEventListener('input', () => renderProspectRows());
+    }
+    renderProspectRows();
+  }
+  function renderProspectRows(){
+    const el = document.querySelector('.page[data-page="prospeccion"]');
+    const interestedPanel = el.querySelector('#prospectInterestedPanel');
+    const interested = state.prospects.filter(p => p.status === 'interesado');
+    interestedPanel.innerHTML = interested.length ? `
+      <div class="panel" style="margin-bottom:16px;">
+        <h2>🎯 Interesados — seguimiento pendiente (${interested.length})</h2>
+        ${interested.map(p => `
+          <div class="kv" style="border-bottom:1px solid var(--border);padding:8px 0;font-size:13px;">
+            <span><a href="#" class="open-prospect" data-id="${p.id}" style="font-weight:600;color:var(--blue);">${esc(p.name)}</a>${p.notes ? ' — ' + esc(p.notes) : ''}</span>
+            ${p.whatsapp ? `<button type="button" class="btn btn-sm btn-outline prospect-wa" data-id="${p.id}">WhatsApp</button>` : ''}
+          </div>`).join('')}
+      </div>` : '';
+    interestedPanel.querySelectorAll('.open-prospect').forEach(a => a.addEventListener('click', e => { e.preventDefault(); const p = state.prospects.find(x => x.id === a.dataset.id); if (p) openProspectForm(p); }));
+    interestedPanel.querySelectorAll('.prospect-wa').forEach(b => b.addEventListener('click', () => {
+      const p = state.prospects.find(x => x.id === b.dataset.id);
+      if (p) openWhatsAppComposer({ name:p.name, phone:p.whatsapp }, null, defaultProspectWhatsAppMessage(p));
+    }));
+
+    const statsEl = el.querySelector('#prospectStats');
+    statsEl.innerHTML = PROSPECT_STATUSES.map(s => {
+      const n = state.prospects.filter(p => p.status === s.key).length;
+      return `<div class="stat-card"><b>${n}</b><span>${esc(s.label)}</span></div>`;
+    }).join('');
+
+    const zoneSelect = el.querySelector('#prospectZoneFilter');
+    const allZones = Array.from(new Set(state.prospects.map(p => p.zone).filter(Boolean))).sort((a,b) => a.localeCompare(b));
+    const currentZone = zoneSelect.value;
+    zoneSelect.innerHTML = '<option value="">Todas las zonas</option>' + allZones.map(z => `<option value="${esc(z)}" ${z===currentZone?'selected':''}>${esc(z)}</option>`).join('');
+
+    const q = (el.querySelector('#prospectSearch').value || '').toLowerCase();
+    const catF = el.querySelector('#prospectCategoryFilter').value;
+    const zoneF = zoneSelect.value;
+    const statusF = el.querySelector('#prospectStatusFilter').value;
+    const rows = state.prospects
+      .filter(p => !q || (p.name||'').toLowerCase().includes(q))
+      .filter(p => !catF || p.category === catF)
+      .filter(p => !zoneF || p.zone === zoneF)
+      .filter(p => {
+        if (!statusF) return true;
+        if (statusF === '_recontactar') return p.status === 'borrador' || p.status === 'contactado';
+        return p.status === statusF;
+      })
+      .sort((a,b) => (a.name||'').localeCompare(b.name||''));
+    const tbody = el.querySelector('#prospectRows');
+    if (!rows.length){ tbody.innerHTML = `<tr><td colspan="7" class="no-label"><p class="empty">No hay contactos que coincidan.</p></td></tr>`; return; }
+    tbody.innerHTML = rows.map(p => {
+      const info = prospectStatusInfo(p.status);
+      return `
+      <tr data-id="${p.id}">
+        <td data-label="Nombre"><a href="#" class="open-prospect" data-id="${p.id}" style="font-weight:600;color:var(--blue);">${esc(p.name)}</a></td>
+        <td data-label="Categoría">${esc(p.category || '—')}</td>
+        <td data-label="Zona">${esc(p.zone || '—')}</td>
+        <td data-label="Contacto">${esc(p.whatsapp || p.email || '—')}</td>
+        <td data-label="Estado"><span class="badge ${info.cls}">${esc(info.label)}</span></td>
+        <td data-label="Notas"><span title="${esc(p.notes||'')}" style="display:inline-block;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:bottom;">${esc(p.notes||'—')}</span></td>
+        <td class="no-label"><div class="row-actions">
+          ${p.whatsapp ? `<button class="icon-btn prospect-wa" data-id="${p.id}" title="Enviar WhatsApp">💬</button>` : ''}
+          <button class="icon-btn edit-prospect" data-id="${p.id}" title="Editar">✎</button>
+        </div></td>
+      </tr>`;
+    }).join('');
+    tbody.querySelectorAll('.open-prospect, .edit-prospect').forEach(b => b.addEventListener('click', e => { e.preventDefault(); const p = state.prospects.find(x => x.id === b.dataset.id); if (p) openProspectForm(p); }));
+    tbody.querySelectorAll('.prospect-wa').forEach(b => b.addEventListener('click', () => {
+      const p = state.prospects.find(x => x.id === b.dataset.id);
+      if (p) openWhatsAppComposer({ name:p.name, phone:p.whatsapp }, null, defaultProspectWhatsAppMessage(p));
+    }));
+  }
+  function openProspectForm(existing){
+    const p = existing || {};
+    openModal(existing ? 'Editar contacto' : 'Nuevo contacto de prospección', `
+      <div class="field"><label>Nombre</label><input name="name" required value="${esc(p.name||'')}"></div>
+      <div class="field-row">
+        <div class="field"><label>Categoría</label><select name="category">${PROSPECT_CATEGORIES.map(c => `<option value="${esc(c)}" ${p.category===c?'selected':''}>${esc(c)}</option>`).join('')}</select></div>
+        <div class="field"><label>Zona</label><input name="zone" placeholder="Ej: Quilmes" value="${esc(p.zone||'')}"></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>WhatsApp / Teléfono</label><input name="whatsapp" value="${esc(p.whatsapp||'')}"></div>
+        <div class="field"><label>Email</label><input name="email" type="email" value="${esc(p.email||'')}"></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>Vía de contacto</label><select name="channel">${PROSPECT_CHANNELS.map(c => `<option value="${esc(c)}" ${p.channel===c?'selected':''}>${esc(c)}</option>`).join('')}</select></div>
+        <div class="field"><label>Estado</label><select name="status">${PROSPECT_STATUSES.map(s => `<option value="${esc(s.key)}" ${(p.status||'contactado')===s.key?'selected':''}>${esc(s.label)}</option>`).join('')}</select></div>
+      </div>
+      <div class="field"><label>Notas</label><textarea name="notes">${esc(p.notes||'')}</textarea></div>
+    `, async data => {
+      if (existing){
+        await db.collection('prospects').doc(existing.id).update(data);
+        toast('Contacto actualizado.');
+      } else {
+        data.createdAt = new Date().toISOString();
+        await db.collection('prospects').add(data);
+        toast('Contacto creado.');
+      }
+    }, existing ? { onDelete: async () => {
+        await db.collection('prospects').doc(existing.id).delete();
+        toast('Contacto eliminado.');
+      } } : {});
+  }
+  function openImportProspectsForm(){
+    const backdrop = openModal('Importar contactos de prospección (CSV)', `
+      <p class="sub" style="margin-bottom:10px;">Columnas esperadas (en cualquier orden): Nombre (o "Inmobiliaria"), Zona, WhatsApp/Telefono, Email, Via de contacto, Estado, Notas.</p>
+      <div class="field"><label>Categoría para todos los contactos de este archivo</label><select id="importCategory">${PROSPECT_CATEGORIES.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('')}</select></div>
+      <div class="field"><input type="file" id="importFile" accept=".csv,text/csv"></div>
+      <p id="importSummary" class="sub" style="margin-top:10px;"></p>
+    `, async () => {}, { submitLabel: 'Cerrar' });
+    const summary = backdrop.querySelector('#importSummary');
+    backdrop.querySelector('#importFile').addEventListener('change', async e => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const category = backdrop.querySelector('#importCategory').value;
+      summary.textContent = 'Importando…';
+      try {
+        const text = await file.text();
+        const rows = parseCsv(text);
+        if (!rows.length){ summary.textContent = 'El archivo está vacío.'; return; }
+        const header = rows[0].map(h => h.trim().toLowerCase());
+        const idx = name => header.indexOf(name);
+        const iName = idx('nombre') >= 0 ? idx('nombre') : idx('inmobiliaria');
+        const iZone = idx('zona');
+        const iPhone = idx('whatsapp/telefono') >= 0 ? idx('whatsapp/telefono') : (idx('whatsapp') >= 0 ? idx('whatsapp') : idx('telefono'));
+        const iEmail = idx('email');
+        const iChannel = idx('via de contacto') >= 0 ? idx('via de contacto') : idx('vía de contacto');
+        const iStatus = idx('estado');
+        const iNotes = idx('notas');
+        if (iName < 0){ summary.textContent = 'Falta la columna "Nombre" (o "Inmobiliaria").'; return; }
+        let created = 0, skipped = 0;
+        for (let i = 1; i < rows.length; i++){
+          const r = rows[i];
+          const name = (r[iName]||'').trim();
+          if (!name) continue;
+          const email = iEmail>=0?(r[iEmail]||'').trim():'';
+          const whatsapp = iPhone>=0?(r[iPhone]||'').trim():'';
+          const exists = state.prospects.some(x => x.name.toLowerCase() === name.toLowerCase() && (x.email||'') === email && (x.whatsapp||'') === whatsapp);
+          if (exists){ skipped++; continue; }
+          const zoneRaw = iZone>=0?(r[iZone]||'').trim():'';
+          const data = {
+            name, category,
+            zone: zoneRaw === '-' ? '' : zoneRaw,
+            whatsapp, email,
+            channel: iChannel>=0?(r[iChannel]||'').trim():'',
+            status: iStatus>=0 ? normalizeProspectStatus(r[iStatus]) : 'contactado',
+            notes: iNotes>=0?(r[iNotes]||'').trim():'',
+            createdAt: new Date().toISOString(),
+          };
+          await db.collection('prospects').add(data);
+          created++;
+        }
+        summary.textContent = `Listo: ${created} contactos importados, ${skipped} omitidos (ya existían).`;
+        toast('Importación de prospección finalizada.');
       } catch (err){
         summary.textContent = 'Error al importar: ' + (err && err.message ? err.message : 'revisá el archivo.');
       }
@@ -3081,7 +3302,7 @@
     const cols = [
       ['clients','clients'], ['policies','policies'], ['quotes','quotes'],
       ['tasks','tasks'], ['interactions','interactions'], ['documents','documents'], ['claims','claims'],
-      ['insurers','insurers'], ['backups','backups'],
+      ['insurers','insurers'], ['backups','backups'], ['prospects','prospects'],
     ];
     cols.forEach(([path, key]) => {
       db.collection(path).onSnapshot(snap => {
