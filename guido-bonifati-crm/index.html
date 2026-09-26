@@ -176,6 +176,12 @@
   .icon-btn.active{color:var(--yellow-deep);border-color:var(--yellow-deep);}
   .star-inline{color:var(--yellow-deep);margin-right:4px;}
 
+  .collapse-panel summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px;}
+  .collapse-panel summary::-webkit-details-marker{display:none;}
+  .collapse-panel summary h2{margin:0;}
+  .collapse-panel summary .chev{color:var(--muted);font-size:11px;transition:transform .15s;flex-shrink:0;}
+  .collapse-panel[open] summary .chev{transform:rotate(90deg);}
+
   /* Comisiones: mini bloque de aseguradoras (comisión + reclamos) */
   .aseg-mini{margin-bottom:18px;}
   .aseg-mini summary{
@@ -1380,14 +1386,16 @@
     const interestedPanel = el.querySelector('#prospectInterestedPanel');
     const interested = state.prospects.filter(p => p.status === 'interesado');
     interestedPanel.innerHTML = interested.length ? `
-      <div class="panel" style="margin-bottom:16px;">
-        <h2>🎯 Interesados — seguimiento pendiente (${interested.length})</h2>
-        ${interested.map(p => `
-          <div class="kv" style="border-bottom:1px solid var(--border);padding:8px 0;font-size:13px;">
-            <span><a href="#" class="open-prospect" data-id="${p.id}" style="font-weight:600;color:var(--blue);">${esc(p.name)}</a>${p.notes ? ' — ' + esc(p.notes) : ''}</span>
-            ${p.whatsapp ? `<button type="button" class="btn btn-sm btn-outline prospect-wa" data-id="${p.id}">WhatsApp</button>` : ''}
-          </div>`).join('')}
-      </div>` : '';
+      <details class="panel collapse-panel" style="margin-bottom:16px;">
+        <summary><span class="chev">▶</span><h2>🎯 Interesados — seguimiento pendiente (${interested.length})</h2></summary>
+        <div style="margin-top:10px;">
+          ${interested.map(p => `
+            <div class="kv" style="border-bottom:1px solid var(--border);padding:8px 0;font-size:13px;">
+              <span><a href="#" class="open-prospect" data-id="${p.id}" style="font-weight:600;color:var(--blue);">${esc(p.name)}</a>${p.notes ? ' — ' + esc(p.notes) : ''}</span>
+              ${p.whatsapp ? `<button type="button" class="btn btn-sm btn-outline prospect-wa" data-id="${p.id}">WhatsApp</button>` : ''}
+            </div>`).join('')}
+        </div>
+      </details>` : '';
     interestedPanel.querySelectorAll('.open-prospect').forEach(a => a.addEventListener('click', e => { e.preventDefault(); const p = state.prospects.find(x => x.id === a.dataset.id); if (p) openProspectForm(p); }));
     interestedPanel.querySelectorAll('.prospect-wa').forEach(b => b.addEventListener('click', () => {
       const p = state.prospects.find(x => x.id === b.dataset.id);
