@@ -1423,6 +1423,44 @@
     if (p.status === 'interesado') return `Hola! Soy Guido, tu asesor de seguros. Te escribo para seguir la conversación sobre trabajar juntos derivando clientes.`;
     return `Hola! Soy Guido Bonifati, asesor de seguros. Te escribo porque me gustaría proponerte trabajar juntos: cuando tengas un cliente que necesite un seguro te lo derivo a mí, o yo te derivo a vos, y coordinamos una comisión. ¿Te interesa charlarlo?`;
   }
+  function defaultProspectEmailSubject(p){
+    return p.status === 'interesado' ? 'Seguimos la conversación — trabajemos juntos' : 'Propuesta de trabajo conjunto — seguros para tus clientes';
+  }
+  function defaultProspectEmailBody(p){
+    const firstName = (p.name||'').trim().split(/\s+/)[0] || '';
+    if (p.status === 'interesado') return `Hola ${firstName},\n\nTe escribo para seguir la conversación sobre trabajar juntos derivando clientes.\n\nQuedo atento a tu respuesta.\n\nSaludos,\nGuido Bonifati\nAsesor de Seguros`;
+    return `Hola ${firstName},\n\nMi nombre es Guido Bonifati, soy asesor de seguros en la zona. Te escribo porque me gustaría proponerte trabajar juntos: cuando alguno de tus clientes necesite asegurar su auto, hogar, o cualquier otro riesgo, te lo puedo cotizar y gestionar yo, y coordinamos una comisión por la derivación.\n\n¿Te interesaría charlarlo? Quedo atento.\n\nSaludos,\nGuido Bonifati\nAsesor de Seguros`;
+  }
+  function openProspectEmailComposer(p){
+    if (!p.email){ toast('Este contacto no tiene email cargado.'); return; }
+    const backdrop = document.createElement('div');
+    backdrop.className = 'modal-backdrop';
+    backdrop.innerHTML = `
+      <div class="modal">
+        <h2>Email — ${esc(p.name)}</h2>
+        <div class="field"><label>Asunto</label><input id="prospectEmailSubject" value="${esc(defaultProspectEmailSubject(p))}"></div>
+        <div class="field"><label>Mensaje</label><textarea id="prospectEmailBody" style="min-height:160px;">${esc(defaultProspectEmailBody(p))}</textarea></div>
+        <p class="sub" style="margin:-4px 0 6px;">Se abre tu programa de correo con esto cargado — todavía lo podés editar ahí antes de enviarlo.</p>
+        <div class="modal-actions" style="flex-wrap:wrap;">
+          <button type="button" class="btn btn-outline" data-act="close">Cerrar</button>
+          <button type="button" class="btn btn-outline" data-act="copy">Copiar mensaje</button>
+          <button type="button" class="btn btn-primary" data-act="open-mail">Abrir email</button>
+        </div>
+      </div>`;
+    document.body.appendChild(backdrop);
+    backdrop.querySelector('[data-act="close"]').addEventListener('click', () => backdrop.remove());
+    backdrop.querySelector('[data-act="copy"]').addEventListener('click', async () => {
+      const body = backdrop.querySelector('#prospectEmailBody').value;
+      try { await navigator.clipboard.writeText(body); toast('Mensaje copiado.'); }
+      catch (e) { toast('No se pudo copiar. Seleccioná el texto a mano.'); }
+    });
+    backdrop.querySelector('[data-act="open-mail"]').addEventListener('click', () => {
+      const subject = backdrop.querySelector('#prospectEmailSubject').value;
+      const body = backdrop.querySelector('#prospectEmailBody').value;
+      window.open(`mailto:${encodeURIComponent(p.email)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`, '_blank');
+      backdrop.remove();
+    });
+  }
   async function createFollowupTasksForInterested(){
     const interested = state.prospects.filter(p => p.status === 'interesado');
     if (!interested.length){ toast('No hay contactos marcados como Interesado.'); return; }
@@ -1541,6 +1579,7 @@
         <td data-label="Notas"><span title="${esc(p.notes||'')}" style="display:inline-block;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:bottom;">${esc(p.notes||'—')}</span></td>
         <td class="no-label"><div class="row-actions">
           ${p.whatsapp ? `<button class="icon-btn prospect-wa" data-id="${p.id}" title="Enviar WhatsApp">💬</button>` : ''}
+          ${p.email ? `<button class="icon-btn prospect-email" data-id="${p.id}" title="Enviar email">✉️</button>` : ''}
           <button class="icon-btn edit-prospect" data-id="${p.id}" title="Editar">✎</button>
         </div></td>
       </tr>`;
@@ -1549,6 +1588,10 @@
     tbody.querySelectorAll('.prospect-wa').forEach(b => b.addEventListener('click', () => {
       const p = state.prospects.find(x => x.id === b.dataset.id);
       if (p) openWhatsAppComposer({ name:p.name, phone:p.whatsapp }, null, defaultProspectWhatsAppMessage(p));
+    }));
+    tbody.querySelectorAll('.prospect-email').forEach(b => b.addEventListener('click', () => {
+      const p = state.prospects.find(x => x.id === b.dataset.id);
+      if (p) openProspectEmailComposer(p);
     }));
   }
   function openProspectForm(existing){
