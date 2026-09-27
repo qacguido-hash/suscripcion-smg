@@ -1424,10 +1424,14 @@
     return `Hola! Soy Guido Bonifati, asesor de seguros. Te escribo porque me gustaría proponerte trabajar juntos: cuando tengas un cliente que necesite un seguro te lo derivo a mí, o yo te derivo a vos, y coordinamos una comisión. ¿Te interesa charlarlo?`;
   }
   function defaultProspectEmailSubject(p){
+    if (p.category === 'Constructora') return 'Propuesta — Guido Bonifati, productor de seguros';
     return p.status === 'interesado' ? 'Seguimos la conversación — trabajemos juntos' : 'Propuesta de trabajo conjunto — seguros para tus clientes';
   }
   function defaultProspectEmailBody(p){
     const firstName = (p.name||'').trim().split(/\s+/)[0] || '';
+    if (p.category === 'Constructora'){
+      return `Hola ${firstName},\n\nMi nombre es Guido Bonifati, productor de seguros especializado en caución, y también manejo el resto de las coberturas que necesita una constructora (ART, RC, seguro técnico, entre otras).\n\nMe gustaría ponerme a disposición como productor para llevarles los seguros de la empresa.\n\nAdemás, desarrollé en mi web una plataforma donde los clientes cargan sus pólizas vigentes y yo las reviso para detectar oportunidades de mejora — en costos, en cobertura, o simplemente una segunda opinión sobre la aseguradora actual.\n\nAl estar radicado en Quilmes, puedo darles un acompañamiento cercano y ágil ante cualquier gestión.\n\n¿Coordinamos una breve reunión para conocernos y ver en qué puedo sumar?\n\nSaludos,\nGuido Bonifati`;
+    }
     if (p.status === 'interesado') return `Hola ${firstName},\n\nTe escribo para seguir la conversación sobre trabajar juntos derivando clientes.\n\nQuedo atento a tu respuesta.\n\nSaludos,\nGuido Bonifati\nAsesor de Seguros`;
     return `Hola ${firstName},\n\nMi nombre es Guido Bonifati, soy asesor de seguros en la zona. Te escribo porque me gustaría proponerte trabajar juntos: cuando alguno de tus clientes necesite asegurar su auto, hogar, o cualquier otro riesgo, te lo puedo cotizar y gestionar yo, y coordinamos una comisión por la derivación.\n\n¿Te interesaría charlarlo? Quedo atento.\n\nSaludos,\nGuido Bonifati\nAsesor de Seguros`;
   }
