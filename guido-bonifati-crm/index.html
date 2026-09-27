@@ -1423,14 +1423,6 @@
     }
     toast(`Se fusionaron ${merged} contacto(s) duplicado(s), se eliminaron ${deleted} registro(s) repetidos.`);
   }
-  async function fixConstructoraStatuses(){
-    const toFix = state.prospects.filter(p => p.category === 'Constructora' && p.status === 'contactado');
-    if (!toFix.length){ toast('No hay constructoras marcadas como "Contactado" para corregir.'); return; }
-    for (const p of toFix){
-      await db.collection('prospects').doc(p.id).update({ status: 'no_contactado' });
-    }
-    toast(`Se corrigieron ${toFix.length} constructora(s) a "No contactado".`);
-  }
   function defaultProspectWhatsAppMessage(p){
     if (p.category === 'Constructora') return defaultProspectEmailBody(p);
     if (p.status === 'interesado') return `Hola! Soy Guido, tu asesor de seguros. Te escribo para seguir la conversación sobre trabajar juntos derivando clientes.`;
@@ -1502,7 +1494,6 @@
           <div><h1>Prospección</h1><p>Inmobiliarias, constructoras, lavaderos, contadores y otros contactos B2B para referidos</p></div>
           <div style="display:flex;gap:8px;">
             <button class="btn btn-outline" id="mergeProspectsBtn" title="Junta en un solo registro los contactos repetidos que comparten email o WhatsApp">Fusionar duplicados</button>
-            <button class="btn btn-outline" id="fixConstructorasBtn" title="Corrige a 'No contactado' las constructoras que quedaron mal cargadas como 'Contactado'">Corregir constructoras</button>
             <button class="btn btn-outline" id="importProspectsBtn">Importar CSV</button>
             <button class="btn btn-primary" id="newProspectBtn">+ Nuevo contacto</button>
           </div>
@@ -1527,7 +1518,6 @@
       el.querySelector('#newProspectBtn').addEventListener('click', () => openProspectForm());
       el.querySelector('#importProspectsBtn').addEventListener('click', () => openImportProspectsForm());
       el.querySelector('#mergeProspectsBtn').addEventListener('click', () => mergeDuplicateProspects());
-      el.querySelector('#fixConstructorasBtn').addEventListener('click', () => fixConstructoraStatuses());
       el.querySelector('#prospectSearch').addEventListener('input', () => renderProspectRows());
       el.querySelector('#prospectCategoryFilter').addEventListener('input', () => renderProspectRows());
       el.querySelector('#prospectZoneFilter').addEventListener('input', () => renderProspectRows());
