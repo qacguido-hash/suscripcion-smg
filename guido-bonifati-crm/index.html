@@ -1420,6 +1420,7 @@
     toast(`Se fusionaron ${merged} contacto(s) duplicado(s), se eliminaron ${deleted} registro(s) repetidos.`);
   }
   function defaultProspectWhatsAppMessage(p){
+    if (p.category === 'Constructora') return defaultProspectEmailBody(p);
     if (p.status === 'interesado') return `Hola! Soy Guido, tu asesor de seguros. Te escribo para seguir la conversación sobre trabajar juntos derivando clientes.`;
     return `Hola! Soy Guido Bonifati, asesor de seguros. Te escribo porque me gustaría proponerte trabajar juntos: cuando tengas un cliente que necesite un seguro te lo derivo a mí, o yo te derivo a vos, y coordinamos una comisión. ¿Te interesa charlarlo?`;
   }
