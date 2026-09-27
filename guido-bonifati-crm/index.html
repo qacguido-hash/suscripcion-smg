@@ -1349,6 +1349,7 @@
   const PROSPECT_CATEGORIES = ['Inmobiliaria','Constructora','Lavadero de autos','Contador','Otro'];
   const PROSPECT_CHANNELS = ['Email','WhatsApp','Teléfono','Otro'];
   const PROSPECT_STATUSES = [
+    { key:'no_contactado', label:'No contactado', cls:'badge-muted' },
     { key:'borrador', label:'Borrador — no enviado', cls:'badge-muted' },
     { key:'contactado', label:'Contactado — sin respuesta', cls:'badge-warn' },
     { key:'interesado', label:'Interesado — en seguimiento', cls:'badge-ok' },
@@ -1356,15 +1357,18 @@
     { key:'rebotado', label:'Dato inválido (rebotó)', cls:'badge-danger' },
   ];
   function prospectStatusInfo(key){
-    return PROSPECT_STATUSES.find(s => s.key === key) || PROSPECT_STATUSES[1];
+    return PROSPECT_STATUSES.find(s => s.key === key) || PROSPECT_STATUSES.find(s => s.key === 'no_contactado');
   }
   function normalizeProspectStatus(text){
     const t = String(text||'').toLowerCase();
+    if (!t.trim()) return 'no_contactado';
     if (/no seguir|no contactar/.test(t)) return 'no_seguir';
     if (/interesad/.test(t)) return 'interesado';
     if (/rebot/.test(t)) return 'rebotado';
     if (/borrador/.test(t)) return 'borrador';
-    return 'contactado';
+    if (/no contactado|sin contactar|no iniciado/.test(t)) return 'no_contactado';
+    if (/contactad|enviad/.test(t)) return 'contactado';
+    return 'no_contactado';
   }
   function findExistingProspectForImport(name, zone, email, whatsapp){
     // Prioridad 1: email/WhatsApp exacto. Es más confiable que el nombre para reconocer al
@@ -1418,6 +1422,14 @@
       merged++;
     }
     toast(`Se fusionaron ${merged} contacto(s) duplicado(s), se eliminaron ${deleted} registro(s) repetidos.`);
+  }
+  async function fixConstructoraStatuses(){
+    const toFix = state.prospects.filter(p => p.category === 'Constructora' && p.status === 'contactado');
+    if (!toFix.length){ toast('No hay constructoras marcadas como "Contactado" para corregir.'); return; }
+    for (const p of toFix){
+      await db.collection('prospects').doc(p.id).update({ status: 'no_contactado' });
+    }
+    toast(`Se corrigieron ${toFix.length} constructora(s) a "No contactado".`);
   }
   function defaultProspectWhatsAppMessage(p){
     if (p.category === 'Constructora') return defaultProspectEmailBody(p);
@@ -1490,6 +1502,7 @@
           <div><h1>Prospección</h1><p>Inmobiliarias, constructoras, lavaderos, contadores y otros contactos B2B para referidos</p></div>
           <div style="display:flex;gap:8px;">
             <button class="btn btn-outline" id="mergeProspectsBtn" title="Junta en un solo registro los contactos repetidos que comparten email o WhatsApp">Fusionar duplicados</button>
+            <button class="btn btn-outline" id="fixConstructorasBtn" title="Corrige a 'No contactado' las constructoras que quedaron mal cargadas como 'Contactado'">Corregir constructoras</button>
             <button class="btn btn-outline" id="importProspectsBtn">Importar CSV</button>
             <button class="btn btn-primary" id="newProspectBtn">+ Nuevo contacto</button>
           </div>
@@ -1514,6 +1527,7 @@
       el.querySelector('#newProspectBtn').addEventListener('click', () => openProspectForm());
       el.querySelector('#importProspectsBtn').addEventListener('click', () => openImportProspectsForm());
       el.querySelector('#mergeProspectsBtn').addEventListener('click', () => mergeDuplicateProspects());
+      el.querySelector('#fixConstructorasBtn').addEventListener('click', () => fixConstructoraStatuses());
       el.querySelector('#prospectSearch').addEventListener('input', () => renderProspectRows());
       el.querySelector('#prospectCategoryFilter').addEventListener('input', () => renderProspectRows());
       el.querySelector('#prospectZoneFilter').addEventListener('input', () => renderProspectRows());
@@ -1669,7 +1683,7 @@
             whatsapp: iPhone>=0?(r[iPhone]||'').trim():'',
             email: iEmail>=0?(r[iEmail]||'').trim():'',
             channel: iChannel>=0?(r[iChannel]||'').trim():'',
-            status: iStatus>=0 ? normalizeProspectStatus(r[iStatus]) : 'contactado',
+            status: iStatus>=0 ? normalizeProspectStatus(r[iStatus]) : 'no_contactado',
             notes: iNotes>=0?(r[iNotes]||'').trim():'',
           };
           const existing = findExistingProspectForImport(name, zone, data.email, data.whatsapp);
