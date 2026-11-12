@@ -1,0 +1,165 @@
+{
+ "px_por_cm": 16.62,
+ "productos": {
+  "01_agua_villavicencio": {
+   "medida_real_cm": [
+    5.9,
+    21.5
+   ],
+   "escala_aplicada": 1.0,
+   "rotado": false
+  },
+  "02_baggio_naranja": {
+   "medida_real_cm": [
+    5.0,
+    11.0
+   ],
+   "escala_aplicada": 1.0,
+   "rotado": false
+  },
+  "03_baggio_multifruta": {
+   "medida_real_cm": [
+    5.0,
+    11.0
+   ],
+   "escala_aplicada": 1.0,
+   "rotado": false
+  },
+  "04_cindor": {
+   "medida_real_cm": [
+    5.2,
+    11.0
+   ],
+   "escala_aplicada": 1.0,
+   "rotado": false
+  },
+  "05_sprite": {
+   "medida_real_cm": [
+    5.8,
+    21.5
+   ],
+   "escala_aplicada": 1.0,
+   "rotado": false
+  },
+  "06_fanta": {
+   "medida_real_cm": [
+    6.0,
+    21.5
+   ],
+   "escala_aplicada": 1.0,
+   "rotado": false
+  },
+  "07_coca_zero": {
+   "medida_real_cm": [
+    6.0,
+    21.5
+   ],
+   "escala_aplicada": 1.0,
+   "rotado": false
+  },
+  "08_coca_cola": {
+   "medida_real_cm": [
+    6.0,
+    21.5
+   ],
+   "escala_aplicada": 1.0,
+   "rotado": false
+  },
+  "09_powerade": {
+   "medida_real_cm": [
+    6.4,
+    21.0
+   ],
+   "escala_aplicada": 1.0,
+   "rotado": false
+  },
+  "10_monster": {
+   "medida_real_cm": [
+    6.6,
+    16.8
+   ],
+   "escala_aplicada": 0.99,
+   "rotado": false
+  },
+  "11_miga_jyq": {
+   "medida_real_cm": [
+    10.7,
+    12.5
+   ],
+   "escala_aplicada": 0.62,
+   "rotado": false
+  },
+  "12_miga_jyq_negro": {
+   "medida_real_cm": [
+    10.7,
+    12.5
+   ],
+   "escala_aplicada": 0.62,
+   "rotado": false
+  },
+  "13_miga_crudo": {
+   "medida_real_cm": [
+    11.3,
+    12.5
+   ],
+   "escala_aplicada": 0.58,
+   "rotado": false
+  },
+  "14_pebete": {
+   "medida_real_cm": [
+    12.7,
+    15.0
+   ],
+   "escala_aplicada": 0.52,
+   "rotado": false
+  },
+  "15_medialuna_rellena": {
+   "medida_real_cm": [
+    10.0,
+    12.0
+   ],
+   "escala_aplicada": 0.66,
+   "rotado": false
+  },
+  "16_mini_oreo": {
+   "medida_real_cm": [
+    9.9,
+    13.5
+   ],
+   "escala_aplicada": 0.67,
+   "rotado": false
+  },
+  "17_mini_pepitos": {
+   "medida_real_cm": [
+    9.3,
+    13.5
+   ],
+   "escala_aplicada": 0.71,
+   "rotado": false
+  },
+  "18_club_social": {
+   "medida_real_cm": [
+    8.7,
+    14.0
+   ],
+   "escala_aplicada": 0.76,
+   "rotado": false
+  },
+  "19_rex": {
+   "medida_real_cm": [
+    14.4,
+    16.0
+   ],
+   "escala_aplicada": 0.46,
+   "rotado": false
+  },
+  "20_pringles": {
+   "medida_real_cm": [
+    6.5,
+    7.5
+   ],
+   "escala_aplicada": 1.0,
+   "rotado": false
+  }
+ }
+}

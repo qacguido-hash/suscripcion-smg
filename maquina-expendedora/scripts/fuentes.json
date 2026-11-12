@@ -1,0 +1,387 @@
+{
+ "01_agua_villavicencio": {
+  "producto": "Agua",
+  "tienda": "carrefour",
+  "nombre_en_tienda": "Agua mineral sin gas Villavicencio 500 ml",
+  "imagen": "https://carrefourar.vteximg.com.br/arquivos/ids/821956/7799155000173_02.jpg",
+  "pagina": "https://www.carrefour.com.ar/agua-mineral-sin-gas-villavicencio-500-ml-727424/p"
+ },
+ "02_baggio_naranja": {
+  "producto": "Baggio Naranja",
+  "tienda": "dia",
+  "nombre_en_tienda": "Jugo Listo Con Vitaminas Naranja Baggio 200 Ml.",
+  "imagen": "https://ardiaprod.vteximg.com.br/arquivos/ids/341402/Jugo-Listo-Con-Vitaminas-Naranja-Baggio-200-Ml-_1.jpg",
+  "pagina": "https://diaonline.supermercadosdia.com.ar/jugo-listo-con-vitaminas-naranja-baggio-200-ml-138086/p"
+ },
+ "03_baggio_multifruta": {
+  "producto": "Baggio Multi",
+  "tienda": "dia",
+  "nombre_en_tienda": "Jugo Listo Multifrutas Con Vitaminas Baggio 200 Ml.",
+  "imagen": "https://ardiaprod.vteximg.com.br/arquivos/ids/341403/Jugo-Listo-Multifrutas-Con-Vitaminas-Baggio-200-Ml-_1.jpg",
+  "pagina": "https://diaonline.supermercadosdia.com.ar/jugo-listo-multifrutas-con-vitaminas-baggio-200-ml-138087/p"
+ },
+ "04_cindor": {
+  "producto": "Cindor chocolatada",
+  "tienda": "dia",
+  "nombre_en_tienda": "Leche Chocolatada Cindor 200 Ml.",
+  "imagen": "https://ardiaprod.vteximg.com.br/arquivos/ids/394103/Leche-Chocolatada-Cindor-200-Ml-_1.jpg",
+  "pagina": "https://diaonline.supermercadosdia.com.ar/leche-chocolatada-cindor-200-ml-295514/p"
+ },
+ "05_sprite": {
+  "producto": "Sprite",
+  "tienda": "carrefour",
+  "nombre_en_tienda": "Gaseosa lima limón Sprite 500 ml",
+  "imagen": "https://carrefourar.vteximg.com.br/arquivos/ids/368780/7790895000829_E01.jpg",
+  "pagina": "https://www.carrefour.com.ar/gaseosa-lima-limon-sprite-500-ml-103269/p"
+ },
+ "06_fanta": {
+  "producto": "Fanta",
+  "tienda": "jumbo",
+  "nombre_en_tienda": "Gaseosa Sabor Naranja 500 Ml Fanta",
+  "imagen": "https://jumboargentina.vteximg.com.br/arquivos/ids/879914/Gaseosa-Naranja-500-Ml-Fanta-2-10597.jpg",
+  "pagina": "https://www.jumbo.com.ar/gaseosa-naranja-500-ml-fanta/p"
+ },
+ "07_coca_zero": {
+  "producto": "Coca-Cola Zero",
+  "tienda": "dia",
+  "nombre_en_tienda": "Gaseosa Coca-Cola Zero 500 Ml.",
+  "imagen": "https://ardiaprod.vteximg.com.br/arquivos/ids/314743/Gaseosa-CocaCola-Zero-500-Ml-_1.jpg",
+  "pagina": "https://diaonline.supermercadosdia.com.ar/gaseosa-coca-cola-zero-500-ml-185518/p"
+ },
+ "08_coca_cola": {
+  "producto": "Coca-Cola",
+  "tienda": "dia",
+  "nombre_en_tienda": "Gaseosa Coca-Cola Sabor Original 500 Ml.",
+  "imagen": "https://ardiaprod.vteximg.com.br/arquivos/ids/358630/Gaseosa-CocaCola-Sabor-Original-500-Ml-_1.jpg",
+  "pagina": "https://diaonline.supermercadosdia.com.ar/gaseosa-coca-cola-sabor-original-500-ml-19359/p"
+ },
+ "09_powerade": {
+  "producto": "Powerade",
+  "tienda": "jumbo",
+  "nombre_en_tienda": "Bebida Isotónica Sabor Mountain Blast 500 Ml Powerade",
+  "imagen": "https://jumboargentina.vteximg.com.br/arquivos/ids/895507/Isotonico-Powerade-Mountain-Blast-500cc-2-26829.jpg",
+  "pagina": "https://www.jumbo.com.ar/bebida-isotonica-mountain-blast-500-ml-powerade/p"
+ },
+ "10_monster": {
+  "producto": "Monster",
+  "tienda": "jumbo",
+  "nombre_en_tienda": "Bebida Energizante Energy 473 Ml Monster",
+  "imagen": "https://jumboargentina.vteximg.com.br/arquivos/ids/881630/Bebida-Energizante-Energy-473-Ml-Monster-2-255777.jpg",
+  "pagina": "https://www.jumbo.com.ar/bebida-energizante-energy-473-ml-monster/p"
+ },
+ "11_miga_jyq": {
+  "producto": "Sándwich de miga JyQ",
+  "tienda": "dia",
+  "nombre_en_tienda": "Sandwich Triple Jamon Y Queso Dia 120 Gr.",
+  "imagen": "https://ardiaprod.vteximg.com.br/arquivos/ids/346433/Sandwich-Triple-Jamon-Y-Queso-Dia-120-Gr-_2.jpg",
+  "pagina": "https://diaonline.supermercadosdia.com.ar/sandwich-triple-jamon-y-queso-dia-120-gr-303161/p"
+ },
+ "12_miga_jyq_negro": {
+  "producto": "Sándwich de miga JyQ pan negro",
+  "tienda": "dia",
+  "nombre_en_tienda": "Sandwich De Jamon Y Queso Triple Pan Negro Dia 120 Gr.",
+  "imagen": "https://ardiaprod.vteximg.com.br/arquivos/ids/346429/Sandwich-De-Jamon-Y-Queso-Triple-Pan-Negro-Dia-120-Gr-_2.jpg",
+  "pagina": "https://diaonline.supermercadosdia.com.ar/sandwich-de-jamon-y-queso-triple-pan-negro-dia-120-gr-303135/p"
+ },
+ "13_miga_crudo": {
+  "producto": "Sándwich de miga crudo y queso",
+  "tienda": "jumbo",
+  "nombre_en_tienda": "Sandwich De Miga Negro Crudo Y Queso",
+  "imagen": "https://jumboargentina.vteximg.com.br/arquivos/ids/644899/Sandwich-De-Miga-Negro-Crudo-Y-Queso-bli-un-2-1-38554.jpg",
+  "pagina": "https://www.jumbo.com.ar/sandwich-de-miga-negro-crudo-y-queso/p"
+ },
+ "14_pebete": {
+  "producto": "Pebete",
+  "tienda": "carrefour",
+  "nombre_en_tienda": "Sandwich de pebete Cañon de jamón y queso x unidad.",
+  "imagen": "https://carrefourar.vteximg.com.br/arquivos/ids/914402/7795947000208_02.jpg",
+  "pagina": "https://www.carrefour.com.ar/sandwich-de-pebete-canon-de-jamon-y-queso-x-unidad-742150/p"
+ },
+ "15_medialuna_rellena": {
+  "producto": "Medialuna rellena",
+  "tienda": "carrefour",
+  "nombre_en_tienda": "Medialunas rellenas con jamón y queso El Mercado x 2 uni",
+  "imagen": "https://carrefourar.vteximg.com.br/arquivos/ids/911956/7795947005159_E02.jpg",
+  "pagina": "https://www.carrefour.com.ar/medialunas-rellenas-con-jamon-y-queso-el-mercado-x-2-uni/p"
+ },
+ "16_mini_oreo": {
+  "producto": "Mini Oreo",
+  "tienda": "carrefour",
+  "nombre_en_tienda": "Galletitas Oreo Mini rellenas con crema sabor original 50 g.",
+  "imagen": "https://carrefourar.vteximg.com.br/arquivos/ids/924102/7622201761288_E01.jpg",
+  "pagina": "https://www.carrefour.com.ar/galletitas-oreo-mini-rellenas-con-crema-sabor-original-50-g-720547/p"
+ },
+ "17_mini_pepitos": {
+  "producto": "Mini Pepitos",
+  "tienda": "carrefour",
+  "nombre_en_tienda": "Galletitas Mini Pepitos con chips de chocolate 50 g.",
+  "imagen": "https://carrefourar.vteximg.com.br/arquivos/ids/924118/7622201740399_E01.jpg",
+  "pagina": "https://www.carrefour.com.ar/galletitas-mini-pepitos-con-chips-de-chocolate-50-g-720553/p"
+ },
+ "18_club_social": {
+  "producto": "Club Social",
+  "tienda": "carrefour",
+  "nombre_en_tienda": "Galletitas original Club Social x6 24 grs",
+  "imagen": "https://carrefourar.vteximg.com.br/arquivos/ids/905783/7622202293733_E02.jpg",
+  "pagina": "https://www.carrefour.com.ar/galletitas-original-club-social-x6-24-grs-768035/p"
+ },
+ "19_rex": {
+  "producto": "Rex",
+  "tienda": "carrefour",
+  "nombre_en_tienda": "Galletitas crackers Rex original 75 g.",
+  "imagen": "https://carrefourar.vteximg.com.br/arquivos/ids/905398/7790040003569_E02.jpg",
+  "pagina": "https://www.carrefour.com.ar/galletitas-crackers-rex-original-75-g/p"
+ },
+ "20_pringles": {
+  "producto": "Papas en tubo",
+  "tienda": "carrefour",
+  "nombre_en_tienda": "Papas fritas Pringles original 37 g",
+  "imagen": "https://carrefourar.vteximg.com.br/arquivos/ids/904244/7896004009186_E02.jpg",
+  "pagina": "https://www.carrefour.com.ar/papas-fritas-pringles-original-37-g-737989/p"
+ },
+ "21_milka_ddl_negro": {
+  "producto": "Milka Super DDL negro",
+  "tienda": "carrefour",
+  "nombre_en_tienda": "Alfajor Milka Super Dulce de Leche 70 grs",
+  "imagen": "https://carrefourar.vteximg.com.br/arquivos/ids/878650/7622202370021_E01.jpg",
+  "pagina": "https://www.carrefour.com.ar/alfajor-milka-super-dulce-de-leche-70-grs-777682/p"
+ },
+ "22_milka_ddl_blanco": {
+  "producto": "Milka Super DDL blanco",
+  "tienda": "carrefour",
+  "nombre_en_tienda": "Alfajor Milka Super Dulce de Leche Blanco 70 grs",
+  "imagen": "https://carrefourar.vteximg.com.br/arquivos/ids/878652/7622202370045_E01.jpg",
+  "pagina": "https://www.carrefour.com.ar/alfajor-milka-super-dulce-de-leche-blanco-70-grs-777683/p"
+ },
+ "23_rasta_negro": {
+  "producto": "Rasta negro",
+  "tienda": "web",
+  "nombre_en_tienda": "",
+  "imagen": "https://destinfoods.mx/cdn/shop/files/alfajor-rasta-negro-70g_1024x.webp",
+  "pagina": "https://destinfoods.mx/cdn/shop/files/alfajor-rasta-negro-70g_1024x.webp"
+ },
+ "24_rasta_blanco": {
+  "producto": "Rasta blanco",
+  "tienda": "web",
+  "nombre_en_tienda": "",
+  "imagen": "https://cdn11.bigcommerce.com/s-3stx4pub31/images/stencil/1280x1280/products/11987/41566/Rasta_Alfajor_White_Chocolate_Alfajores_with_Creamy_Dulce_de_Leche_70_g_2.46_oz_ea_pack_of_6__92669.1786562595.jpg",
+  "pagina": "https://cdn11.bigcommerce.com/s-3stx4pub31/images/stencil/1280x1280/products/11987/41566/Rasta_Alfajor_White_Chocolate_Alfajores_with_Creamy_Dulce_de_Leche_70_g_2.46_oz_ea_pack_of_6__92669.1786562595.jpg"
+ },
+ "25_aguila_brownie": {
+  "producto": "Águila Brownie",
+  "tienda": "carrefour",
+  "nombre_en_tienda": "Alfajor brownie Aguila mini torta 71.5 g",
+  "imagen": "https://carrefourar.vteximg.com.br/arquivos/ids/318921/7790040133594_E01.jpg",
+  "pagina": "https://www.carrefour.com.ar/alfajor-brownie-aguila-mini-torta-715-g-717414/p"
+ },
+ "26_cachafaz": {
+  "producto": "Cachafaz",
+  "tienda": "carrefour",
+  "nombre_en_tienda": "Alfajor Cachafaz chocolate 60 g.",
+  "imagen": "https://carrefourar.vteximg.com.br/arquivos/ids/915496/77934499_E02.jpg",
+  "pagina": "https://www.carrefour.com.ar/alfajor-cachafaz-chocolate-60-g/p"
+ },
+ "27_alfajor_block": {
+  "producto": "Alfajor Block",
+  "tienda": "carrefour",
+  "nombre_en_tienda": "Alfajor negro block Cofler 60 g.",
+  "imagen": "https://carrefourar.vteximg.com.br/arquivos/ids/318985/7790040659605_E01.jpg",
+  "pagina": "https://www.carrefour.com.ar/alfajor-negro-block-cofler-60-g/p"
+ },
+ "28_chocotorta": {
+  "producto": "Chocotorta",
+  "tienda": "carrefour",
+  "nombre_en_tienda": "Alfajor Chocolinas chocotorta 71.5 grs",
+  "imagen": "https://carrefourar.vteximg.com.br/arquivos/ids/915668/7790040150072_E02.jpg",
+  "pagina": "https://www.carrefour.com.ar/alfajor-chocolinas-chocotorta-71-5-grs-761715/p"
+ },
+ "29_milka_mousse": {
+  "producto": "Milka Mousse",
+  "tienda": "carrefour",
+  "nombre_en_tienda": "Alfajor Milka triple mousse 55 g.",
+  "imagen": "https://carrefourar.vteximg.com.br/arquivos/ids/915501/77903785_E01.jpg",
+  "pagina": "https://www.carrefour.com.ar/alfajor-milka-triple-mousse-55-g-569705/p"
+ },
+ "30_guaymallen": {
+  "producto": "Guaymallén",
+  "tienda": "carrefour",
+  "nombre_en_tienda": "Alfajor Guaymallén chocolate 38 g.",
+  "imagen": "https://carrefourar.vteximg.com.br/arquivos/ids/915489/77980229_02.jpg",
+  "pagina": "https://www.carrefour.com.ar/alfajor-guaymallen-chocolate-38-g-37711-37711/p"
+ },
+ "31_rocklets": {
+  "producto": "Rocklets",
+  "tienda": "carrefour",
+  "nombre_en_tienda": "Confites de chocolate Rocklets 40 g.",
+  "imagen": "https://carrefourar.vteximg.com.br/arquivos/ids/916111/7790580327415_E01.jpg",
+  "pagina": "https://www.carrefour.com.ar/confites-de-chocolate-rocklets-40-g-310673/p"
+ },
+ "32_sugus": {
+  "producto": "Sugus",
+  "tienda": "carrefour",
+  "nombre_en_tienda": "Caramelos Sugus confitados 50 g.",
+  "imagen": "https://carrefourar.vteximg.com.br/arquivos/ids/192843/7790580056001_01.jpg",
+  "pagina": "https://www.carrefour.com.ar/caramelos-sugus-confitados-50-g-36959/p"
+ },
+ "33_hamlet": {
+  "producto": "Hamlet",
+  "tienda": "carrefour",
+  "nombre_en_tienda": "Chocolate Hamlet bicolor 42 gr.",
+  "imagen": "https://carrefourar.vteximg.com.br/arquivos/ids/914583/7794612491013_02.jpg",
+  "pagina": "https://www.carrefour.com.ar/chocolate-hamlet-bicolor-42-gr/p"
+ },
+ "34_kitkat": {
+  "producto": "Kit Kat",
+  "tienda": "carrefour",
+  "nombre_en_tienda": "Oblea Kitkat 4 fingers 41.5 grs",
+  "imagen": "https://carrefourar.vteximg.com.br/arquivos/ids/914655/7891000248799_E01.jpg",
+  "pagina": "https://www.carrefour.com.ar/oblea-kitkat-4-fingers-415-grs-622987/p"
+ },
+ "35_kinder": {
+  "producto": "Kinder",
+  "tienda": "carrefour",
+  "nombre_en_tienda": "Kinder Chocolate 50 grs",
+  "imagen": "https://carrefourar.vteximg.com.br/arquivos/ids/909689/77949677_E01.jpg",
+  "pagina": "https://www.carrefour.com.ar/kinder-chocolate-50-grs-613384/p"
+ },
+ "36_conito": {
+  "producto": "Conito DDL",
+  "tienda": "web",
+  "nombre_en_tienda": "",
+  "imagen": "https://acdn-us.mitiendanube.com/stores/001/058/870/products/cach16_1-cba19c59c3bafee8a617828288937102-1024-1024.webp",
+  "pagina": "https://acdn-us.mitiendanube.com/stores/001/058/870/products/cach16_1-cba19c59c3bafee8a617828288937102-1024-1024.webp"
+ },
+ "37_beldent": {
+  "producto": "Beldent Infinit",
+  "tienda": "carrefour",
+  "nombre_en_tienda": "Chicles Beldent Infinit menta 13,3 g.",
+  "imagen": "https://carrefourar.vteximg.com.br/arquivos/ids/916024/7622201421496_E01.jpg",
+  "pagina": "https://www.carrefour.com.ar/chicles-beldent-infinit-menta-13-3-g/p"
+ },
+ "38_tictac": {
+  "producto": "Tic Tac",
+  "tienda": "carrefour",
+  "nombre_en_tienda": "Tic Tac Menta 16 grs",
+  "imagen": "https://carrefourar.vteximg.com.br/arquivos/ids/909662/78600010_E01.jpg",
+  "pagina": "https://www.carrefour.com.ar/tic-tac-menta-16-grs-162190/p"
+ },
+ "39_dientitos": {
+  "producto": "Dientitos",
+  "tienda": "dia",
+  "nombre_en_tienda": "Gomitas Dientes Mogul 50 Gr.",
+  "imagen": "https://ardiaprod.vteximg.com.br/arquivos/ids/377802/Gomitas-Dientes-Mogul-50-Gr-_1.jpg",
+  "pagina": "https://diaonline.supermercadosdia.com.ar/gomitas-dientes-mogul-50-gr-309784/p"
+ },
+ "40_moritas": {
+  "producto": "Moritas",
+  "tienda": "dia",
+  "nombre_en_tienda": "Gomitas Moras Mogul 50 Gr.",
+  "imagen": "https://ardiaprod.vteximg.com.br/arquivos/ids/377298/Gomitas-Moras-Mogul-50-Gr-_1.jpg",
+  "pagina": "https://diaonline.supermercadosdia.com.ar/gomitas-moras-mogul-50-gr-314129/p"
+ },
+ "41_cofler_air_mixto": {
+  "producto": "Cofler Air variado",
+  "tienda": "carrefour",
+  "nombre_en_tienda": "Chocolate Cofler Air mixto 55 g.",
+  "imagen": "https://carrefourar.vteximg.com.br/arquivos/ids/192859/7790580103422_01.jpg",
+  "pagina": "https://www.carrefour.com.ar/chocolate-cofler-air-mixto-55-g/p"
+ },
+ "42_cofler_air": {
+  "producto": "Cofler Air negro",
+  "tienda": "jumbo",
+  "nombre_en_tienda": "Chocolate Cofler Aireado 55 Gr",
+  "imagen": "https://jumboargentina.vteximg.com.br/arquivos/ids/937313/11811502007.jpg",
+  "pagina": "https://www.jumbo.com.ar/chocolate-cofler-aireado-55-gr/p"
+ },
+ "43_cofler_extra": {
+  "producto": "Cofler Extra",
+  "tienda": "vea",
+  "nombre_en_tienda": "Chocolate Cofler Extra Maní 38 Gr",
+  "imagen": "https://jumboargentina.vteximg.com.br/arquivos/ids/421496/Chocolate-Cofler-Extra-Mani-38-Gr-1-45935.jpg",
+  "pagina": "https://www.vea.com.ar/chocolate-cofler-extra-mani-38-gr/p"
+ },
+ "44_cofler_extra": {
+  "producto": "Cofler Extra",
+  "tienda": "vea",
+  "nombre_en_tienda": "Chocolate Cofler Extra Maní 38 Gr",
+  "imagen": "https://jumboargentina.vteximg.com.br/arquivos/ids/421496/Chocolate-Cofler-Extra-Mani-38-Gr-1-45935.jpg",
+  "pagina": "https://www.vea.com.ar/chocolate-cofler-extra-mani-38-gr/p"
+ },
+ "45_block": {
+  "producto": "Chocolate Block",
+  "tienda": "dia",
+  "nombre_en_tienda": "Chocolate con Maní Cofler Block 38 Gr.",
+  "imagen": "https://ardiaprod.vteximg.com.br/arquivos/ids/388834/Chocolate-con-Mani-Cofler-Block-38-Gr-_1.jpg",
+  "pagina": "https://diaonline.supermercadosdia.com.ar/chocolate-con-mani-cofler-block-38-gr-25769/p"
+ },
+ "46_cadbury_fruti": {
+  "producto": "Cadbury Fruti",
+  "tienda": "carrefour",
+  "nombre_en_tienda": "Chocolate Cadbury relleno yoghurt frutilla 29 g.",
+  "imagen": "https://carrefourar.vteximg.com.br/arquivos/ids/912607/7622201818654_01.jpg",
+  "pagina": "https://www.carrefour.com.ar/chocolate-cadbury-relleno-yoghurt-frutilla-yoghurt-29-g-680441/p"
+ },
+ "47_cereal_mix": {
+  "producto": "Cereal Mix frutilla",
+  "tienda": "vea",
+  "nombre_en_tienda": "Barra de Cereal Sabor Yoghurt Frutilla 26 Grs Cereal Mix",
+  "imagen": "https://jumboargentina.vteximg.com.br/arquivos/ids/547539/Barra-Cereal-Mix-Yoghurt-Frutilla-Light-X26gr-1-802977.jpg",
+  "pagina": "https://www.vea.com.ar/barra-cereal-mix-yoghurt-frutilla-26-gr/p"
+ },
+ "48_integra_choco": {
+  "producto": "Integra proteica chocolate",
+  "tienda": "carrefour",
+  "nombre_en_tienda": "Barra proteica Íntegra maní chocolate 45 grs",
+  "imagen": "https://carrefourar.vteximg.com.br/arquivos/ids/945975/7798343751422_02.jpg",
+  "pagina": "https://www.carrefour.com.ar/barra-proteica-integra-mani-chocolate-45-grs-744868/p"
+ },
+ "49_integra_arandanos": {
+  "producto": "Integra proteica arándanos",
+  "tienda": "carrefour",
+  "nombre_en_tienda": "Barra proteica Íntegra pasta de maní y arándanos 43 grs",
+  "imagen": "https://carrefourar.vteximg.com.br/arquivos/ids/945976/7798343751446_02.jpg",
+  "pagina": "https://www.carrefour.com.ar/barra-proteica-integra-pasta-de-mani-y-arandanos-43-grs-744869/p"
+ },
+ "50_frutos_secos": {
+  "producto": "Mix frutos secos",
+  "tienda": "vea",
+  "nombre_en_tienda": "Mix Frutos Secos 40 Gr Eatwell",
+  "imagen": "https://jumboargentina.vteximg.com.br/arquivos/ids/774244/Mix-Frutos-Secos-Eatwell-X-40gr-1-947721.jpg",
+  "pagina": "https://www.vea.com.ar/mix-frutos-secos-40-gr-eatwell/p"
+ },
+ "51_lays": {
+  "producto": "Lays",
+  "tienda": "carrefour",
+  "nombre_en_tienda": "Papas fritas Lays clásicas 85 g.",
+  "imagen": "https://carrefourar.vteximg.com.br/arquivos/ids/896506/7790310985458_E01.jpg",
+  "pagina": "https://www.carrefour.com.ar/papas-fritas-lays-clasicas-85-g-721950/p"
+ },
+ "52_rueditas": {
+  "producto": "Rueditas Pep",
+  "tienda": "carrefour",
+  "nombre_en_tienda": "Snack sabor a pizza Pep rueditas 74 g.",
+  "imagen": "https://carrefourar.vteximg.com.br/arquivos/ids/905448/7790310984314_E01.jpg",
+  "pagina": "https://www.carrefour.com.ar/snack-sabor-a-pizza-pep-rueditas-74-g-676530/p"
+ },
+ "53_doritos": {
+  "producto": "Doritos",
+  "tienda": "carrefour",
+  "nombre_en_tienda": "Nachos sabor a queso Doritos 77 g.",
+  "imagen": "https://carrefourar.vteximg.com.br/arquivos/ids/904458/7790310985649_E01.jpg",
+  "pagina": "https://www.carrefour.com.ar/nachos-sabor-a-queso-doritos-77-g-721951/p"
+ },
+ "54_saladix": {
+  "producto": "Saladix",
+  "tienda": "carrefour",
+  "nombre_en_tienda": "Galletitas snacks Saladix sabor pizza 100 grs",
+  "imagen": "https://carrefourar.vteximg.com.br/arquivos/ids/319020/7790580697303_E01.jpg",
+  "pagina": "https://www.carrefour.com.ar/galletitas-snacks-saladix-sabor-pizza-100-grs-21917/p"
+ },
+ "55_surtidas": {
+  "producto": "Galletitas surtidas",
+  "tienda": "carrefour",
+  "nombre_en_tienda": "Galletitas surtidas Terrabusi Variedad 390 grs",
+  "imagen": "https://carrefourar.vteximg.com.br/arquivos/ids/860611/7622202839962_E02.jpg",
+  "pagina": "https://www.carrefour.com.ar/galletitas-surtidas-terrabusi-variedad-390-grs-777681/p"
+ }
+}

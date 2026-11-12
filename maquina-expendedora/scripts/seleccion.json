@@ -1,0 +1,387 @@
+[
+[
+"01_agua_villavicencio",
+"Agua",
+"carrefour",
+"Agua mineral sin gas Villavicencio 500 ml",
+0
+],
+[
+"02_baggio_naranja",
+"Baggio Naranja",
+"dia",
+"Jugo Listo Con Vitaminas Naranja Baggio 200 Ml.",
+0
+],
+[
+"03_baggio_multifruta",
+"Baggio Multi",
+"dia",
+"Jugo Listo Multifrutas Con Vitaminas Baggio 200 Ml.",
+0
+],
+[
+"04_cindor",
+"Cindor chocolatada",
+"dia",
+"Leche Chocolatada Cindor 200 Ml.",
+0
+],
+[
+"05_sprite",
+"Sprite",
+"carrefour",
+"Gaseosa lima limón Sprite 500 ml",
+0
+],
+[
+"06_fanta",
+"Fanta",
+"jumbo",
+"Gaseosa Sabor Naranja 500 Ml Fanta",
+1
+],
+[
+"07_coca_zero",
+"Coca-Cola Zero",
+"dia",
+"Gaseosa Coca-Cola Zero 500 Ml.",
+0
+],
+[
+"08_coca_cola",
+"Coca-Cola",
+"dia",
+"Gaseosa Coca-Cola Sabor Original 500 Ml.",
+0
+],
+[
+"09_powerade",
+"Powerade",
+"jumbo",
+"Bebida Isotónica Sabor Mountain Blast 500 Ml Powerade",
+1
+],
+[
+"10_monster",
+"Monster",
+"jumbo",
+"Bebida Energizante Energy 473 Ml Monster",
+1
+],
+[
+"11_miga_jyq",
+"Sándwich de miga JyQ",
+"dia",
+"Sandwich Triple Jamon Y Queso Dia 120 Gr.",
+1
+],
+[
+"12_miga_jyq_negro",
+"Sándwich de miga JyQ pan negro",
+"dia",
+"Sandwich De Jamon Y Queso Triple Pan Negro Dia 120 Gr.",
+1
+],
+[
+"13_miga_crudo",
+"Sándwich de miga crudo y queso",
+"jumbo",
+"Sandwich De Miga Negro Crudo Y Queso",
+0
+],
+[
+"14_pebete",
+"Pebete",
+"carrefour",
+"Sandwich de pebete Cañon de jamón y queso x unidad.",
+0
+],
+[
+"15_medialuna_rellena",
+"Medialuna rellena",
+"carrefour",
+"Medialunas rellenas con jamón y queso El Mercado x 2 uni",
+0
+],
+[
+"16_mini_oreo",
+"Mini Oreo",
+"carrefour",
+"Galletitas Oreo Mini rellenas con crema sabor original 50 g.",
+0
+],
+[
+"17_mini_pepitos",
+"Mini Pepitos",
+"carrefour",
+"Galletitas Mini Pepitos con chips de chocolate 50 g.",
+0
+],
+[
+"18_club_social",
+"Club Social",
+"carrefour",
+"Galletitas original Club Social x6 24 grs",
+0
+],
+[
+"19_rex",
+"Rex",
+"carrefour",
+"Galletitas crackers Rex original 75 g.",
+0
+],
+[
+"20_pringles",
+"Papas en tubo",
+"carrefour",
+"Papas fritas Pringles original 37 g",
+0
+],
+[
+"21_milka_ddl_negro",
+"Milka Super DDL negro",
+"carrefour",
+"Alfajor Milka Super Dulce de Leche 70 grs",
+0
+],
+[
+"22_milka_ddl_blanco",
+"Milka Super DDL blanco",
+"carrefour",
+"Alfajor Milka Super Dulce de Leche Blanco 70 grs",
+0
+],
+[
+"23_rasta_negro",
+"Rasta negro",
+"web",
+"https://destinfoods.mx/cdn/shop/files/alfajor-rasta-negro-70g_1024x.webp",
+0
+],
+[
+"24_rasta_blanco",
+"Rasta blanco",
+"web",
+"https://cdn11.bigcommerce.com/s-3stx4pub31/images/stencil/1280x1280/products/11987/41566/Rasta_Alfajor_White_Chocolate_Alfajores_with_Creamy_Dulce_de_Leche_70_g_2.46_oz_ea_pack_of_6__92669.1786562595.jpg",
+0
+],
+[
+"25_aguila_brownie",
+"Águila Brownie",
+"carrefour",
+"Alfajor brownie Aguila mini torta 71.5 g",
+0
+],
+[
+"26_cachafaz",
+"Cachafaz",
+"carrefour",
+"Alfajor Cachafaz chocolate 60 g.",
+0
+],
+[
+"27_alfajor_block",
+"Alfajor Block",
+"carrefour",
+"Alfajor negro block Cofler 60 g.",
+0
+],
+[
+"28_chocotorta",
+"Chocotorta",
+"carrefour",
+"Alfajor Chocolinas chocotorta 71.5 grs",
+0
+],
+[
+"29_milka_mousse",
+"Milka Mousse",
+"carrefour",
+"Alfajor Milka triple mousse 55 g.",
+0
+],
+[
+"30_guaymallen",
+"Guaymallén",
+"carrefour",
+"Alfajor Guaymallén chocolate 38 g.",
+0
+],
+[
+"31_rocklets",
+"Rocklets",
+"carrefour",
+"Confites de chocolate Rocklets 40 g.",
+0
+],
+[
+"32_sugus",
+"Sugus",
+"carrefour",
+"Caramelos Sugus confitados 50 g.",
+0
+],
+[
+"33_hamlet",
+"Hamlet",
+"carrefour",
+"Chocolate Hamlet bicolor 42 gr.",
+0
+],
+[
+"34_kitkat",
+"Kit Kat",
+"carrefour",
+"Oblea Kitkat 4 fingers 41.5 grs",
+0
+],
+[
+"35_kinder",
+"Kinder",
+"carrefour",
+"Kinder Chocolate 50 grs",
+0
+],
+[
+"36_conito",
+"Conito DDL",
+"web",
+"https://acdn-us.mitiendanube.com/stores/001/058/870/products/cach16_1-cba19c59c3bafee8a617828288937102-1024-1024.webp",
+0
+],
+[
+"37_beldent",
+"Beldent Infinit",
+"carrefour",
+"Chicles Beldent Infinit menta 13,3 g.",
+0
+],
+[
+"38_tictac",
+"Tic Tac",
+"carrefour",
+"Tic Tac Menta 16 grs",
+0
+],
+[
+"39_dientitos",
+"Dientitos",
+"dia",
+"Gomitas Dientes Mogul 50 Gr.",
+0
+],
+[
+"40_moritas",
+"Moritas",
+"dia",
+"Gomitas Moras Mogul 50 Gr.",
+0
+],
+[
+"41_cofler_air_mixto",
+"Cofler Air variado",
+"carrefour",
+"Chocolate Cofler Air mixto 55 g.",
+0
+],
+[
+"42_cofler_air",
+"Cofler Air negro",
+"jumbo",
+"Chocolate Cofler Aireado 55 Gr",
+0
+],
+[
+"43_cofler_extra",
+"Cofler Extra",
+"vea",
+"Chocolate Cofler Extra Maní 38 Gr",
+0
+],
+[
+"44_cofler_extra",
+"Cofler Extra",
+"vea",
+"Chocolate Cofler Extra Maní 38 Gr",
+0
+],
+[
+"45_block",
+"Chocolate Block",
+"dia",
+"Chocolate con Maní Cofler Block 38 Gr.",
+0
+],
+[
+"46_cadbury_fruti",
+"Cadbury Fruti",
+"carrefour",
+"Chocolate Cadbury relleno yoghurt frutilla 29 g.",
+0
+],
+[
+"47_cereal_mix",
+"Cereal Mix frutilla",
+"vea",
+"Barra de Cereal Sabor Yoghurt Frutilla 26 Grs Cereal Mix",
+0
+],
+[
+"48_integra_choco",
+"Integra proteica chocolate",
+"carrefour",
+"Barra proteica Íntegra maní chocolate 45 grs",
+0
+],
+[
+"49_integra_arandanos",
+"Integra proteica arándanos",
+"carrefour",
+"Barra proteica Íntegra pasta de maní y arándanos 43 grs",
+0
+],
+[
+"50_frutos_secos",
+"Mix frutos secos",
+"vea",
+"Mix Frutos Secos 40 Gr Eatwell",
+0
+],
+[
+"51_lays",
+"Lays",
+"carrefour",
+"Papas fritas Lays clásicas 85 g.",
+0
+],
+[
+"52_rueditas",
+"Rueditas Pep",
+"carrefour",
+"Snack sabor a pizza Pep rueditas 74 g.",
+0
+],
+[
+"53_doritos",
+"Doritos",
+"carrefour",
+"Nachos sabor a queso Doritos 77 g.",
+0
+],
+[
+"54_saladix",
+"Saladix",
+"carrefour",
+"Galletitas snacks Saladix sabor pizza 100 grs",
+0
+],
+[
+"55_surtidas",
+"Galletitas surtidas",
+"carrefour",
+"Galletitas surtidas Terrabusi Variedad 390 grs",
+0
+]
+]
