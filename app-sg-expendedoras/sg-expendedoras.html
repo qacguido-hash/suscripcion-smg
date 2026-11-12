@@ -1,0 +1,646 @@
+<title>S&amp;G Expendedoras</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap">
+<style>
+/* Layout: barra lateral en compu, barra de pestañas abajo en celular; contenido en tarjetas sobre fondo gris frío */
+:root{
+  --bg:#F3F4F6; --surface:#FFFFFF; --surface-2:#F7F8FA; --line:#E2E5EA; --line-2:#EDEFF2;
+  --fg:#15171C; --muted:#5A616E; --nav-bg:#15171C; --nav-fg:#C9CDD4; --nav-active:#2A2D35;
+  --accent:#C4161C; --accent-fg:#FFFFFF; --accent-soft:#FDECEC;
+  --ok:#1B6B3C; --ok-soft:#E6F4EC; --warn:#8A4B00; --warn-soft:#FFF4E0; --bad:#A3161C; --bad-soft:#FDECEC;
+  --info-soft:#EEF0F3;
+  --font:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif; --display:"Space Grotesk","Inter",system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0F1115; --surface:#181B21; --surface-2:#1E2229; --line:#2B3038; --line-2:#242830;
+  --fg:#ECEEF2; --muted:#A3AAB6; --nav-bg:#0A0B0E; --nav-fg:#B9BEC7; --nav-active:#22262E;
+  --accent:#E5484D; --accent-fg:#FFFFFF; --accent-soft:#3A1A1C;
+  --ok:#5CC98A; --ok-soft:#173326; --warn:#F2B35B; --warn-soft:#3A2A12; --bad:#F2777A; --bad-soft:#3A1A1C; --info-soft:#262A31;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0F1115; --surface:#181B21; --surface-2:#1E2229; --line:#2B3038; --line-2:#242830;
+  --fg:#ECEEF2; --muted:#A3AAB6; --nav-bg:#0A0B0E; --nav-fg:#B9BEC7; --nav-active:#22262E;
+  --accent:#E5484D; --accent-fg:#FFFFFF; --accent-soft:#3A1A1C;
+  --ok:#5CC98A; --ok-soft:#173326; --warn:#F2B35B; --warn-soft:#3A2A12; --bad:#F2777A; --bad-soft:#3A1A1C; --info-soft:#262A31;
+  color-scheme:dark}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{background:var(--bg);color:var(--fg);font-family:var(--font);font-size:15px;line-height:1.45}
+h1,h2,h3{margin:0;text-wrap:balance}
+h1{font-family:var(--display);font-size:26px;letter-spacing:-.3px}
+h2{font-size:16px;font-weight:600}
+h3{font-size:14px;font-weight:600}
+.num{font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.small{font-size:13px}
+a{color:var(--accent)}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+.app{display:flex;min-height:100%}
+.side{width:236px;flex:0 0 236px;background:var(--nav-bg);color:var(--nav-fg);padding:20px 14px;display:flex;flex-direction:column;gap:4px;position:sticky;top:0;height:100vh}
+.brand{display:flex;align-items:center;gap:10px;padding:0 8px 20px;color:#fff}
+.brand-mark{width:34px;height:34px;border-radius:8px;background:var(--accent);display:grid;place-items:center;font-family:var(--display);font-weight:700;font-size:14px;color:#fff}
+.brand-name{font-family:var(--display);font-weight:700;font-size:16px;line-height:1.1}
+.side a{display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:8px;color:var(--nav-fg);text-decoration:none;font-size:14px;min-height:44px}
+.side a.on{background:var(--nav-active);color:#fff;font-weight:600;box-shadow:inset 3px 0 0 var(--accent)}
+.side a svg{flex:0 0 18px}
+.side .foot{margin-top:auto;font-size:12px;color:#8B919C;padding:12px 8px 0}
+.main{flex:1 1 auto;min-width:0;padding-block:24px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+.tabs{display:none}
+@media (max-width:899px){
+  .side{display:none}
+  .main{padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))}
+  .tabs{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--surface);border-top:1px solid var(--line);padding:4px max(4px,env(safe-area-inset-right,0px)) calc(8px + env(safe-area-inset-bottom,0px)) max(4px,env(safe-area-inset-left,0px))}
+  .tabs a{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 2px;min-height:48px;text-decoration:none;color:var(--muted);font-size:11px;font-weight:500}
+  .tabs a.on{color:var(--fg);font-weight:700}
+  .tabs a.on svg{color:var(--accent)}
+  .mtop{display:flex}
+}
+.mtop{display:none;align-items:center;gap:10px;margin-bottom:4px}
+
+.head{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px}
+.head p{margin:4px 0 0}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.grid-k{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px}
+.grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px}
+.card > h2{margin-bottom:10px}
+.kpi .l{font-size:13px;color:var(--muted);font-weight:500}
+.kpi .v{font-size:26px;font-weight:700;letter-spacing:-.4px;margin-top:2px}
+.kpi .s{font-size:13px;color:var(--muted);margin-top:2px}
+.list{display:flex;flex-direction:column}
+.li{display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid var(--line-2)}
+.li:first-child{border-top:0}
+.li .grow{flex:1 1 auto;min-width:0}
+.li .t{font-weight:600;font-size:14px}
+.li .d{font-size:13px;color:var(--muted)}
+.thumb{width:44px;height:44px;object-fit:contain;flex:0 0 44px;border-radius:6px;background:var(--surface-2)}
+.thumb.lg{width:72px;height:72px;flex-basis:72px}
+.ph{display:grid;place-items:center;color:var(--muted);font-size:11px;text-align:center}
+.pill{display:inline-flex;align-items:center;font-size:12px;font-weight:700;padding:3px 9px;border-radius:999px;white-space:nowrap}
+.p-ok{background:var(--ok-soft);color:var(--ok)} .p-warn{background:var(--warn-soft);color:var(--warn)} .p-bad{background:var(--bad-soft);color:var(--bad)} .p-info{background:var(--info-soft);color:var(--muted)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 16px;border-radius:10px;border:1px solid var(--line);background:var(--surface);font-weight:600;font-size:14px;cursor:pointer;text-decoration:none;color:var(--fg)}
+.btn:hover{background:var(--surface-2)}
+.btn.pri{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
+.btn.pri:hover{filter:brightness(1.05)}
+.btn.ghost{border-color:transparent;background:transparent}
+.btn.danger{color:var(--bad)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.field{display:flex;flex-direction:column;gap:5px;font-size:13px;color:var(--muted);font-weight:500;min-width:0}
+.field input,.field select,.field textarea,.inp{min-height:44px;padding:9px 11px;border:1px solid var(--line);border-radius:9px;background:var(--surface);color:var(--fg);font-size:15px;width:100%}
+.field textarea{min-height:80px;resize:vertical}
+.fgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+.tablebox{overflow-x:auto;margin:0 -4px}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{text-align:left;font-size:12px;color:var(--muted);font-weight:600;padding:8px 10px;white-space:nowrap;border-bottom:1px solid var(--line)}
+td{padding:10px;border-top:1px solid var(--line-2);vertical-align:middle}
+tr.click{cursor:pointer} tr.click:hover td{background:var(--surface-2)}
+.empty{padding:28px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:12px;background:var(--surface)}
+.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px}
+.pcard{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:8px;cursor:pointer;text-align:left}
+.pcard:hover{border-color:var(--muted)}
+.pcard img,.pcard .ph{width:100%;height:120px;object-fit:contain}
+.pcard .n{font-weight:600;font-size:14px;line-height:1.25}
+.kv{display:flex;justify-content:space-between;font-size:13px;gap:8px}
+.slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:10px}
+.slot{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:8px;display:flex;flex-direction:column;gap:6px;cursor:pointer;text-align:left;min-height:150px}
+.slot:hover{border-color:var(--muted)}
+.slot .no{font-size:12px;font-weight:700;color:var(--muted)}
+.slot img,.slot .ph{width:100%;height:64px;object-fit:contain}
+.slot .nm{font-size:12px;font-weight:600;line-height:1.2;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.bar{height:6px;border-radius:3px;background:var(--line-2);overflow:hidden}
+.bar > i{display:block;height:100%;background:var(--ok)}
+.bar.w > i{background:var(--warn)} .bar.b > i{background:var(--bad)}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--surface)}
+.seg button{border:0;background:transparent;padding:0 14px;min-height:42px;font-weight:600;font-size:14px;cursor:pointer;color:var(--muted)}
+.seg button.on{background:var(--fg);color:var(--bg)}
+.notice{padding:12px 14px;border-radius:10px;background:var(--info-soft);font-size:14px}
+.notice.warn{background:var(--warn-soft);color:var(--warn)}
+
+/* Panel lateral (edición) */
+.scrim{position:fixed;inset:0;background:rgba(10,12,16,.45);z-index:40}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(560px,100%);background:var(--bg);z-index:41;display:flex;flex-direction:column;box-shadow:-8px 0 30px rgba(0,0,0,.18)}
+.drawer .dh{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:calc(14px + env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) 14px 16px;border-bottom:1px solid var(--line);background:var(--surface)}
+.drawer .db{flex:1 1 auto;overflow:auto;padding:16px max(16px,env(safe-area-inset-right,0px)) 24px 16px;display:flex;flex-direction:column;gap:16px}
+.drawer .df{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;padding:12px max(16px,env(safe-area-inset-right,0px)) calc(12px + env(safe-area-inset-bottom,0px)) 16px;border-top:1px solid var(--line);background:var(--surface)}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(90px + env(safe-area-inset-bottom,0px));background:var(--fg);color:var(--bg);padding:10px 16px;border-radius:10px;font-size:14px;font-weight:600;z-index:60;max-width:calc(100% - 32px)}
+@media (min-width:900px){.toast{bottom:28px}}
+.sim{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+.sim .box{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.sim .box .l{font-size:12px;color:var(--muted)}
+.sim .box .v{font-size:18px;font-weight:700}
+@media (prefers-reduced-motion:no-preference){.drawer{animation:slide .18s ease-out}@keyframes slide{from{transform:translateX(24px);opacity:.6}to{transform:none;opacity:1}}}
+</style>
+
+<div class="app">
+  <nav class="side" aria-label="Secciones" id="side"></nav>
+  <main class="main"><div class="wrap" id="view"><div class="empty">Cargando datos…</div></div></main>
+  <nav class="tabs" aria-label="Secciones" id="tabs"></nav>
+</div>
+<div id="layer"></div>
+
+<script>
+(function(){
+"use strict";
+
+// ---------- utilidades ----------
+const $ = (s, r=document) => r.querySelector(s);
+const esc = (v) => String(v ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const money0 = new Intl.NumberFormat("es-AR",{style:"currency",currency:"ARS",maximumFractionDigits:0});
+const fm = (n) => (n == null || !isFinite(n)) ? "—" : money0.format(Math.round(n));
+const pct = (n) => (n == null || !isFinite(n)) ? "—" : (Math.round(n*10)/10).toString().replace(".",",") + "%";
+const sgn = (n) => (n == null || !isFinite(n)) ? "—" : (n > 0 ? "+" : "") + Math.round(n) + "%";
+function num(v){ if (v == null) return null; const s = String(v).trim(); if (!s) return null;
+  let t = s.replace(/\s|\$/g,""); if (/,\d{1,2}$/.test(t)) t = t.replace(/\./g,"").replace(",","."); else t = t.replace(/\./g,"").replace(",",".");
+  const n = Number(t); return isFinite(n) ? n : null; }
+const today = () => new Date().toISOString().slice(0,10);
+function days(a, b){ if (!a) return null; const d1 = new Date(a+"T00:00:00"), d2 = b ? new Date(b+"T00:00:00") : new Date(today()+"T00:00:00"); return Math.round((d1 - d2)/86400000); }
+function ago(d){ if (!d) return "sin fecha"; const n = -days(d); return n <= 0 ? "hoy" : n === 1 ? "hace 1 día" : "hace " + n + " días"; }
+function fdate(d){ if (!d) return "—"; const [y,m,dd] = d.split("-"); return dd + "/" + m + "/" + y.slice(2); }
+const uid = () => Math.random().toString(36).slice(2,10) + Date.now().toString(36).slice(-4);
+const img = (p, cls="thumb") => p && p.imagen ? `<img class="${cls}" src="/_blob/${esc(p.imagen)}" alt="" loading="lazy">` : `<div class="${cls} ph" aria-hidden="true">sin foto</div>`;
+
+const ICONS = {
+  inicio:'<path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/>',
+  productos:'<path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/>',
+  precios:'<path d="M20.6 13.4l-7.2 7.2a2 2 0 0 1-2.8 0L3 13V3h10l7.6 7.6a2 2 0 0 1 0 2.8z"/><circle cx="7.5" cy="7.5" r="1.5"/>',
+  stock:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M9 4v16"/>',
+  maquinas:'<rect x="5" y="2" width="14" height="20" rx="2"/><path d="M9 6h6M9 10h6M8 17h8"/>',
+  ajustes:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>'
+};
+const icon = (k, s=20) => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[k]}</svg>`;
+const ROUTES = [["inicio","Inicio"],["productos","Productos"],["precios","Precios"],["stock","Stock"],["maquinas","Máquinas"],["ajustes","Ajustes"]];
+
+const CATS = ["Bebidas","Sándwiches y panificados","Alfajores","Golosinas","Chocolates y barras","Galletitas","Snacks","Otros"];
+const TIPOS = {chino:"Supermercado chino", kiosco:"Kiosco", pya_market:"PedidosYa Market", pya_comercio:"Comercio en PedidosYa", super:"Supermercado", otro:"Otro"};
+const PROMOS = {none:"Sin promo", "2x1":"2x1", "3x2":"3x2", segunda:"2ª unidad al X%", desc:"Descuento directo X%"};
+
+// ---------- estado ----------
+const S = { productos:{}, stock:{}, relev:{}, competidores:{}, proveedores:{}, maquinas:{}, config:{}, ready:false, ro:false };
+let db = null, assets = null, downloads = null;
+const DEF_CONFIG = { comisionQR: 0, limiteKiosco: 15, diasPrecioViejo: 30, diasVence: 7 };
+const cfg = () => Object.assign({}, DEF_CONFIG, S.config);
+
+// ---------- cálculos ----------
+function costoActual(p){ const h = (p.costos||[]); if (!h.length) return null; const last = h.slice().sort((a,b)=> (a.fecha||"").localeCompare(b.fecha||""))[h.length-1]; return last.costoUnit ?? null; }
+function efectivo(e){ // precio por unidad con promo
+  const L = e.lista; if (L == null) return null; const v = e.promoValor;
+  switch (e.promoTipo){ case "2x1": return L/2; case "3x2": return L*2/3; case "segunda": return v==null?L:(L + L*(v/100))/2; case "desc": return v==null?L:L*(1-v/100); default: return L; }
+}
+function margen(precio, costo){ if (precio == null || costo == null || !precio) return {neto:null,gan:null,m:null};
+  const neto = precio*(1 - (cfg().comisionQR||0)/100); const gan = neto - costo; return {neto, gan, m: gan/precio*100}; }
+function compStats(pid){
+  const r = S.relev[pid]; const out = {kiosco:[],chino:[],pya:[],otro:[],viejo:0,total:0,masViejo:null};
+  if (!r || !r.precios) return out;
+  for (const [cid, e] of Object.entries(r.precios)){
+    const c = S.competidores[cid]; if (!c || e.lista == null) continue;
+    out.total++;
+    const age = -days(e.fecha); if (age > cfg().diasPrecioViejo) out.viejo++;
+    if (out.masViejo == null || (e.fecha||"") < out.masViejo) out.masViejo = e.fecha||"";
+    const item = {c, e, unit: e.lista, promo: efectivo(e)};
+    if (c.tipo === "kiosco") out.kiosco.push(item); else if (c.tipo === "chino") out.chino.push(item);
+    else if (c.tipo === "pya_market" || c.tipo === "pya_comercio") out.pya.push(item); else out.otro.push(item);
+  }
+  return out;
+}
+const avg = (a, k="unit") => a.length ? a.reduce((s,x)=>s+x[k],0)/a.length : null;
+function stockDep(pid){ const s = S.stock[pid]; return s && s.lotes ? s.lotes.reduce((t,l)=>t+(l.cantidad||0),0) : 0; }
+function stockMaq(pid){ let t=0; for (const m of Object.values(S.maquinas)) for (const sl of Object.values(m.slots||{})) if (sl.productoId===pid) t += sl.cantidad||0; return t; }
+function slotState(sl){ if (!sl || !sl.productoId || !sl.capacidad) return null; const r = (sl.cantidad||0)/sl.capacidad; return r <= .25 ? "b" : r <= .5 ? "w" : ""; }
+const prodList = () => Object.entries(S.productos).map(([id,p])=>Object.assign({id},p)).sort((a,b)=>(a.nombre||"").localeCompare(b.nombre||"","es"));
+const maqList = () => Object.entries(S.maquinas).map(([id,m])=>Object.assign({id},m)).sort((a,b)=>(a.orden||0)-(b.orden||0) || (a.nombre||"").localeCompare(b.nombre||""));
+
+function vencimientos(){
+  const out = [], lim = cfg().diasVence;
+  for (const [pid, s] of Object.entries(S.stock)) for (const l of (s.lotes||[])) if (l.vence && l.cantidad>0){ const d = days(l.vence); if (d <= lim) out.push({pid, d, cant:l.cantidad, lugar:"Depósito", vence:l.vence}); }
+  for (const m of maqList()) for (const [n, sl] of Object.entries(m.slots||{})) if (sl.productoId && sl.vence && sl.cantidad>0){ const d = days(sl.vence); if (d <= lim) out.push({pid:sl.productoId, d, cant:sl.cantidad, lugar:m.nombre + " · slot " + n, vence:sl.vence}); }
+  return out.sort((a,b)=>a.d-b.d);
+}
+function reposicion(m){
+  const out = [];
+  for (const [n, sl] of Object.entries(m.slots||{})) if (sl.productoId && sl.capacidad){ const falta = sl.capacidad - (sl.cantidad||0); if (falta > 0) out.push({n:+n, pid:sl.productoId, falta, cant:sl.cantidad||0, cap:sl.capacidad, st:slotState(sl)}); }
+  return out.sort((a,b)=>a.n-b.n);
+}
+function compras(){
+  return prodList().map(p => { const tot = stockDep(p.id) + stockMaq(p.id); const min = p.stockMinimo, obj = p.stockObjetivo ?? p.stockMinimo;
+    return {p, tot, min, sug: (min != null && tot < min) ? Math.max(0, (obj||0) - tot) : 0}; }).filter(x => x.sug > 0);
+}
+
+// ---------- persistencia ----------
+let toastT = null;
+function toast(msg){ let t = $("#toast"); if (!t){ t = document.createElement("div"); t.id="toast"; t.className="toast"; t.setAttribute("role","status"); document.body.appendChild(t); } t.textContent = msg; t.hidden = false; clearTimeout(toastT); toastT = setTimeout(()=>{ t.hidden = true; }, 2600); }
+async function save(path, data, msg){
+  if (!db){ toast("No hay conexión con la base de datos"); return false; }
+  try { await db.doc(path).set(JSON.parse(JSON.stringify(data))); if (msg) toast(msg); return true; }
+  catch(e){ if (e && e.code === "unavailable"){ try { await new Promise(r=>setTimeout(r, 600+Math.random()*600)); await db.doc(path).set(data); if (msg) toast(msg); return true; } catch(_){} }
+    toast(e && e.code === "quota_exceeded" ? "Se llenó la base de datos: borrá registros viejos" : "No se pudo guardar. Probá de nuevo."); return false; }
+}
+async function del(path, msg){ if (!db) return; try { await db.doc(path).delete(); if (msg) toast(msg); } catch(e){ toast("No se pudo borrar"); } }
+const strip = (o) => { const c = Object.assign({}, o); delete c.id; return c; };
+
+// ---------- navegación ----------
+let route = "inicio";
+function setRoute(){ const h = (location.hash||"").replace("#",""); route = ROUTES.some(r=>r[0]===h) ? h : "inicio"; renderNav(); render(); window.scrollTo(0,0); }
+function renderNav(){
+  const links = ROUTES.map(([k,l]) => `<a href="#${k}" class="${route===k?"on":""}" ${route===k?'aria-current="page"':""}>${icon(k,18)}<span>${l}</span></a>`).join("");
+  $("#side").innerHTML = `<div class="brand"><div class="brand-mark">S&amp;G</div><div class="brand-name">S&amp;G<br>Expendedoras</div></div>${links}<div class="foot">${S.ro ? "Solo lectura" : "Los cambios se guardan solos en la nube"}</div>`;
+  $("#tabs").innerHTML = ROUTES.map(([k,l]) => `<a href="#${k}" class="${route===k?"on":""}" ${route===k?'aria-current="page"':""}>${icon(k,22)}<span>${l}</span></a>`).join("");
+}
+const mtop = () => `<div class="mtop"><div class="brand-mark" aria-hidden="true">S&amp;G</div><strong>S&amp;G Expendedoras</strong></div>`;
+
+let drawerOpen = false, pending = false;
+function render(){ if (drawerOpen){ pending = true; return; } const v = $("#view"); if (!S.ready){ v.innerHTML = `<div class="empty">Cargando datos…</div>`; return; }
+  const fn = {inicio:vInicio, productos:vProductos, precios:vPrecios, stock:vStock, maquinas:vMaquinas, ajustes:vAjustes}[route];
+  v.innerHTML = mtop() + fn(); bindView(); }
+
+// ---------- vistas ----------
+const UI = { q:"", cat:"", stockTab:"deposito", maq:null, precioFiltro:"todos" };
+
+function vInicio(){
+  const ps = prodList(), c = cfg();
+  const conCosto = ps.filter(p => costoActual(p) != null);
+  const valor = conCosto.reduce((t,p)=> t + costoActual(p)*(stockDep(p.id)+stockMaq(p.id)), 0);
+  const ms = ps.map(p => margen(p.precioVenta, costoActual(p)).m).filter(x=>x!=null);
+  const mprom = ms.length ? ms.reduce((a,b)=>a+b,0)/ms.length : null;
+  const maqs = maqList(); const rep = maqs.flatMap(m => reposicion(m).filter(r=>r.st).map(r=>Object.assign({m},r)));
+  const venc = vencimientos();
+  const bajos = ps.map(p=>({p, mm:margen(p.precioVenta, costoActual(p)).m})).filter(x=>x.mm!=null && x.mm < 25).sort((a,b)=>a.mm-b.mm);
+  const viejos = []; for (const p of ps){ const st = compStats(p.id); if (st.viejo) viejos.push({p, n:st.viejo, f:st.masViejo}); }
+  const altos = ps.map(p=>{ const k = avg(compStats(p.id).kiosco); return {p, d: (p.precioVenta && k) ? (p.precioVenta/k-1)*100 : null}; }).filter(x=>x.d!=null && x.d > c.limiteKiosco);
+  const compra = compras();
+  const sinDatos = !conCosto.length && !Object.keys(S.relev).length;
+  const li = (rows, empty) => rows.length ? `<div class="list">${rows.join("")}</div>` : `<p class="muted small" style="margin:0">${empty}</p>`;
+  return `
+  <div class="head"><div><h1>Inicio</h1><p class="muted">${new Date().toLocaleDateString("es-AR",{weekday:"long",day:"numeric",month:"long"})}</p></div>
+   <div class="row"><a class="btn pri" href="#maquinas">Armar reposición</a><a class="btn" href="#stock" data-go-stock="compras">Lista de compras</a></div></div>
+  ${sinDatos ? `<div class="notice">Para empezar: cargá en <a href="#productos">Productos</a> el costo y tu precio de venta, y en <a href="#precios">Precios</a> lo que cobra la competencia. Los productos ya están cargados con foto.</div>` : ""}
+  <section class="grid-k" aria-label="Resumen">
+    <div class="card kpi"><div class="l">Productos</div><div class="v num">${ps.length}</div><div class="s">${conCosto.length} con costo cargado</div></div>
+    <div class="card kpi"><div class="l">Margen promedio</div><div class="v num">${pct(mprom)}</div><div class="s">Descontada la comisión del QR (${pct(c.comisionQR)})</div></div>
+    <div class="card kpi"><div class="l">Valor del stock (a costo)</div><div class="v num">${fm(valor)}</div><div class="s">Depósito y máquinas</div></div>
+    <div class="card kpi"><div class="l">Slots para reponer</div><div class="v num">${rep.length}</div><div class="s">Por debajo de la mitad</div></div>
+  </section>
+  <section class="grid-2" aria-label="Avisos">
+    <div class="card"><div class="row" style="justify-content:space-between;margin-bottom:6px"><h2>Por agotarse</h2><span class="pill ${rep.length?"p-bad":"p-ok"}">${rep.length} slots</span></div>
+      ${li(rep.slice(0,5).map(r=>{ const p = S.productos[r.pid]||{}; return `<div class="li">${img(p)}<div class="grow"><div class="t">Slot ${r.n} · ${esc(p.nombre)}</div><div class="d">${esc(r.m.nombre)} · quedan ${r.cant} de ${r.cap}</div></div><span class="pill ${r.st==="b"?"p-bad":"p-warn"}">llevar ${r.falta}</span></div>`; }), "Ningún slot está por debajo de la mitad.")}</div>
+    <div class="card"><div class="row" style="justify-content:space-between;margin-bottom:6px"><h2>Vencen pronto</h2><span class="pill ${venc.length?"p-warn":"p-ok"}">${venc.length}</span></div>
+      ${li(venc.slice(0,5).map(v=>{ const p = S.productos[v.pid]||{}; return `<div class="li">${img(p)}<div class="grow"><div class="t">${esc(p.nombre)}</div><div class="d">${esc(v.lugar)} · ${v.cant} u.</div></div><span class="pill ${v.d<=1?"p-bad":"p-warn"}">${v.d<0?"vencido":v.d===0?"hoy":v.d===1?"mañana":"en "+v.d+" días"}</span></div>`; }), "Nada vence en los próximos " + c.diasVence + " días.")}</div>
+    <div class="card"><div class="row" style="justify-content:space-between;margin-bottom:6px"><h2>Margen bajo (menos de 25%)</h2><span class="pill ${bajos.length?"p-warn":"p-ok"}">${bajos.length}</span></div>
+      ${li(bajos.slice(0,5).map(x=>`<div class="li">${img(x.p)}<div class="grow"><div class="t">${esc(x.p.nombre)}</div><div class="d">Costo ${fm(costoActual(x.p))} · precio ${fm(x.p.precioVenta)}</div></div><span class="pill ${x.mm<10?"p-bad":"p-warn"}">${pct(x.mm)}</span></div>`), "Todos los productos con precio tienen 25% o más.")}</div>
+    <div class="card"><div class="row" style="justify-content:space-between;margin-bottom:6px"><h2>Más de ${c.limiteKiosco}% arriba del kiosco</h2><span class="pill ${altos.length?"p-warn":"p-ok"}">${altos.length}</span></div>
+      ${li(altos.slice(0,5).map(x=>`<div class="li">${img(x.p)}<div class="grow"><div class="t">${esc(x.p.nombre)}</div><div class="d">Tu precio ${fm(x.p.precioVenta)}</div></div><span class="pill p-warn">${sgn(x.d)}</span></div>`), "Ningún precio supera tu límite.")}</div>
+    <div class="card"><div class="row" style="justify-content:space-between;margin-bottom:6px"><h2>Precios de competencia viejos</h2><span class="pill ${viejos.length?"p-info":"p-ok"}">${viejos.length} productos</span></div>
+      ${li(viejos.slice(0,5).map(x=>`<div class="li">${img(x.p)}<div class="grow"><div class="t">${esc(x.p.nombre)}</div><div class="d">${x.n} precio${x.n>1?"s":""} con más de ${c.diasPrecioViejo} días</div></div><span class="muted small">${ago(x.f)}</span></div>`), "Todos los relevamientos están al día.")}</div>
+    <div class="card"><div class="row" style="justify-content:space-between;margin-bottom:6px"><h2>Para comprar</h2><span class="pill ${compra.length?"p-warn":"p-ok"}">${compra.length}</span></div>
+      ${li(compra.slice(0,5).map(x=>`<div class="li">${img(x.p)}<div class="grow"><div class="t">${esc(x.p.nombre)}</div><div class="d">Hay ${x.tot} · mínimo ${x.min}</div></div><span class="pill p-warn">comprar ${x.sug}</span></div>`), "Definí stock mínimo en cada producto para ver qué comprar.")}</div>
+  </section>
+  <section class="card"><h2>Ventas y rentabilidad</h2><p class="muted" style="margin:6px 0 0">Esta parte se activa en la próxima etapa, cuando conectemos las ventas del panel de la máquina: facturación, ganancia por producto y por máquina, y ventas por horario.</p></section>`;
+}
+
+function vProductos(){
+  const q = UI.q.toLowerCase(); const ps = prodList().filter(p => (!UI.cat || p.categoria === UI.cat) && (!q || (p.nombre||"").toLowerCase().includes(q) || (p.marca||"").toLowerCase().includes(q) || (p.ean||"").includes(q)));
+  return `<div class="head"><div><h1>Productos</h1><p class="muted">${ps.length} de ${Object.keys(S.productos).length}</p></div>${S.ro?"":`<button class="btn pri" type="button" data-act="nuevo-prod">Nuevo producto</button>`}</div>
+  <div class="fgrid"><label class="field">Buscar<input id="f-q" type="search" value="${esc(UI.q)}" placeholder="Nombre, marca o código"></label>
+   <label class="field">Categoría<select id="f-cat"><option value="">Todas</option>${CATS.map(c=>`<option ${UI.cat===c?"selected":""}>${c}</option>`).join("")}</select></label></div>
+  ${ps.length ? `<div class="pgrid">${ps.map(p=>{ const co = costoActual(p), mm = margen(p.precioVenta, co).m; return `<button type="button" class="pcard" data-prod="${esc(p.id)}">${img(p,"")}<div class="n">${esc(p.nombre)}</div>
+    <div class="kv"><span class="muted">Costo</span><span class="num">${fm(co)}</span></div><div class="kv"><span class="muted">Precio</span><span class="num"><strong>${fm(p.precioVenta)}</strong></span></div>
+    <div class="kv"><span class="muted">Margen</span><span class="pill ${mm==null?"p-info":mm<10?"p-bad":mm<25?"p-warn":"p-ok"}">${pct(mm)}</span></div>
+    <div class="kv"><span class="muted">Stock</span><span class="num">${stockDep(p.id)} dep. · ${stockMaq(p.id)} máq.</span></div></button>`; }).join("")}</div>` : `<div class="empty">No hay productos con ese filtro.</div>`}`;
+}
+
+function vPrecios(){
+  const c = cfg(); let rows = prodList().map(p => { const st = compStats(p.id), co = costoActual(p), mm = margen(p.precioVenta, co);
+    const k = avg(st.kiosco), ch = avg(st.chino), py = avg(st.pya), pyp = avg(st.pya,"promo"); const d = (p.precioVenta && k) ? (p.precioVenta/k-1)*100 : null;
+    return {p, st, co, mm, k, ch, py, pyp, d}; });
+  if (UI.precioFiltro === "alto") rows = rows.filter(r => r.d != null && r.d > c.limiteKiosco);
+  if (UI.precioFiltro === "viejo") rows = rows.filter(r => r.st.viejo > 0);
+  if (UI.precioFiltro === "sin") rows = rows.filter(r => r.st.total === 0);
+  const f = (k,l) => `<button type="button" class="${UI.precioFiltro===k?"on":""}" data-pf="${k}">${l}</button>`;
+  return `<div class="head"><div><h1>Precios y competencia</h1><p class="muted">Tocá un producto para cargar precios de la competencia y probar tu precio.</p></div></div>
+  <div class="row"><div class="seg" role="group" aria-label="Filtro">${f("todos","Todos")}${f("alto","Arriba del límite")}${f("viejo","Precios viejos")}${f("sin","Sin relevar")}</div>
+   <span class="muted small">Límite: ${c.limiteKiosco}% sobre kiosco · comisión QR ${pct(c.comisionQR)} · viejo: más de ${c.diasPrecioViejo} días</span></div>
+  <div class="card" style="padding:8px 8px 4px"><div class="tablebox"><table style="min-width:900px"><thead><tr><th>Producto</th><th>Tu costo</th><th>Tu precio</th><th>Margen</th><th>Kioscos</th><th>Chinos</th><th>PedidosYa 1 u.</th><th>PedidosYa con promo</th><th>vs. kioscos</th><th>Relevado</th></tr></thead><tbody>
+  ${rows.length ? rows.map(r=>`<tr class="click" data-precio="${esc(r.p.id)}" tabindex="0"><td><div class="row" style="flex-wrap:nowrap;gap:10px">${img(r.p)}<strong>${esc(r.p.nombre)}</strong></div></td>
+   <td class="num">${fm(r.co)}</td><td class="num"><strong>${fm(r.p.precioVenta)}</strong></td><td><span class="pill ${r.mm.m==null?"p-info":r.mm.m<10?"p-bad":r.mm.m<25?"p-warn":"p-ok"}">${pct(r.mm.m)}</span></td>
+   <td class="num">${fm(r.k)}</td><td class="num">${fm(r.ch)}</td><td class="num">${fm(r.py)}</td><td class="num">${fm(r.pyp)}</td>
+   <td>${r.d==null?'<span class="muted">—</span>':`<span class="pill ${r.d>c.limiteKiosco?"p-warn":"p-ok"}">${sgn(r.d)}</span>`}</td><td class="small muted">${r.st.total? ago(r.st.masViejo) : "sin datos"}</td></tr>`).join("") : `<tr><td colspan="10" class="muted" style="text-align:center;padding:24px">No hay productos con este filtro.</td></tr>`}
+  </tbody></table></div></div>
+  <p class="muted small" style="margin:0">Kioscos y chinos: promedio de los precios cargados. PedidosYa con promo: lo que sale cada unidad si el cliente lleva las que pide la promo (por ejemplo 2x1). En la máquina se compra de a una.</p>`;
+}
+
+function vStock(){
+  const t = UI.stockTab; const tab = (k,l) => `<button type="button" class="${t===k?"on":""}" data-st="${k}">${l}</button>`;
+  let body = "";
+  if (t === "deposito"){
+    const ps = prodList();
+    body = `<div class="card" style="padding:8px 8px 4px"><div class="tablebox"><table style="min-width:640px"><thead><tr><th>Producto</th><th>Depósito</th><th>En máquinas</th><th>Mínimo</th><th>Próximo vencimiento</th><th></th></tr></thead><tbody>
+    ${ps.map(p=>{ const lots = ((S.stock[p.id]||{}).lotes||[]).filter(l=>l.cantidad>0).sort((a,b)=>(a.vence||"9").localeCompare(b.vence||"9")); const dep = stockDep(p.id), mq = stockMaq(p.id), nx = lots.find(l=>l.vence);
+      const low = p.stockMinimo != null && dep + mq < p.stockMinimo;
+      return `<tr><td><div class="row" style="flex-wrap:nowrap;gap:10px">${img(p)}<strong>${esc(p.nombre)}</strong></div></td><td class="num"><strong>${dep}</strong> <span class="muted small">${lots.length>1?"("+lots.length+" lotes)":""}</span></td><td class="num">${mq}</td>
+      <td>${p.stockMinimo==null?'<span class="muted">—</span>':`<span class="pill ${low?"p-warn":"p-ok"}">${p.stockMinimo}</span>`}</td><td class="small">${nx?fdate(nx.vence)+" · "+(days(nx.vence)<0?"vencido":"en "+days(nx.vence)+" días"):'<span class="muted">—</span>'}</td>
+      <td style="text-align:right">${S.ro?"":`<button class="btn" type="button" data-lotes="${esc(p.id)}">Lotes</button>`}</td></tr>`; }).join("")}
+    </tbody></table></div></div>`;
+  } else if (t === "vence"){
+    const v = vencimientos();
+    body = v.length ? `<div class="card"><div class="list">${v.map(x=>{ const p = S.productos[x.pid]||{}; return `<div class="li">${img(p)}<div class="grow"><div class="t">${esc(p.nombre)}</div><div class="d">${esc(x.lugar)} · ${x.cant} u. · vence ${fdate(x.vence)}</div></div><span class="pill ${x.d<=1?"p-bad":"p-warn"}">${x.d<0?"vencido":x.d===0?"hoy":x.d===1?"mañana":"en "+x.d+" días"}</span></div>`; }).join("")}</div></div>`
+      : `<div class="empty">Nada vence en los próximos ${cfg().diasVence} días. Cargá la fecha de vencimiento al registrar cada compra.</div>`;
+  } else {
+    const cs = compras();
+    body = cs.length ? `<div class="card"><div class="row" style="justify-content:space-between;margin-bottom:8px"><h2>${cs.length} productos para comprar</h2><div class="row"><button class="btn" type="button" data-act="copiar-compras">Copiar lista</button><button class="btn" type="button" data-act="csv-compras">Descargar CSV</button></div></div>
+      <div class="list">${cs.map(x=>`<div class="li">${img(x.p)}<div class="grow"><div class="t">${esc(x.p.nombre)}</div><div class="d">Hay ${x.tot} (depósito + máquinas) · mínimo ${x.min} · objetivo ${x.p.stockObjetivo ?? x.min}</div></div><span class="pill p-warn">comprar ${x.sug}</span></div>`).join("")}</div></div>`
+      : `<div class="empty">No hace falta comprar nada. La lista usa el stock mínimo y el objetivo de cada producto (se cargan en Productos).</div>`;
+  }
+  return `<div class="head"><div><h1>Stock</h1><p class="muted">Depósito, vencimientos y compras</p></div>${S.ro?"":`<button class="btn pri" type="button" data-act="compra">Registrar compra</button>`}</div>
+  <div class="seg" role="group" aria-label="Vista">${tab("deposito","Depósito")}${tab("vence","Vencimientos")}${tab("compras","Lista de compras")}</div>${body}`;
+}
+
+function vMaquinas(){
+  const ms = maqList(); if (!ms.length) return `<div class="head"><h1>Máquinas</h1>${S.ro?"":`<button class="btn pri" type="button" data-act="nueva-maq">Agregar máquina</button>`}</div><div class="empty">Todavía no hay máquinas.</div>`;
+  if (!UI.maq || !S.maquinas[UI.maq]) UI.maq = ms[0].id; const m = Object.assign({id:UI.maq}, S.maquinas[UI.maq]);
+  const n = m.cantidadSlots || 60, rep = reposicion(m); const gastos = (m.alquiler||0) + (m.otrosGastos||[]).reduce((t,g)=>t+(g.monto||0),0);
+  const slots = []; for (let i=1;i<=n;i++){ const sl = (m.slots||{})[i] || {}; const p = sl.productoId ? S.productos[sl.productoId] : null; const st = slotState(sl);
+    slots.push(`<button type="button" class="slot" data-slot="${i}" aria-label="Slot ${i}${p?": "+esc(p.nombre):" vacío"}"><span class="no">Slot ${i}</span>${p?img(p,""):`<div class="ph" aria-hidden="true">vacío</div>`}<span class="nm">${p?esc(p.nombre):'<span class="muted">Sin asignar</span>'}</span>
+    ${p && sl.capacidad ? `<span class="small num">${sl.cantidad||0}/${sl.capacidad}</span><div class="bar ${st||""}"><i style="width:${Math.min(100,Math.round((sl.cantidad||0)/sl.capacidad*100))}%"></i></div>` : ""}</button>`); }
+  return `<div class="head"><div><h1>Máquinas</h1><p class="muted">${esc(m.ubicacion||"")}</p></div><div class="row">
+    ${ms.length>1?`<label class="field">Máquina<select id="f-maq">${ms.map(x=>`<option value="${esc(x.id)}" ${x.id===m.id?"selected":""}>${esc(x.nombre)}</option>`).join("")}</select></label>`:""}
+    ${S.ro?"":`<button class="btn" type="button" data-act="editar-maq">Datos y gastos</button><button class="btn" type="button" data-act="nueva-maq">Agregar máquina</button>`}</div></div>
+  <section class="grid-k"><div class="card kpi"><div class="l">${esc(m.nombre)}</div><div class="v">${n} slots</div><div class="s">${(m.mediosPago||[]).map(x=>x==="qr"?"QR":x==="efectivo"?"Efectivo":x==="tarjeta"?"Tarjeta":x).join(" · ")||"Medios de pago sin definir"}</div></div>
+   <div class="card kpi"><div class="l">Gastos fijos por mes</div><div class="v num">${fm(gastos)}</div><div class="s">Alquiler ${m.alquiler!=null?fm(m.alquiler):"a definir"}</div></div>
+   <div class="card kpi"><div class="l">Para reponer</div><div class="v num">${rep.reduce((t,r)=>t+r.falta,0)} u.</div><div class="s">en ${rep.length} slots</div></div></section>
+  <div class="card"><div class="row" style="justify-content:space-between;margin-bottom:6px"><h2>Lista de reposición</h2>${rep.length && !S.ro?`<div class="row"><button class="btn" type="button" data-act="copiar-repo">Copiar</button><button class="btn pri" type="button" data-act="reponer-todo">Marcar todo como repuesto</button></div>`:""}</div>
+   ${rep.length ? `<div class="list">${rep.map(r=>{ const p = S.productos[r.pid]||{}; const dep = stockDep(r.pid); return `<div class="li">${img(p)}<div class="grow"><div class="t">Slot ${r.n} · ${esc(p.nombre)}</div><div class="d">Quedan ${r.cant} de ${r.cap} · en depósito ${dep}${dep<r.falta?' <strong style="color:var(--warn)">(no alcanza)</strong>':""}</div></div><span class="pill ${r.st==="b"?"p-bad":r.st==="w"?"p-warn":"p-info"}">llevar ${r.falta}</span></div>`; }).join("")}</div>`
+     : `<p class="muted small" style="margin:0">Todos los slots están llenos (o falta cargar la capacidad de cada slot).</p>`}</div>
+  <div class="card"><div class="row" style="justify-content:space-between;margin-bottom:10px"><h2>Slots</h2><span class="muted small">Tocá un slot para asignar producto, capacidad y cantidad</span></div><div class="slots">${slots.join("")}</div></div>`;
+}
+
+function vAjustes(){
+  const c = cfg(); const comps = Object.entries(S.competidores).sort((a,b)=>(a[1].nombre||"").localeCompare(b[1].nombre||"")); const provs = Object.entries(S.proveedores).sort((a,b)=>(a[1].nombre||"").localeCompare(b[1].nombre||""));
+  return `<div class="head"><div><h1>Ajustes</h1><p class="muted">Reglas para los cálculos, competidores y proveedores</p></div></div>
+  <form class="card" id="f-cfg"><h2>Cálculos</h2><div class="fgrid" style="margin-top:10px">
+   <label class="field">Comisión del cobro con QR (%)<input id="c-com" inputmode="decimal" value="${esc(c.comisionQR)}"></label>
+   <label class="field">Aviso si estás arriba del kiosco más de (%)<input id="c-lim" inputmode="decimal" value="${esc(c.limiteKiosco)}"></label>
+   <label class="field">Precio de competencia viejo después de (días)<input id="c-vie" inputmode="numeric" value="${esc(c.diasPrecioViejo)}"></label>
+   <label class="field">Avisar vencimientos con (días)<input id="c-ven" inputmode="numeric" value="${esc(c.diasVence)}"></label></div>
+   <p class="muted small">La comisión de Mercado Pago depende de tu plan y del plazo de acreditación: fijate el porcentaje en tu cuenta.</p>
+   ${S.ro?"":`<div class="row" style="justify-content:flex-end"><button class="btn pri" type="submit">Guardar</button></div>`}</form>
+  <div class="grid-2">
+   <div class="card"><h2>Competidores</h2><div class="list">${comps.map(([id,x])=>`<div class="li"><div class="grow"><div class="t">${esc(x.nombre)}</div><div class="d">${esc(TIPOS[x.tipo]||x.tipo)}</div></div>${S.ro?"":`<button class="btn ghost danger" type="button" data-del-comp="${esc(id)}" aria-label="Borrar ${esc(x.nombre)}">Borrar</button>`}</div>`).join("") || '<p class="muted small">Sin competidores.</p>'}</div>
+    ${S.ro?"":`<form id="f-comp" class="fgrid" style="margin-top:10px"><label class="field">Nombre<input id="n-comp" required placeholder="Ej.: Kiosco de la esquina"></label><label class="field">Tipo<select id="t-comp">${Object.entries(TIPOS).map(([k,l])=>`<option value="${k}">${l}</option>`).join("")}</select></label><div class="field" style="justify-content:flex-end"><button class="btn" type="submit">Agregar</button></div></form>`}</div>
+   <div class="card"><h2>Proveedores</h2><div class="list">${provs.map(([id,x])=>`<div class="li"><div class="grow"><div class="t">${esc(x.nombre)}</div></div>${S.ro?"":`<button class="btn ghost danger" type="button" data-del-prov="${esc(id)}" aria-label="Borrar ${esc(x.nombre)}">Borrar</button>`}</div>`).join("") || '<p class="muted small">Sin proveedores.</p>'}</div>
+    ${S.ro?"":`<form id="f-prov" class="fgrid" style="margin-top:10px"><label class="field">Nombre<input id="n-prov" required placeholder="Ej.: Mayorista Vital"></label><div class="field" style="justify-content:flex-end"><button class="btn" type="submit">Agregar</button></div></form>`}</div>
+  </div>
+  <div class="card"><h2>Exportar</h2><p class="muted small">Productos con costo, precio, margen y stock, para abrir en Excel.</p><button class="btn" type="button" data-act="csv-prod">Descargar productos (CSV)</button></div>`;
+}
+
+// ---------- eventos de las vistas ----------
+function bindView(){
+  const v = $("#view");
+  const q = $("#f-q"); if (q) q.addEventListener("input", e => { UI.q = e.target.value; const pos = e.target.selectionStart; render(); const n = $("#f-q"); n.focus(); try{ n.setSelectionRange(pos,pos);}catch(_){} });
+  const cat = $("#f-cat"); if (cat) cat.addEventListener("change", e => { UI.cat = e.target.value; render(); });
+  const fm2 = $("#f-maq"); if (fm2) fm2.addEventListener("change", e => { UI.maq = e.target.value; render(); });
+  v.querySelectorAll("[data-prod]").forEach(b => b.addEventListener("click", () => openProducto(b.dataset.prod)));
+  v.querySelectorAll("[data-precio]").forEach(b => { b.addEventListener("click", () => openPrecio(b.dataset.precio)); b.addEventListener("keydown", e => { if (e.key==="Enter") openPrecio(b.dataset.precio); }); });
+  v.querySelectorAll("[data-pf]").forEach(b => b.addEventListener("click", () => { UI.precioFiltro = b.dataset.pf; render(); }));
+  v.querySelectorAll("[data-st]").forEach(b => b.addEventListener("click", () => { UI.stockTab = b.dataset.st; render(); }));
+  v.querySelectorAll("[data-go-stock]").forEach(b => b.addEventListener("click", () => { UI.stockTab = b.dataset.goStock; }));
+  v.querySelectorAll("[data-lotes]").forEach(b => b.addEventListener("click", () => openLotes(b.dataset.lotes)));
+  v.querySelectorAll("[data-slot]").forEach(b => b.addEventListener("click", () => openSlot(UI.maq, b.dataset.slot)));
+  v.querySelectorAll("[data-del-comp]").forEach(b => b.addEventListener("click", () => confirmar("¿Borrar este competidor? Sus precios cargados dejan de contar.", () => del("competidores/"+b.dataset.delComp, "Competidor borrado"))));
+  v.querySelectorAll("[data-del-prov]").forEach(b => b.addEventListener("click", () => confirmar("¿Borrar este proveedor?", () => del("proveedores/"+b.dataset.delProv, "Proveedor borrado"))));
+  v.querySelectorAll("[data-act]").forEach(b => b.addEventListener("click", () => acciones[b.dataset.act] && acciones[b.dataset.act]()));
+  const fc = $("#f-cfg"); if (fc) fc.addEventListener("submit", e => { e.preventDefault(); save("config/general", { comisionQR: num($("#c-com").value) ?? 0, limiteKiosco: num($("#c-lim").value) ?? 15, diasPrecioViejo: num($("#c-vie").value) ?? 30, diasVence: num($("#c-ven").value) ?? 7 }, "Ajustes guardados"); });
+  const fcp = $("#f-comp"); if (fcp) fcp.addEventListener("submit", e => { e.preventDefault(); const n = $("#n-comp").value.trim(); if (!n) return; save("competidores/"+uid(), {nombre:n, tipo:$("#t-comp").value}, "Competidor agregado"); });
+  const fpv = $("#f-prov"); if (fpv) fpv.addEventListener("submit", e => { e.preventDefault(); const n = $("#n-prov").value.trim(); if (!n) return; save("proveedores/"+uid(), {nombre:n}, "Proveedor agregado"); });
+}
+
+async function copiar(text){ try { await navigator.clipboard.writeText(text); toast("Copiado"); } catch(_){ openDrawer("Copiá el texto", `<textarea class="inp" style="min-height:300px" readonly>${esc(text)}</textarea>`, `<button class="btn" type="button" data-close>Cerrar</button>`); } }
+async function bajar(nombre, filas){ const csv = "﻿" + filas.map(r => r.map(x => { const s = String(x ?? ""); return /[;"\n]/.test(s) ? '"' + s.replace(/"/g,'""') + '"' : s; }).join(";")).join("\n");
+  if (!downloads){ copiar(csv); return; } try { await downloads.save({filename:nombre, data:csv}); } catch(e){ if (e && e.code !== "declined") toast("No se pudo descargar"); } }
+const acciones = {
+  "nuevo-prod": () => openProducto(null),
+  "compra": () => openCompra(null),
+  "nueva-maq": () => openMaquina(null),
+  "editar-maq": () => openMaquina(UI.maq),
+  "copiar-repo": () => { const m = S.maquinas[UI.maq]; copiar("Reposición " + m.nombre + "\n" + reposicion(m).map(r => "Slot " + r.n + ": " + ((S.productos[r.pid]||{}).nombre||"") + " x " + r.falta).join("\n")); },
+  "reponer-todo": () => confirmar("Se van a llenar todos los slots y descontar las unidades del depósito (primero las que vencen antes). ¿Seguimos?", reponerTodo),
+  "copiar-compras": () => copiar("Lista de compras\n" + compras().map(x => x.p.nombre + ": " + x.sug).join("\n")),
+  "csv-compras": () => bajar("lista-de-compras.csv", [["Producto","Hay","Mínimo","Comprar"], ...compras().map(x=>[x.p.nombre, x.tot, x.min, x.sug])]),
+  "csv-prod": () => bajar("productos.csv", [["Producto","Categoría","Costo","Precio","Margen %","Depósito","Máquinas","Kioscos prom.","Chinos prom.","PedidosYa 1 u."], ...prodList().map(p=>{ const st = compStats(p.id), co = costoActual(p), mm = margen(p.precioVenta, co).m; const r = (x) => x==null?"":Math.round(x); return [p.nombre, p.categoria, r(co), r(p.precioVenta), mm==null?"":Math.round(mm*10)/10, stockDep(p.id), stockMaq(p.id), r(avg(st.kiosco)), r(avg(st.chino)), r(avg(st.pya))]; })])
+};
+
+// ---------- panel lateral ----------
+function openDrawer(title, body, foot, onMount){
+  drawerOpen = true; const layer = $("#layer"); const prev = document.activeElement;
+  layer.innerHTML = `<div class="scrim" data-close></div><section class="drawer" role="dialog" aria-modal="true" aria-label="${esc(title)}"><div class="dh"><h2>${esc(title)}</h2><button class="btn ghost" type="button" data-close aria-label="Cerrar">✕</button></div><div class="db">${body}</div>${foot?`<div class="df">${foot}</div>`:""}</section>`;
+  const close = () => { layer.innerHTML = ""; drawerOpen = false; document.removeEventListener("keydown", onKey); if (pending){ pending = false; render(); } try { prev && prev.focus(); } catch(_){} };
+  const onKey = (e) => { if (e.key === "Escape") close(); };
+  document.addEventListener("keydown", onKey);
+  layer.querySelectorAll("[data-close]").forEach(b => b.addEventListener("click", close));
+  const first = layer.querySelector(".db input, .db select, .db textarea, .db button"); if (first) setTimeout(()=>{ try{ first.focus(); }catch(_){} }, 30);
+  if (onMount) onMount(layer.querySelector(".drawer"), close);
+  return close;
+}
+function confirmar(msg, ok){ openDrawer("Confirmar", `<p style="margin:0">${esc(msg)}</p>`, `<button class="btn" type="button" data-close>Cancelar</button><button class="btn pri" type="button" id="ok-confirm">Sí, seguir</button>`, (d, close) => { $("#ok-confirm", d).addEventListener("click", async () => { close(); await ok(); }); }); }
+const opts = (obj, sel, empty) => (empty?`<option value="">${empty}</option>`:"") + Object.entries(obj).sort((a,b)=>(a[1].nombre||"").localeCompare(b[1].nombre||"")).map(([id,x])=>`<option value="${esc(id)}" ${id===sel?"selected":""}>${esc(x.nombre)}</option>`).join("");
+
+// Producto
+function openProducto(id){
+  const p = id ? Object.assign({id}, S.productos[id]) : {nombre:"", categoria:CATS[0], unidad:"g", costos:[]};
+  let fotoId = p.imagen || null; const hist = (p.costos||[]).slice().sort((a,b)=>(b.fecha||"").localeCompare(a.fecha||""));
+  const porProv = {}; for (const h of hist) if (h.proveedorId && !porProv[h.proveedorId]) porProv[h.proveedorId] = h;
+  const body = `
+   <div class="row" style="flex-wrap:nowrap;align-items:flex-start"><div id="foto-prev">${img(p,"thumb lg")}</div><div class="grow" style="flex:1;min-width:0">
+     <label class="field">Nombre<input id="p-nom" value="${esc(p.nombre)}" required></label>
+     ${assets && !S.ro ? `<label class="btn" style="margin-top:8px;width:fit-content">Cambiar foto<input id="p-foto" type="file" accept="image/png,image/jpeg,image/webp" hidden></label>` : ""}</div></div>
+   <div class="fgrid">
+     <label class="field">Marca<input id="p-mar" value="${esc(p.marca)}"></label>
+     <label class="field">Categoría<select id="p-cat">${CATS.map(c=>`<option ${p.categoria===c?"selected":""}>${c}</option>`).join("")}</select></label>
+     <label class="field">Contenido<input id="p-cont" inputmode="decimal" value="${esc(p.contenido)}" placeholder="Ej.: 500"></label>
+     <label class="field">Unidad<select id="p-uni">${["ml","g","u"].map(u=>`<option ${p.unidad===u?"selected":""}>${u}</option>`).join("")}</select></label>
+     <label class="field">Código de barras<input id="p-ean" inputmode="numeric" value="${esc(p.ean)}"></label>
+     <label class="field">Tu precio de venta ($)<input id="p-pre" inputmode="decimal" value="${esc(p.precioVenta)}"></label>
+     <label class="field">Stock mínimo (u.)<input id="p-min" inputmode="numeric" value="${esc(p.stockMinimo)}"></label>
+     <label class="field">Stock objetivo al comprar (u.)<input id="p-obj" inputmode="numeric" value="${esc(p.stockObjetivo)}"></label>
+   </div>
+   <div class="card"><h2>Costo</h2>
+     <div class="kv"><span class="muted">Costo actual por unidad</span><strong class="num">${fm(costoActual(p))}</strong></div>
+     ${Object.keys(porProv).length > 1 ? `<h3 style="margin-top:12px">Último precio por proveedor</h3><div class="list">${Object.entries(porProv).sort((a,b)=>a[1].costoUnit-b[1].costoUnit).map(([pid,h],i)=>`<div class="li"><div class="grow"><div class="t">${esc((S.proveedores[pid]||{}).nombre||"Proveedor borrado")}</div><div class="d">${fdate(h.fecha)}</div></div><span class="pill ${i===0?"p-ok":"p-info"}">${fm(h.costoUnit)} c/u</span></div>`).join("")}</div>` : ""}
+     <h3 style="margin-top:12px">Historial</h3>
+     ${hist.length ? `<div class="list">${hist.slice(0,12).map(h=>`<div class="li"><div class="grow"><div class="t num">${fm(h.costoUnit)} por unidad</div><div class="d">${fdate(h.fecha)} · ${esc((S.proveedores[h.proveedorId]||{}).nombre||"sin proveedor")}${h.unidadesBulto>1?" · bulto de "+h.unidadesBulto+" a "+fm(h.precioBulto):""}</div></div></div>`).join("")}</div>` : `<p class="muted small" style="margin:0">Sin costos. Cargalo con "Registrar compra" en Stock, o acá abajo.</p>`}
+     ${S.ro?"":`<div class="fgrid" style="margin-top:10px"><label class="field">Precio del bulto ($)<input id="c-bul" inputmode="decimal"></label><label class="field">Unidades por bulto<input id="c-uni" inputmode="numeric" value="1"></label><label class="field">Proveedor<select id="c-prov">${opts(S.proveedores,"","Sin proveedor")}</select></label></div><p class="muted small" style="margin:6px 0 0">Si cargás un costo nuevo se guarda con la fecha de hoy.</p>`}
+   </div>`;
+  const foot = S.ro ? `<button class="btn" type="button" data-close>Cerrar</button>` : `${id?`<button class="btn ghost danger" type="button" id="p-del">Borrar</button>`:""}<button class="btn" type="button" data-close>Cancelar</button><button class="btn pri" type="button" id="p-ok">Guardar</button>`;
+  openDrawer(id ? p.nombre : "Nuevo producto", body, foot, (d, close) => {
+    const f = $("#p-foto", d); if (f) f.addEventListener("change", async () => { const file = f.files[0]; if (!file) return; toast("Subiendo foto…");
+      try { const r = await assets.upload(file, {type: file.type || "image/jpeg"}); fotoId = r.id; $("#foto-prev", d).innerHTML = `<img class="thumb lg" src="${esc(r.url)}" alt="">`; toast("Foto lista: tocá Guardar"); }
+      catch(e){ toast(e && e.code==="too_large" ? "La foto pesa demasiado (máx. 20 MB)" : e && e.code==="unsupported_type" ? "Usá una foto PNG, JPG o WEBP" : "No se pudo subir la foto"); } });
+    const dl = $("#p-del", d); if (dl) dl.addEventListener("click", () => { close(); confirmar("¿Borrar " + p.nombre + "? Se borran también su stock y sus precios de competencia.", async () => { await del("productos/"+id); await del("stock/"+id); await del("relev/"+id, "Producto borrado"); }); });
+    const ok = $("#p-ok", d); if (ok) ok.addEventListener("click", async () => {
+      const nombre = $("#p-nom", d).value.trim(); if (!nombre){ toast("Falta el nombre"); return; }
+      const costos = (p.costos||[]).slice(); const bul = num($("#c-bul", d).value), un = num($("#c-uni", d).value) || 1;
+      if (bul != null) costos.push({fecha: today(), precioBulto: bul, unidadesBulto: un, costoUnit: bul/un, proveedorId: $("#c-prov", d).value || null});
+      const data = Object.assign(strip(p), { nombre, marca: $("#p-mar", d).value.trim() || null, categoria: $("#p-cat", d).value, contenido: num($("#p-cont", d).value), unidad: $("#p-uni", d).value,
+        ean: $("#p-ean", d).value.trim() || null, precioVenta: num($("#p-pre", d).value), stockMinimo: num($("#p-min", d).value), stockObjetivo: num($("#p-obj", d).value), imagen: fotoId, costos: costos.slice(-60) });
+      if (await save("productos/" + (id || uid()), data, "Producto guardado")) close();
+    });
+  });
+}
+
+// Precios de competencia de un producto + simulador
+function openPrecio(pid){
+  const p = Object.assign({id:pid}, S.productos[pid]); const r = S.relev[pid] || {precios:{}, historial:[]}; const co = costoActual(p); const c = cfg();
+  const comps = Object.entries(S.competidores).sort((a,b)=>(a[1].tipo+a[1].nombre).localeCompare(b[1].tipo+b[1].nombre));
+  const porLitro = (e) => { const cont = e.contenido || p.contenido; if (!cont || p.unidad === "u") return null; return e.lista / cont * (p.unidad==="ml"?1000:100); };
+  const filas = comps.map(([cid, cp]) => { const e = r.precios[cid]; if (!e || e.lista == null) return "";
+    const pr = efectivo(e), viejo = -days(e.fecha) > c.diasPrecioViejo, otroFormato = e.contenido && p.contenido && e.contenido !== p.contenido;
+    return `<div class="li"><div class="grow"><div class="t">${esc(cp.nombre)} <span class="muted small">· ${esc(TIPOS[cp.tipo]||"")}</span></div>
+      <div class="d">${fm(e.lista)} por unidad${e.promoTipo && e.promoTipo!=="none" ? " · promo " + esc(PROMOS[e.promoTipo].replace("X%", (e.promoValor??"")+"%")) + " → " + fm(pr) + " c/u" : ""}${e.envio ? " · envío " + fm(e.envio) : ""}${otroFormato ? " · formato " + e.contenido + " " + p.unidad + " (" + fm(porLitro(e)) + (p.unidad==="ml"?"/litro":"/100 g") + ")" : ""}</div>
+      <div class="d">${ago(e.fecha)}${viejo?' · <strong style="color:var(--warn)">desactualizado</strong>':""}</div></div>${S.ro?"":`<button class="btn ghost" type="button" data-edit-c="${esc(cid)}">Editar</button>`}</div>`; }).join("");
+  const body = `
+   <div class="row" style="flex-wrap:nowrap">${img(p,"thumb lg")}<div><div style="font-weight:700">${esc(p.nombre)}</div><div class="muted small">Costo ${fm(co)} · precio actual ${fm(p.precioVenta)}</div></div></div>
+   <div class="card"><h2>Probá un precio</h2>
+     <label class="field" style="margin-top:6px">Precio de venta ($)<input id="s-pre" inputmode="decimal" value="${esc(p.precioVenta ?? "")}" placeholder="Escribí un precio"></label>
+     <div class="sim" id="s-out" style="margin-top:10px"></div>
+     ${S.ro?"":`<div class="row" style="justify-content:flex-end;margin-top:10px"><button class="btn pri" type="button" id="s-save">Usar este precio</button></div>`}</div>
+   <div class="card"><h2>Precios de la competencia</h2>${filas ? `<div class="list">${filas}</div>` : `<p class="muted small" style="margin:0">Todavía no cargaste precios para este producto.</p>`}</div>
+   ${S.ro?"":`<form class="card" id="c-form"><h2 id="c-title">Cargar precio</h2><div class="fgrid" style="margin-top:8px">
+     <label class="field">Competidor<select id="c-comp" required>${comps.map(([id,x])=>`<option value="${esc(id)}">${esc(x.nombre)}</option>`).join("")}</select></label>
+     <label class="field">Precio por 1 unidad ($)<input id="c-lis" inputmode="decimal" required></label>
+     <label class="field">Promo<select id="c-pro">${Object.entries(PROMOS).map(([k,l])=>`<option value="${k}">${l}</option>`).join("")}</select></label>
+     <label class="field" id="c-val-w" hidden>Porcentaje X (%)<input id="c-val" inputmode="decimal" placeholder="Ej.: 70"></label>
+     <label class="field">Envío y servicio ($, opcional)<input id="c-env" inputmode="decimal"></label>
+     <label class="field">Contenido si es otro formato (${esc(p.unidad||"")}, opcional)<input id="c-cont" inputmode="decimal" placeholder="${esc(p.contenido ?? "")}"></label>
+     <label class="field">Fecha<input id="c-fec" type="date" value="${today()}"></label></div>
+     <div class="row" style="justify-content:flex-end;margin-top:10px"><button class="btn" type="button" id="c-del" hidden>Quitar este precio</button><button class="btn pri" type="submit">Guardar precio</button></div></form>`}`;
+  openDrawer("Precios", body, `<button class="btn" type="button" data-close>Cerrar</button>`, (d, close) => {
+    const out = $("#s-out", d), inp = $("#s-pre", d); const st = compStats(pid);
+    const calc = () => { const pr = num(inp.value); const mm = margen(pr, co); const k = avg(st.kiosco), ch = avg(st.chino), py = avg(st.pya), pyp = avg(st.pya,"promo");
+      const vs = (x) => (pr && x) ? sgn((pr/x-1)*100) : "—"; const box = (l,v,cls="") => `<div class="box"><div class="l">${l}</div><div class="v num ${cls}">${v}</div></div>`;
+      const kd = (pr && k) ? (pr/k-1)*100 : null;
+      out.innerHTML = box("Ganás por unidad", fm(mm.gan)) + box("Margen", pct(mm.m)) + box("Te queda después del QR", fm(mm.neto)) +
+        box("vs. kioscos ("+fm(k)+")", vs(k), kd!=null && kd>c.limiteKiosco ? "" : "") + box("vs. chinos ("+fm(ch)+")", vs(ch)) + box("vs. PedidosYa 1 u. ("+fm(py)+")", vs(py)) + box("vs. PedidosYa con promo ("+fm(pyp)+")", vs(pyp)) +
+        (co == null ? `<div class="box" style="grid-column:1/-1"><div class="l">Sin costo cargado: el margen aparece cuando cargues el costo.</div></div>` : "") +
+        (kd!=null && kd>c.limiteKiosco ? `<div class="box" style="grid-column:1/-1;background:var(--warn-soft);color:var(--warn)"><div>Estás ${sgn(kd)} sobre el promedio de kioscos (tu límite es ${c.limiteKiosco}%).</div></div>` : ""); };
+    inp.addEventListener("input", calc); calc();
+    const sv = $("#s-save", d); if (sv) sv.addEventListener("click", async () => { const pr = num(inp.value); if (pr == null){ toast("Escribí un precio"); return; } await save("productos/"+pid, Object.assign(strip(p), {precioVenta: pr}), "Precio actualizado a " + fm(pr)); p.precioVenta = pr; });
+    const form = $("#c-form", d); if (!form) return;
+    const pro = $("#c-pro", d), valW = $("#c-val-w", d); const syncPro = () => { valW.hidden = !(pro.value==="segunda" || pro.value==="desc"); }; pro.addEventListener("change", syncPro);
+    const load = (cid) => { const e = r.precios[cid]; $("#c-comp", d).value = cid; $("#c-title", d).textContent = e ? "Editar precio" : "Cargar precio"; $("#c-del", d).hidden = !e;
+      $("#c-lis", d).value = e ? e.lista : ""; pro.value = e ? (e.promoTipo||"none") : "none"; $("#c-val", d).value = e && e.promoValor != null ? e.promoValor : ""; $("#c-env", d).value = e && e.envio ? e.envio : ""; $("#c-cont", d).value = e && e.contenido ? e.contenido : ""; $("#c-fec", d).value = today(); syncPro(); };
+    $("#c-comp", d).addEventListener("change", e => load(e.target.value));
+    d.querySelectorAll("[data-edit-c]").forEach(b => b.addEventListener("click", () => { load(b.dataset.editC); form.scrollIntoView({behavior:"smooth", block:"start"}); }));
+    load($("#c-comp", d).value);
+    $("#c-del", d).addEventListener("click", async () => { const cid = $("#c-comp", d).value; const nr = JSON.parse(JSON.stringify(r)); delete nr.precios[cid]; if (await save("relev/"+pid, nr, "Precio quitado")){ close(); openPrecio(pid); } });
+    form.addEventListener("submit", async (ev) => { ev.preventDefault(); const lista = num($("#c-lis", d).value); if (lista == null){ toast("Falta el precio"); return; }
+      const cid = $("#c-comp", d).value; const e = {lista, promoTipo: pro.value, promoValor: num($("#c-val", d).value), envio: num($("#c-env", d).value), contenido: num($("#c-cont", d).value), fecha: $("#c-fec", d).value || today()};
+      const nr = JSON.parse(JSON.stringify(r)); nr.precios = nr.precios || {}; nr.precios[cid] = e; nr.historial = (nr.historial||[]).concat([Object.assign({competidorId:cid}, e)]).slice(-120);
+      if (await save("relev/"+pid, nr, "Precio guardado")){ close(); openPrecio(pid); } });
+  });
+}
+
+// Compra = ingreso de stock con costo y vencimiento
+function openCompra(pid){
+  const body = `<div class="fgrid">
+    <label class="field" style="grid-column:1/-1">Producto<select id="k-prod">${prodList().map(p=>`<option value="${esc(p.id)}" ${p.id===pid?"selected":""}>${esc(p.nombre)}</option>`).join("")}</select></label>
+    <label class="field">Proveedor<select id="k-prov">${opts(S.proveedores,"","Sin proveedor")}</select></label>
+    <label class="field">Bultos<input id="k-bul" inputmode="numeric" value="1"></label>
+    <label class="field">Unidades por bulto<input id="k-upb" inputmode="numeric" value="1"></label>
+    <label class="field">Precio por bulto ($)<input id="k-pre" inputmode="decimal"></label>
+    <label class="field">Vence (opcional)<input id="k-ven" type="date"></label></div>
+    <div class="notice" id="k-res">Completá los datos para ver el costo por unidad.</div>`;
+  openDrawer("Registrar compra", body, `<button class="btn" type="button" data-close>Cancelar</button><button class="btn pri" type="button" id="k-ok">Guardar compra</button>`, (d, close) => {
+    const calc = () => { const b = num($("#k-bul",d).value)||0, u = num($("#k-upb",d).value)||1, pr = num($("#k-pre",d).value); $("#k-res",d).textContent = pr==null ? "Completá el precio para ver el costo por unidad." : `Entran ${b*u} unidades al depósito · costo ${fm(pr/u)} por unidad · total ${fm(pr*b)}`; };
+    d.querySelectorAll("input").forEach(i => i.addEventListener("input", calc));
+    $("#k-ok", d).addEventListener("click", async () => { const id = $("#k-prod",d).value, b = num($("#k-bul",d).value)||0, u = num($("#k-upb",d).value)||1, pr = num($("#k-pre",d).value), ven = $("#k-ven",d).value || null, prov = $("#k-prov",d).value || null;
+      if (!id || b*u <= 0){ toast("Revisá producto y cantidad"); return; }
+      const p = S.productos[id]; if (pr != null){ const costos = (p.costos||[]).concat([{fecha: today(), precioBulto: pr, unidadesBulto: u, costoUnit: pr/u, proveedorId: prov}]).slice(-60); await save("productos/"+id, Object.assign({}, p, {costos})); }
+      const s = S.stock[id] || {lotes:[]}; const lotes = (s.lotes||[]).filter(l=>l.cantidad>0).concat([{id: uid(), cantidad: b*u, vence: ven, fecha: today(), costoUnit: pr!=null?pr/u:null}]);
+      if (await save("stock/"+id, {lotes}, "Compra registrada: +" + (b*u) + " u.")) close(); });
+  });
+}
+
+function openLotes(pid){
+  const p = S.productos[pid]||{}; const lots = ((S.stock[pid]||{}).lotes||[]).map(l=>Object.assign({},l));
+  const row = (l,i) => `<div class="fgrid" data-i="${i}" style="align-items:end;border-top:1px solid var(--line-2);padding-top:10px"><label class="field">Cantidad<input inputmode="numeric" data-k="cantidad" value="${esc(l.cantidad)}"></label><label class="field">Vence<input type="date" data-k="vence" value="${esc(l.vence||"")}"></label><div class="muted small">Ingresó ${fdate(l.fecha)}</div></div>`;
+  openDrawer("Lotes · " + (p.nombre||""), `${lots.length ? lots.map(row).join("") : '<p class="muted">Sin lotes en depósito.</p>'}<p class="muted small">Corregí cantidades después de un conteo, o poné 0 para dar de baja (vencido, roto o faltante).</p><button class="btn" type="button" id="l-add">Agregar lote sin compra</button>`,
+    `<button class="btn" type="button" data-close>Cancelar</button><button class="btn pri" type="button" id="l-ok">Guardar</button>`, (d, close) => {
+    $("#l-add", d).addEventListener("click", () => { close(); openCompra(pid); });
+    $("#l-ok", d).addEventListener("click", async () => { d.querySelectorAll("[data-i]").forEach(el => { const l = lots[+el.dataset.i]; l.cantidad = num(el.querySelector('[data-k="cantidad"]').value) || 0; l.vence = el.querySelector('[data-k="vence"]').value || null; });
+      if (await save("stock/"+pid, {lotes: lots.filter(l=>l.cantidad>0)}, "Stock actualizado")) close(); });
+  });
+}
+
+// Descontar del depósito (primero lo que vence antes)
+function sacarDeposito(pid, cant){ const s = S.stock[pid]; const lotes = ((s && s.lotes)||[]).map(l=>Object.assign({},l)).sort((a,b)=>(a.vence||"9999").localeCompare(b.vence||"9999"));
+  let falta = cant, venceMin = null; for (const l of lotes){ if (falta<=0) break; const t = Math.min(l.cantidad, falta); if (t>0){ l.cantidad -= t; falta -= t; if (l.vence && (!venceMin || l.vence < venceMin)) venceMin = l.vence; } }
+  return {lotes: lotes.filter(l=>l.cantidad>0), sacado: cant - falta, venceMin}; }
+
+function openSlot(mid, n){
+  const m = S.maquinas[mid]; const sl = Object.assign({}, (m.slots||{})[n]); const p = sl.productoId ? S.productos[sl.productoId] : null;
+  const body = `<div class="fgrid"><label class="field" style="grid-column:1/-1">Producto<select id="o-prod"><option value="">Vacío</option>${prodList().map(x=>`<option value="${esc(x.id)}" ${x.id===sl.productoId?"selected":""}>${esc(x.nombre)}</option>`).join("")}</select></label>
+   <label class="field">Capacidad (u.)<input id="o-cap" inputmode="numeric" value="${esc(sl.capacidad)}"></label><label class="field">Cantidad ahora (u.)<input id="o-can" inputmode="numeric" value="${esc(sl.cantidad ?? 0)}"></label>
+   <label class="field">Vence (el más próximo)<input id="o-ven" type="date" value="${esc(sl.vence||"")}"></label></div>
+   ${p ? `<div class="notice">En depósito hay ${stockDep(sl.productoId)} u. de ${esc(p.nombre)}.</div>` : ""}`;
+  openDrawer(m.nombre + " · slot " + n, body, S.ro ? `<button class="btn" type="button" data-close>Cerrar</button>` : `<button class="btn" type="button" data-close>Cancelar</button><button class="btn" type="button" id="o-fill">Reponer hasta llenar</button><button class="btn pri" type="button" id="o-ok">Guardar</button>`, (d, close) => {
+    const leer = () => ({productoId: $("#o-prod",d).value || null, capacidad: num($("#o-cap",d).value), cantidad: num($("#o-can",d).value) || 0, vence: $("#o-ven",d).value || null});
+    const guardar = async (nsl, msg) => { const slots = Object.assign({}, m.slots||{}); if (nsl.productoId) slots[n] = nsl; else delete slots[n]; return save("maquinas/"+mid, Object.assign({}, m, {slots}), msg); };
+    const ok = $("#o-ok", d); if (ok) ok.addEventListener("click", async () => { if (await guardar(leer(), "Slot " + n + " guardado")) close(); });
+    const fill = $("#o-fill", d); if (fill) fill.addEventListener("click", async () => { const x = leer(); if (!x.productoId || !x.capacidad){ toast("Elegí producto y capacidad"); return; }
+      const need = x.capacidad - x.cantidad; if (need <= 0){ toast("El slot ya está lleno"); return; }
+      const r = sacarDeposito(x.productoId, need); if (r.sacado <= 0){ toast("No hay stock en el depósito"); return; }
+      x.cantidad += r.sacado; if (r.venceMin && (!x.vence || r.venceMin < x.vence)) x.vence = r.venceMin;
+      await save("stock/"+x.productoId, {lotes: r.lotes}); if (await guardar(x, "Repuestas " + r.sacado + " u." + (r.sacado < need ? " (no alcanzó el depósito)" : ""))) close(); });
+  });
+}
+async function reponerTodo(){ const mid = UI.maq, m = JSON.parse(JSON.stringify(S.maquinas[mid])); const stockCopy = JSON.parse(JSON.stringify(S.stock)); let total = 0, cortos = 0; const tocados = new Set();
+  for (const r of reposicion(m)){ const sOld = S.stock; S.stock = stockCopy; const x = sacarDeposito(r.pid, r.falta); S.stock = sOld; stockCopy[r.pid] = {lotes: x.lotes}; tocados.add(r.pid);
+    const sl = m.slots[r.n]; sl.cantidad = (sl.cantidad||0) + x.sacado; if (x.venceMin && (!sl.vence || x.venceMin < sl.vence)) sl.vence = x.venceMin; total += x.sacado; if (x.sacado < r.falta) cortos++; }
+  for (const pid of tocados) await save("stock/"+pid, stockCopy[pid]);
+  await save("maquinas/"+mid, m, "Repuestas " + total + " u." + (cortos ? " · " + cortos + " slots quedaron cortos" : "")); }
+
+function openMaquina(mid){
+  const m = mid ? S.maquinas[mid] : {nombre:"", ubicacion:"", cantidadSlots:60, mediosPago:["qr"], alquiler:null, otrosGastos:[], slots:{}};
+  const gastos = (m.otrosGastos||[]).map(g=>Object.assign({},g));
+  const gRow = (g,i) => `<div class="fgrid" data-g="${i}" style="align-items:end"><label class="field">Concepto<input data-k="concepto" value="${esc(g.concepto)}"></label><label class="field">Monto mensual ($)<input data-k="monto" inputmode="decimal" value="${esc(g.monto)}"></label></div>`;
+  const body = `<div class="fgrid"><label class="field">Nombre<input id="m-nom" value="${esc(m.nombre)}" placeholder="Ej.: Sanatorio"></label><label class="field">Ubicación<input id="m-ubi" value="${esc(m.ubicacion)}"></label>
+   <label class="field">Cantidad de slots<input id="m-n" inputmode="numeric" value="${esc(m.cantidadSlots||60)}"></label><label class="field">Alquiler mensual ($)<input id="m-alq" inputmode="decimal" value="${esc(m.alquiler)}" placeholder="A definir"></label></div>
+   <fieldset class="card" style="margin:0"><legend class="small muted" style="padding:0 6px">Medios de pago</legend><div class="row">${[["qr","QR"],["efectivo","Efectivo"],["tarjeta","Tarjeta"]].map(([k,l])=>`<label class="row" style="gap:6px;min-height:44px"><input type="checkbox" data-mp="${k}" ${(m.mediosPago||[]).includes(k)?"checked":""}> ${l}</label>`).join("")}</div></fieldset>
+   <div><h3>Otros gastos mensuales</h3><div id="m-gs" style="display:flex;flex-direction:column;gap:10px;margin-top:8px">${gastos.map(gRow).join("")}</div><button class="btn" type="button" id="m-addg" style="margin-top:10px">Agregar gasto</button></div>`;
+  openDrawer(mid ? "Datos de " + m.nombre : "Nueva máquina", body, `${mid?`<button class="btn ghost danger" type="button" id="m-del">Borrar</button>`:""}<button class="btn" type="button" data-close>Cancelar</button><button class="btn pri" type="button" id="m-ok">Guardar</button>`, (d, close) => {
+    $("#m-addg", d).addEventListener("click", () => { gastos.push({concepto:"", monto:null}); const w = document.createElement("div"); w.innerHTML = gRow(gastos[gastos.length-1], gastos.length-1); $("#m-gs", d).appendChild(w.firstElementChild); });
+    const dl = $("#m-del", d); if (dl) dl.addEventListener("click", () => { close(); confirmar("¿Borrar la máquina " + m.nombre + " y su planograma?", () => del("maquinas/"+mid, "Máquina borrada")); });
+    $("#m-ok", d).addEventListener("click", async () => { const nombre = $("#m-nom",d).value.trim(); if (!nombre){ toast("Falta el nombre"); return; }
+      d.querySelectorAll("[data-g]").forEach(el => { const g = gastos[+el.dataset.g]; g.concepto = el.querySelector('[data-k="concepto"]').value.trim(); g.monto = num(el.querySelector('[data-k="monto"]').value); });
+      const id = mid || uid(); const data = Object.assign({}, m, {nombre, ubicacion: $("#m-ubi",d).value.trim(), cantidadSlots: Math.max(1, Math.min(200, num($("#m-n",d).value) || 60)), alquiler: num($("#m-alq",d).value),
+        mediosPago: [...d.querySelectorAll("[data-mp]")].filter(x=>x.checked).map(x=>x.dataset.mp), otrosGastos: gastos.filter(g=>g.concepto && g.monto!=null)});
+      if (await save("maquinas/"+id, data, "Máquina guardada")){ UI.maq = id; close(); } });
+  });
+}
+
+// ---------- arranque ----------
+renderNav(); render();
+window.addEventListener("hashchange", setRoute);
+const COLS = ["productos","stock","relev","competidores","proveedores","maquinas","config"];
+(async function(){
+  const C = window.claude; if (!C || !C.use){ $("#view").innerHTML = `<div class="empty">Abrí esta app desde claude.ai para ver y guardar tus datos.</div>`; return; }
+  db = await C.use("db");
+  if (!db){ $("#view").innerHTML = `<div class="empty">No se pudo conectar con la base de datos. Recargá la página.</div>`; return; }
+  C.use("assets").then(a => { assets = a; if (!a){ S.ro = false; } });
+  C.use("downloads").then(x => { downloads = x; });
+  C.use("user").then(u => { if (u && u.canEdit && !u.canEdit()){ S.ro = true; renderNav(); render(); } }).catch(()=>{});
+  const got = new Set();
+  for (const col of COLS){
+    db.collection(col).onSnapshot(snap => {
+      const o = {}; snap.docs.forEach(d => { if (d.exists) o[d.id] = d.data(); });
+      if (col === "config") S.config = o.general || {}; else S[col] = o;
+      got.add(col); if (got.size === COLS.length) S.ready = true;
+      if (S.ready) render();
+    }, err => { if (err && err.code !== "unavailable") toast("Se cortó la conexión con los datos. Recargá la página."); });
+  }
+  setRoute();
+})();
+})();
+</script>
