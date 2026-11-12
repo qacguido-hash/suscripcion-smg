@@ -220,8 +220,8 @@ def sombreado_base(im):
     return Image.fromarray(np.clip(arr, 0, 255).astype(np.uint8))
 
 
-def componer(estantes_a_llenar, sufijo):
-    cfg = json.load(open(f"{BASE}/scripts/distribucion.json"))
+def componer(estantes_a_llenar, sufijo, distribucion="distribucion.json"):
+    cfg = json.load(open(f"{BASE}/scripts/{distribucion}"))
     img, floor_y = fondo()
     gabinete(img, floor_y)
     gx0, gy0, gx1, gy1 = GLASS
@@ -328,6 +328,7 @@ if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--estantes", type=int, nargs="*", default=[1, 2, 3, 4, 5, 6])
     ap.add_argument("--sufijo", default=None)
+    ap.add_argument("--distribucion", default="distribucion.json", help="p. ej. distribucion_colegio.json")
     a = ap.parse_args()
     suf = a.sufijo or ("completa" if len(a.estantes) == 6 else "parcial_" + "_".join(map(str, a.estantes)))
-    componer(set(a.estantes), suf)
+    componer(set(a.estantes), suf, a.distribucion)

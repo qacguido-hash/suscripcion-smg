@@ -383,5 +383,82 @@
   "nombre_en_tienda": "Galletitas surtidas Terrabusi Variedad 390 grs",
   "imagen": "https://carrefourar.vteximg.com.br/arquivos/ids/860611/7622202839962_E02.jpg",
   "pagina": "https://www.carrefour.com.ar/galletitas-surtidas-terrabusi-variedad-390-grs-777681/p"
+ },
+ "56_baggio_manzana": {
+  "producto": "Baggio Manzana",
+  "tienda": "dia",
+  "nombre_en_tienda": "Jugo Listo Manzana Con Vitaminas Baggio Pronto 200 Ml.",
+  "imagen": "https://ardiaprod.vteximg.com.br/arquivos/ids/338682/Jugo-Listo-Manzana-Con-Vitaminas-Baggio-Pronto-200-Ml-_1.jpg",
+  "pagina": "https://diaonline.supermercadosdia.com.ar/jugo-listo-manzana-con-vitaminas-baggio-pronto-200-ml-181530/p"
+ },
+ "57_leche_protein": {
+  "producto": "Leche Protein 200 ml",
+  "tienda": "jumbo",
+  "nombre_en_tienda": "Bebida Lactea Protein Chocolate Intenso 200 Ml La Serenisima",
+  "imagen": "https://jumboargentina.vteximg.com.br/arquivos/ids/936283/21120202003.jpg",
+  "pagina": "https://www.jumbo.com.ar/protein-chocolate-intenso-200-ml-la-serenisima/p"
+ },
+ "58_cepita_naranja": {
+  "producto": "Cepita naranja 500 ml",
+  "tienda": "jumbo",
+  "nombre_en_tienda": "Jugo Sabor Naranja 500 Cc Cepita",
+  "imagen": "https://jumboargentina.vteximg.com.br/arquivos/ids/921800/7790895647369-1.jpg",
+  "pagina": "https://www.jumbo.com.ar/jugo-listo-cepita-fresh-naranja-500cc/p"
+ },
+ "59_guaymallen_blanco": {
+  "producto": "Guaymallén blanco",
+  "tienda": "carrefour",
+  "nombre_en_tienda": "Alfajor blanco Guaymallén 38 g.",
+  "imagen": "https://carrefourar.vteximg.com.br/arquivos/ids/915488/77980212_02.jpg",
+  "pagina": "https://www.carrefour.com.ar/alfajor-blanco-guaymallen-38-g-37809-37809/p"
+ },
+ "60_matilda": {
+  "producto": "Alfajor Matilda",
+  "tienda": "web",
+  "nombre_en_tienda": "",
+  "imagen": "https://www.zanettigolosinas.com.ar/datos/uploads/mod_catalogo/32431/d-nq-np-2x-634752-mla113658881523-062026-f-6a68fb0c61ab3.webp",
+  "pagina": "https://www.zanettigolosinas.com.ar/datos/uploads/mod_catalogo/32431/d-nq-np-2x-634752-mla113658881523-062026-f-6a68fb0c61ab3.webp"
+ },
+ "61_don_satur_dulces": {
+  "producto": "Don Satur dulces",
+  "tienda": "jumbo",
+  "nombre_en_tienda": "Bizcochos Sabor Dulce 200 Grs Don Satur",
+  "imagen": "https://jumboargentina.vteximg.com.br/arquivos/ids/250105/Bizcochos-Don-Satur-Dulces-200-Gr-1-16176.jpg",
+  "pagina": "https://www.jumbo.com.ar/bizcochos-don-satur-dulces-200-gr/p"
+ },
+ "62_don_satur_salados": {
+  "producto": "Don Satur salados",
+  "tienda": "jumbo",
+  "nombre_en_tienda": "Bizcochos De Grasa Don Satur 200 Gr",
+  "imagen": "https://jumboargentina.vteximg.com.br/arquivos/ids/181715/Bizcocho-Don-Satur-X-200-Gr-Bizcochos-De-Grasa-Don-Satur-200-Gr-1-16177.jpg",
+  "pagina": "https://www.jumbo.com.ar/bizcochos-de-grasa-don-satur-200-gr/p"
+ },
+ "63_pepas_terepin": {
+  "producto": "Pepas Terepín",
+  "tienda": "jumbo",
+  "nombre_en_tienda": "Galletitas Terepín Pepas 200 Gr",
+  "imagen": "https://jumboargentina.vteximg.com.br/arquivos/ids/469047/Galletitas-Terepin-Pepas-200-Gr-1-13687.jpg",
+  "pagina": "https://www.jumbo.com.ar/galletitas-terepin-pepas-200-gr/p"
+ },
+ "64_cerealitas": {
+  "producto": "Cerealitas",
+  "tienda": "jumbo",
+  "nombre_en_tienda": "Galletitas Saladas Clásicas 212 Grs Cerealitas",
+  "imagen": "https://jumboargentina.vteximg.com.br/arquivos/ids/846479/Galletitas-Cracker-Cereal-Cl-sicas-Cerealitas-212-Gr-1-958707.jpg",
+  "pagina": "https://www.jumbo.com.ar/galletitas-cracker-cereal-clasicas-cerealitas-212-gr-2/p"
+ },
+ "65_cachafaz_avena_chips": {
+  "producto": "Cachafaz integral avena y chips",
+  "tienda": "jumbo",
+  "nombre_en_tienda": "Galletitas Integral Avena Con Chips De Chocolate 225 Gr Cachafaz",
+  "imagen": "https://jumboargentina.vteximg.com.br/arquivos/ids/829046/11121604002.jpg",
+  "pagina": "https://www.jumbo.com.ar/galletitas-integral-avena-con-chips-de-chocolate-225-gr-cachafaz-2/p"
+ },
+ "66_sonrisas": {
+  "producto": "Sonrisas",
+  "tienda": "dia",
+  "nombre_en_tienda": "Galletitas Sonrisas Frambuesa 108 Gr.",
+  "imagen": "https://ardiaprod.vteximg.com.br/arquivos/ids/361439/Galletitas-Sonrisas-Frambuesa-108-Gr-_1.jpg",
+  "pagina": "https://diaonline.supermercadosdia.com.ar/galletitas-sonrisas-frambuesa-108-gr-275784/p"
  }
 }

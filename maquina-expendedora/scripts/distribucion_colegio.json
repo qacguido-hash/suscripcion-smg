@@ -1,0 +1,271 @@
+{
+ "_nota": "Estantes de abajo (1) hacia arriba (6). alto_cm/ancho_cm = medida real aproximada del frente del envase tal como se ve (si rotar=true, alto_cm es el largo del envase, que queda vertical). rotar=true: el envase va parado (como se carga en espiral) porque acostado no entra en el canal.",
+ "estantes": [
+  {
+   "n": 1,
+   "alto_cm": 26,
+   "canales": [
+    {
+     "slug": "02_baggio_naranja",
+     "alto_cm": 11
+    },
+    {
+     "slug": "56_baggio_manzana",
+     "alto_cm": 11
+    },
+    {
+     "slug": "03_baggio_multifruta",
+     "alto_cm": 11
+    },
+    {
+     "slug": "57_leche_protein",
+     "alto_cm": 12.5
+    },
+    {
+     "slug": "58_cepita_naranja",
+     "alto_cm": 21
+    },
+    {
+     "slug": "08_coca_cola",
+     "alto_cm": 21.5
+    },
+    {
+     "slug": "07_coca_zero",
+     "alto_cm": 21.5
+    },
+    {
+     "slug": "01_agua_villavicencio",
+     "alto_cm": 21.5
+    },
+    {
+     "slug": "05_sprite",
+     "alto_cm": 21.5
+    },
+    {
+     "slug": "09_powerade",
+     "alto_cm": 21
+    }
+   ]
+  },
+  {
+   "n": 2,
+   "alto_cm": 19,
+   "canales": [
+    {
+     "slug": "11_miga_jyq",
+     "alto_cm": 12.5
+    },
+    {
+     "slug": "12_miga_jyq_negro",
+     "alto_cm": 12.5
+    },
+    {
+     "slug": "13_miga_crudo",
+     "alto_cm": 12.5
+    },
+    {
+     "slug": "14_pebete",
+     "alto_cm": 15
+    },
+    {
+     "slug": "15_medialuna_rellena",
+     "alto_cm": 12
+    },
+    {
+     "slug": "33_hamlet",
+     "rotar": true,
+     "alto_cm": 14
+    },
+    {
+     "slug": "47_cereal_mix",
+     "alto_cm": 13
+    },
+    {
+     "slug": "48_integra_choco",
+     "alto_cm": 15
+    },
+    {
+     "slug": "49_integra_arandanos",
+     "alto_cm": 15
+    },
+    {
+     "slug": "50_frutos_secos",
+     "alto_cm": 14
+    }
+   ]
+  },
+  {
+   "n": 3,
+   "alto_cm": 15,
+   "canales": [
+    {
+     "slug": "21_milka_ddl_negro",
+     "alto_cm": 11.5
+    },
+    {
+     "slug": "22_milka_ddl_blanco",
+     "alto_cm": 11.5
+    },
+    {
+     "slug": "23_rasta_negro",
+     "alto_cm": 11.5
+    },
+    {
+     "slug": "24_rasta_blanco",
+     "alto_cm": 11.5
+    },
+    {
+     "slug": "25_aguila_brownie",
+     "alto_cm": 11
+    },
+    {
+     "slug": "27_alfajor_block",
+     "alto_cm": 11
+    },
+    {
+     "slug": "28_chocotorta",
+     "alto_cm": 11.5
+    },
+    {
+     "slug": "60_matilda",
+     "alto_cm": 12
+    },
+    {
+     "slug": "30_guaymallen",
+     "ancho_cm": 10.5
+    },
+    {
+     "slug": "59_guaymallen_blanco",
+     "ancho_cm": 10.5
+    }
+   ]
+  },
+  {
+   "n": 4,
+   "alto_cm": 15,
+   "canales": [
+    {
+     "slug": "31_rocklets",
+     "rotar": true,
+     "alto_cm": 12
+    },
+    {
+     "slug": "32_sugus",
+     "rotar": true,
+     "alto_cm": 9.5
+    },
+    {
+     "slug": "46_cadbury_fruti",
+     "rotar": true,
+     "alto_cm": 14
+    },
+    {
+     "slug": "34_kitkat",
+     "rotar": true,
+     "alto_cm": 13
+    },
+    {
+     "slug": "35_kinder",
+     "rotar": true,
+     "alto_cm": 13
+    },
+    {
+     "slug": "36_conito",
+     "alto_cm": 6.5
+    },
+    {
+     "slug": "37_beldent",
+     "rotar": true,
+     "alto_cm": 9
+    },
+    {
+     "slug": "38_tictac",
+     "alto_cm": 7.5
+    },
+    {
+     "slug": "39_dientitos",
+     "alto_cm": 13
+    },
+    {
+     "slug": "40_moritas",
+     "alto_cm": 13
+    }
+   ]
+  },
+  {
+   "n": 5,
+   "alto_cm": 18,
+   "canales": [
+    {
+     "slug": "61_don_satur_dulces",
+     "ancho_cm": 17
+    },
+    {
+     "slug": "62_don_satur_salados",
+     "ancho_cm": 17
+    },
+    {
+     "slug": "63_pepas_terepin",
+     "alto_cm": 19
+    },
+    {
+     "slug": "64_cerealitas",
+     "alto_cm": 20,
+     "rotar": true
+    },
+    {
+     "slug": "65_cachafaz_avena_chips",
+     "alto_cm": 19,
+     "rotar": true
+    },
+    {
+     "slug": "16_mini_oreo",
+     "alto_cm": 13.5
+    },
+    {
+     "slug": "17_mini_pepitos",
+     "alto_cm": 13.5
+    },
+    {
+     "slug": "18_club_social",
+     "alto_cm": 14
+    },
+    {
+     "slug": "19_rex",
+     "alto_cm": 16
+    },
+    {
+     "slug": "66_sonrisas",
+     "alto_cm": 16,
+     "rotar": true
+    }
+   ]
+  },
+  {
+   "n": 6,
+   "alto_cm": 27,
+   "canales": [
+    {
+     "slug": "51_lays",
+     "alto_cm": 25
+    },
+    {
+     "slug": "52_rueditas",
+     "alto_cm": 24
+    },
+    {
+     "slug": "53_doritos",
+     "alto_cm": 24
+    },
+    {
+     "slug": "54_saladix",
+     "alto_cm": 20
+    },
+    {
+     "slug": "55_surtidas",
+     "alto_cm": 23
+    }
+   ]
+  }
+ ]
+}
