@@ -134,7 +134,7 @@ def pantalla(img, thumbs):
         tt = t.copy(); tt.thumbnail((int(bw * 0.8), int(bh * 0.8)), Image.LANCZOS)
         scr.paste(tt, (bx + (bw - tt.width) // 2, by + (bh - tt.height) // 2), tt)
     sd.rounded_rectangle((int(w * 0.12), int(h * 0.885), int(w * 0.88), int(h * 0.955)), 24, fill=(30, 140, 70))
-    sd.text((w / 2, h * 0.92), "Pagá con QR, tarjeta o efectivo", font=font(FONT_M, int(h * 0.028)), fill="white", anchor="mm")
+    sd.text((w / 2, h * 0.92), "Pagá con QR, tarjeta o efectivo", font=font(FONT_M, int(h * 0.023)), fill="white", anchor="mm")
     img.paste(scr, (x0, y0), rounded_mask((w, h), 8))
     # reflejo del vidrio de la pantalla
     refl = Image.new("L", (w, h), 0)

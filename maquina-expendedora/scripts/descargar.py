@@ -17,7 +17,7 @@ for slug, label, store, name, i in sel:
         url, page = c["imgs"][i], c["link"]
     if not url: print("SIN URL", slug); continue
     out = f"{BASE}/productos_raw/{slug}.img"
-    if not os.path.exists(out):
+    if not os.path.exists(out) or slug in sys.argv[1:]:
         r = requests.get(url, timeout=30, headers={"User-Agent": "Mozilla/5.0"}); r.raise_for_status()
         open(out, "wb").write(r.content)
     fuentes[slug] = {"producto": label, "tienda": store, "nombre_en_tienda": name if store != "web" else "", "imagen": url, "pagina": page}
