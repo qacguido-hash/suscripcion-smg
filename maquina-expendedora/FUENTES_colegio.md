@@ -7,18 +7,18 @@ Todas las fotos son del envase real argentino. Escala base: 16.62 px por cm (can
 | A1 (estante 6) | Lays | Papas fritas Lays clásicas 85 g. | [Carrefour Argentina](https://www.carrefour.com.ar/papas-fritas-lays-clasicas-85-g-721950/p) | 73% |
 | A2 (estante 6) | Rueditas Pep | Snack sabor a pizza Pep rueditas 74 g. | [Carrefour Argentina](https://www.carrefour.com.ar/snack-sabor-a-pizza-pep-rueditas-74-g-676530/p) | 79% |
 | A3 (estante 6) | Doritos | Nachos sabor a queso Doritos 77 g. | [Carrefour Argentina](https://www.carrefour.com.ar/nachos-sabor-a-queso-doritos-77-g-721951/p) | 81% |
-| A4 (estante 6) | Saladix | Galletitas snacks Saladix sabor pizza 100 grs | [Carrefour Argentina](https://www.carrefour.com.ar/galletitas-snacks-saladix-sabor-pizza-100-grs-21917/p) | 93% |
+| A4 (estante 6) | Madalenas Bimbo chocolate rellenas DDL | Madalena Bimbo chocolate rellena con DDL 234 grs | [Carrefour Argentina](https://www.carrefour.com.ar/madalena-bimbo-chocolate-rellena-con-ddl-234-grs-768825/p) | 82% |
 | A5 (estante 6) | Galletitas surtidas | Galletitas surtidas Terrabusi Variedad 390 grs | [Carrefour Argentina](https://www.carrefour.com.ar/galletitas-surtidas-terrabusi-variedad-390-grs-777681/p) | 72% |
 | B1 (estante 5) | Don Satur dulces | Bizcochos Sabor Dulce 200 Grs Don Satur | [Jumbo](https://www.jumbo.com.ar/bizcochos-don-satur-dulces-200-gr/p) | 39% |
 | B2 (estante 5) | Don Satur salados | Bizcochos De Grasa Don Satur 200 Gr | [Jumbo](https://www.jumbo.com.ar/bizcochos-de-grasa-don-satur-200-gr/p) | 39% |
 | B3 (estante 5) | Pepas Terepín | Galletitas Terepín Pepas 200 Gr | [Jumbo](https://www.jumbo.com.ar/galletitas-terepin-pepas-200-gr/p) | 44% |
 | B4 (estante 5) | Cerealitas | Galletitas Saladas Clásicas 212 Grs Cerealitas | [Jumbo](https://www.jumbo.com.ar/galletitas-cracker-cereal-clasicas-cerealitas-212-gr-2/p) | 69% · parado |
-| B5 (estante 5) | Cachafaz integral avena y chips | Galletitas Integral Avena Con Chips De Chocolate 225 Gr Cachafaz | [Jumbo](https://www.jumbo.com.ar/galletitas-integral-avena-con-chips-de-chocolate-225-gr-cachafaz-2/p) | 73% · parado |
+| B5 (estante 5) | Budín Bonafide marmolado | Budin marmolado Bonafide 180 grs | [Carrefour Argentina](https://www.carrefour.com.ar/budin-de-vainilla-bonafide-180-grs-769044/p) | 77% · parado |
 | B6 (estante 5) | Mini Oreo | Galletitas Oreo Mini rellenas con crema sabor original 50 g. | [Carrefour Argentina](https://www.carrefour.com.ar/galletitas-oreo-mini-rellenas-con-crema-sabor-original-50-g-720547/p) | 67% |
 | B7 (estante 5) | Mini Pepitos | Galletitas Mini Pepitos con chips de chocolate 50 g. | [Carrefour Argentina](https://www.carrefour.com.ar/galletitas-mini-pepitos-con-chips-de-chocolate-50-g-720553/p) | 71% |
 | B8 (estante 5) | Club Social | Galletitas original Club Social x6 24 grs | [Carrefour Argentina](https://www.carrefour.com.ar/galletitas-original-club-social-x6-24-grs-768035/p) | 76% |
 | B9 (estante 5) | Rex | Galletitas crackers Rex original 75 g. | [Carrefour Argentina](https://www.carrefour.com.ar/galletitas-crackers-rex-original-75-g/p) | 46% |
-| B10 (estante 5) | Sonrisas | Galletitas Sonrisas Frambuesa 108 Gr. | [Día Online](https://diaonline.supermercadosdia.com.ar/galletitas-sonrisas-frambuesa-108-gr-275784/p) | 86% · parado |
+| B10 (estante 5) | Palitos salados Nikitos | Palitos Salados Nikitos 80 Gr | [Jumbo](https://www.jumbo.com.ar/palitos-salados-nikitos-80-gr/p) | 41% |
 | C1 (estante 4) | Rocklets | Confites de chocolate Rocklets 40 g. | [Carrefour Argentina](https://www.carrefour.com.ar/confites-de-chocolate-rocklets-40-g-310673/p) | 67% · parado |
 | C2 (estante 4) | Sugus | Caramelos Sugus confitados 50 g. | [Carrefour Argentina](https://www.carrefour.com.ar/caramelos-sugus-confitados-50-g-36959/p) | 100% · parado |
 | C3 (estante 4) | Cadbury Fruti | Chocolate Cadbury relleno yoghurt frutilla 29 g. | [Carrefour Argentina](https://www.carrefour.com.ar/chocolate-cadbury-relleno-yoghurt-frutilla-yoghurt-29-g-680441/p) | 77% · parado |
@@ -48,7 +48,7 @@ Todas las fotos son del envase real argentino. Escala base: 16.62 px por cm (can
 | E7 (estante 2) | Cereal Mix frutilla | Barra de Cereal Sabor Yoghurt Frutilla 26 Grs Cereal Mix | [Vea](https://www.vea.com.ar/barra-cereal-mix-yoghurt-frutilla-26-gr/p) | 100% |
 | E8 (estante 2) | Integra proteica chocolate | Barra proteica Íntegra maní chocolate 45 grs | [Carrefour Argentina](https://www.carrefour.com.ar/barra-proteica-integra-mani-chocolate-45-grs-744868/p) | 98% |
 | E9 (estante 2) | Integra proteica arándanos | Barra proteica Íntegra pasta de maní y arándanos 43 grs | [Carrefour Argentina](https://www.carrefour.com.ar/barra-proteica-integra-pasta-de-mani-y-arandanos-43-grs-744869/p) | 98% |
-| E10 (estante 2) | Mix frutos secos | Mix Frutos Secos 40 Gr Eatwell | [Vea](https://www.vea.com.ar/mix-frutos-secos-40-gr-eatwell/p) | 67% |
+| E10 (estante 2) | Barra B3ST Protein frutos rojos | Barra Proteica Sabor Frutos Rojos 60 Grs B3st | [Jumbo](https://www.jumbo.com.ar/barra-proteica-b3st-frutos-rojos-60gr/p) | 66% |
 | F1 (estante 1) | Baggio Naranja | Jugo Listo Con Vitaminas Naranja Baggio 200 Ml. | [Día Online](https://diaonline.supermercadosdia.com.ar/jugo-listo-con-vitaminas-naranja-baggio-200-ml-138086/p) | 100% |
 | F2 (estante 1) | Baggio Manzana | Jugo Listo Manzana Con Vitaminas Baggio Pronto 200 Ml. | [Día Online](https://diaonline.supermercadosdia.com.ar/jugo-listo-manzana-con-vitaminas-baggio-pronto-200-ml-181530/p) | 100% |
 | F3 (estante 1) | Baggio Multi | Jugo Listo Multifrutas Con Vitaminas Baggio 200 Ml. | [Día Online](https://diaonline.supermercadosdia.com.ar/jugo-listo-multifrutas-con-vitaminas-baggio-200-ml-138087/p) | 100% |

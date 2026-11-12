@@ -460,5 +460,33 @@
   "nombre_en_tienda": "Galletitas Sonrisas Frambuesa 108 Gr.",
   "imagen": "https://ardiaprod.vteximg.com.br/arquivos/ids/361439/Galletitas-Sonrisas-Frambuesa-108-Gr-_1.jpg",
   "pagina": "https://diaonline.supermercadosdia.com.ar/galletitas-sonrisas-frambuesa-108-gr-275784/p"
+ },
+ "67_madalenas_bimbo": {
+  "producto": "Madalenas Bimbo chocolate rellenas DDL",
+  "tienda": "carrefour",
+  "nombre_en_tienda": "Madalena Bimbo chocolate rellena con DDL 234 grs",
+  "imagen": "https://carrefourar.vteximg.com.br/arquivos/ids/827886/7793890262001_E02.jpg",
+  "pagina": "https://www.carrefour.com.ar/madalena-bimbo-chocolate-rellena-con-ddl-234-grs-768825/p"
+ },
+ "68_b3st_protein": {
+  "producto": "Barra B3ST Protein frutos rojos",
+  "tienda": "jumbo",
+  "nombre_en_tienda": "Barra Proteica Sabor Frutos Rojos 60 Grs B3st",
+  "imagen": "https://jumboargentina.vteximg.com.br/arquivos/ids/925330/Barra-Proteica-B3st-Frutos-Rojos-60gr-1-1062528.jpg",
+  "pagina": "https://www.jumbo.com.ar/barra-proteica-b3st-frutos-rojos-60gr/p"
+ },
+ "69_budin_bonafide": {
+  "producto": "Budín Bonafide marmolado",
+  "tienda": "carrefour",
+  "nombre_en_tienda": "Budin marmolado Bonafide 180 grs",
+  "imagen": "https://carrefourar.vteximg.com.br/arquivos/ids/741129/7792360097860_E02.jpg",
+  "pagina": "https://www.carrefour.com.ar/budin-de-vainilla-bonafide-180-grs-769044/p"
+ },
+ "70_palitos_nikitos": {
+  "producto": "Palitos salados Nikitos",
+  "tienda": "jumbo",
+  "nombre_en_tienda": "Palitos Salados Nikitos 80 Gr",
+  "imagen": "https://jumboargentina.vteximg.com.br/arquivos/ids/533877/Palitos-Salados-Nikitos-X-80grs-1-668258.jpg",
+  "pagina": "https://www.jumbo.com.ar/palitos-salados-nikitos-80-gr/p"
  }
 }

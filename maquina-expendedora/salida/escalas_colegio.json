@@ -153,12 +153,12 @@
    "escala_aplicada": 0.98,
    "rotado": false
   },
-  "50_frutos_secos": {
+  "68_b3st_protein": {
    "medida_real_cm": [
-    9.8,
-    14.0
+    10.1,
+    15.0
    ],
-   "escala_aplicada": 0.67,
+   "escala_aplicada": 0.66,
    "rotado": false
   },
   "21_milka_ddl_negro": {
@@ -353,12 +353,12 @@
    "escala_aplicada": 0.69,
    "rotado": true
   },
-  "65_cachafaz_avena_chips": {
+  "69_budin_bonafide": {
    "medida_real_cm": [
-    6.4,
-    19.0
+    8.5,
+    18.0
    ],
-   "escala_aplicada": 0.73,
+   "escala_aplicada": 0.77,
    "rotado": true
   },
   "16_mini_oreo": {
@@ -393,13 +393,13 @@
    "escala_aplicada": 0.46,
    "rotado": false
   },
-  "66_sonrisas": {
+  "70_palitos_nikitos": {
    "medida_real_cm": [
-    4.7,
-    16.0
+    16.1,
+    20.0
    ],
-   "escala_aplicada": 0.86,
-   "rotado": true
+   "escala_aplicada": 0.41,
+   "rotado": false
   },
   "51_lays": {
    "medida_real_cm": [
@@ -425,12 +425,12 @@
    "escala_aplicada": 0.81,
    "rotado": false
   },
-  "54_saladix": {
+  "67_madalenas_bimbo": {
    "medida_real_cm": [
-    14.7,
-    20.0
+    16.6,
+    22.0
    ],
-   "escala_aplicada": 0.93,
+   "escala_aplicada": 0.82,
    "rotado": false
   },
   "55_surtidas": {

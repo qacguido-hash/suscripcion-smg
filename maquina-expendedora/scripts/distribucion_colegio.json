@@ -89,8 +89,8 @@
      "alto_cm": 15
     },
     {
-     "slug": "50_frutos_secos",
-     "alto_cm": 14
+     "slug": "68_b3st_protein",
+     "alto_cm": 15
     }
    ]
   },
@@ -214,8 +214,8 @@
      "rotar": true
     },
     {
-     "slug": "65_cachafaz_avena_chips",
-     "alto_cm": 19,
+     "slug": "69_budin_bonafide",
+     "alto_cm": 18,
      "rotar": true
     },
     {
@@ -235,9 +235,8 @@
      "alto_cm": 16
     },
     {
-     "slug": "66_sonrisas",
-     "alto_cm": 16,
-     "rotar": true
+     "slug": "70_palitos_nikitos",
+     "alto_cm": 20
     }
    ]
   },
@@ -258,8 +257,8 @@
      "alto_cm": 24
     },
     {
-     "slug": "54_saladix",
-     "alto_cm": 20
+     "slug": "67_madalenas_bimbo",
+     "alto_cm": 22
     },
     {
      "slug": "55_surtidas",
