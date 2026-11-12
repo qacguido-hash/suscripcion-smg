@@ -73,14 +73,6 @@
    "escala_aplicada": 1.0,
    "rotado": false
   },
-  "10_monster": {
-   "medida_real_cm": [
-    6.6,
-    16.8
-   ],
-   "escala_aplicada": 0.99,
-   "rotado": false
-  },
   "11_miga_jyq": {
    "medida_real_cm": [
     10.7,
@@ -121,44 +113,44 @@
    "escala_aplicada": 0.66,
    "rotado": false
   },
-  "16_mini_oreo": {
+  "33_hamlet": {
    "medida_real_cm": [
-    9.9,
-    13.5
-   ],
-   "escala_aplicada": 0.67,
-   "rotado": false
-  },
-  "17_mini_pepitos": {
-   "medida_real_cm": [
-    9.3,
-    13.5
-   ],
-   "escala_aplicada": 0.71,
-   "rotado": false
-  },
-  "18_club_social": {
-   "medida_real_cm": [
-    8.7,
+    4.0,
     14.0
    ],
-   "escala_aplicada": 0.76,
-   "rotado": false
+   "escala_aplicada": 1.0,
+   "rotado": true
   },
-  "19_rex": {
+  "47_cereal_mix": {
    "medida_real_cm": [
-    14.4,
-    16.0
-   ],
-   "escala_aplicada": 0.46,
-   "rotado": false
-  },
-  "20_pringles": {
-   "medida_real_cm": [
-    6.5,
-    7.5
+    3.9,
+    13.0
    ],
    "escala_aplicada": 1.0,
+   "rotado": false
+  },
+  "48_integra_choco": {
+   "medida_real_cm": [
+    5.5,
+    15.0
+   ],
+   "escala_aplicada": 0.98,
+   "rotado": false
+  },
+  "49_integra_arandanos": {
+   "medida_real_cm": [
+    5.5,
+    15.0
+   ],
+   "escala_aplicada": 0.98,
+   "rotado": false
+  },
+  "50_frutos_secos": {
+   "medida_real_cm": [
+    9.8,
+    14.0
+   ],
+   "escala_aplicada": 0.67,
    "rotado": false
   },
   "21_milka_ddl_negro": {
@@ -257,9 +249,9 @@
    "escala_aplicada": 1.0,
    "rotado": true
   },
-  "33_hamlet": {
+  "46_cadbury_fruti": {
    "medida_real_cm": [
-    4.0,
+    3.6,
     14.0
    ],
    "escala_aplicada": 0.77,
@@ -361,44 +353,44 @@
    "escala_aplicada": 1.0,
    "rotado": true
   },
-  "46_cadbury_fruti": {
+  "16_mini_oreo": {
    "medida_real_cm": [
-    3.6,
-    14.0
-   ],
-   "escala_aplicada": 0.98,
-   "rotado": true
-  },
-  "47_cereal_mix": {
-   "medida_real_cm": [
-    3.9,
-    13.0
-   ],
-   "escala_aplicada": 1.0,
-   "rotado": false
-  },
-  "48_integra_choco": {
-   "medida_real_cm": [
-    5.5,
-    15.0
-   ],
-   "escala_aplicada": 0.92,
-   "rotado": false
-  },
-  "49_integra_arandanos": {
-   "medida_real_cm": [
-    5.5,
-    15.0
-   ],
-   "escala_aplicada": 0.92,
-   "rotado": false
-  },
-  "50_frutos_secos": {
-   "medida_real_cm": [
-    9.8,
-    14.0
+    9.9,
+    13.5
    ],
    "escala_aplicada": 0.67,
+   "rotado": false
+  },
+  "17_mini_pepitos": {
+   "medida_real_cm": [
+    9.3,
+    13.5
+   ],
+   "escala_aplicada": 0.71,
+   "rotado": false
+  },
+  "18_club_social": {
+   "medida_real_cm": [
+    8.7,
+    14.0
+   ],
+   "escala_aplicada": 0.76,
+   "rotado": false
+  },
+  "19_rex": {
+   "medida_real_cm": [
+    14.4,
+    16.0
+   ],
+   "escala_aplicada": 0.46,
+   "rotado": false
+  },
+  "20_pringles": {
+   "medida_real_cm": [
+    6.5,
+    7.5
+   ],
+   "escala_aplicada": 1.0,
    "rotado": false
   },
   "51_lays": {

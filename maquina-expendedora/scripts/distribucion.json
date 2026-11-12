@@ -38,12 +38,12 @@
      "alto_cm": 21.5
     },
     {
-     "slug": "09_powerade",
-     "alto_cm": 21
+     "slug": "08_coca_cola",
+     "alto_cm": 21.5
     },
     {
-     "slug": "10_monster",
-     "alto_cm": 16.8
+     "slug": "09_powerade",
+     "alto_cm": 21
     }
    ]
   },
@@ -72,24 +72,25 @@
      "alto_cm": 12
     },
     {
-     "slug": "16_mini_oreo",
-     "alto_cm": 13.5
-    },
-    {
-     "slug": "17_mini_pepitos",
-     "alto_cm": 13.5
-    },
-    {
-     "slug": "18_club_social",
+     "slug": "33_hamlet",
+     "rotar": true,
      "alto_cm": 14
     },
     {
-     "slug": "19_rex",
-     "alto_cm": 16
+     "slug": "47_cereal_mix",
+     "alto_cm": 13
     },
     {
-     "slug": "20_pringles",
-     "alto_cm": 7.5
+     "slug": "48_integra_choco",
+     "alto_cm": 15
+    },
+    {
+     "slug": "49_integra_arandanos",
+     "alto_cm": 15
+    },
+    {
+     "slug": "50_frutos_secos",
+     "alto_cm": 14
     }
    ]
   },
@@ -154,7 +155,7 @@
      "alto_cm": 9.5
     },
     {
-     "slug": "33_hamlet",
+     "slug": "46_cadbury_fruti",
      "rotar": true,
      "alto_cm": 14
     },
@@ -220,25 +221,24 @@
      "alto_cm": 13.5
     },
     {
-     "slug": "46_cadbury_fruti",
-     "rotar": true,
+     "slug": "16_mini_oreo",
+     "alto_cm": 13.5
+    },
+    {
+     "slug": "17_mini_pepitos",
+     "alto_cm": 13.5
+    },
+    {
+     "slug": "18_club_social",
      "alto_cm": 14
     },
     {
-     "slug": "47_cereal_mix",
-     "alto_cm": 13
+     "slug": "19_rex",
+     "alto_cm": 16
     },
     {
-     "slug": "48_integra_choco",
-     "alto_cm": 15
-    },
-    {
-     "slug": "49_integra_arandanos",
-     "alto_cm": 15
-    },
-    {
-     "slug": "50_frutos_secos",
-     "alto_cm": 14
+     "slug": "20_pringles",
+     "alto_cm": 7.5
     }
    ]
   },
