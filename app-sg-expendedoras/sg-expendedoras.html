@@ -53,7 +53,7 @@ button,input,select,textarea{font:inherit;color:inherit}
 @media (max-width:899px){
   .side{display:none}
   .main{padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))}
-  .tabs{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--surface);border-top:1px solid var(--line);padding:4px max(4px,env(safe-area-inset-right,0px)) calc(8px + env(safe-area-inset-bottom,0px)) max(4px,env(safe-area-inset-left,0px))}
+  .tabs{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--surface);border-top:1px solid var(--line);padding:4px max(4px,env(safe-area-inset-right,0px)) calc(8px + env(safe-area-inset-bottom,0px)) max(4px,env(safe-area-inset-left,0px))}
   .tabs a{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 1px;min-height:48px;text-decoration:none;color:var(--muted);font-size:10px;font-weight:500;overflow:hidden}
   .tabs a.on{color:var(--fg);font-weight:700}
   .tabs a.on svg{color:var(--accent)}
@@ -162,6 +162,20 @@ tr.click{cursor:pointer} tr.click:hover td{background:var(--surface-2)}
 .vpanel .qr{width:36px;height:36px;background:repeating-conic-gradient(#fff 0 25%,#222 0 50%) 0 0/9px 9px;border-radius:3px}
 .vpanel .pay{width:26px;height:6px;background:#111;border-radius:3px}
 @media (max-width:1100px){.vwrap{grid-template-columns:1fr}}
+.fin2{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:16px;align-items:start}
+.fin2 .col{display:flex;flex-direction:column;gap:16px}
+.stl{display:flex;justify-content:space-between;gap:12px;padding:10px 0;font-size:14.5px;border-top:1px solid var(--line)}
+.stl:first-of-type{border-top:0}
+.stl.sub{padding:2px 0 6px 22px;color:var(--muted);font-size:13.5px;border-top:0}
+.stl.tot{font-weight:700;border-top:2px solid var(--fg);font-size:16px}
+.stl .neg{color:var(--bad)} .stl .pos{color:var(--ok)}
+.stl>.num{white-space:nowrap}
+.sq{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:8px;vertical-align:-1px}
+.fbar{height:10px;background:var(--info-soft);border-radius:99px;overflow:hidden;margin:8px 0 4px}.fbar i{display:block;height:100%;border-radius:99px}
+.mv{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--line);font-size:14px}.mv:first-child{border-top:0}
+.mv .ic{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;font-size:14px;font-weight:700;color:#fff;flex:0 0 30px}
+.mnav{display:flex;align-items:center;gap:8px}
+@media (max-width:1000px){.fin2{grid-template-columns:1fr}}
 .slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:10px}
 .slot{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:8px;display:flex;flex-direction:column;gap:6px;cursor:pointer;text-align:left;min-height:150px}
 .slot:hover{border-color:var(--muted)}
@@ -257,17 +271,18 @@ const ICONS = {
   precios:'<path d="M20.6 13.4l-7.2 7.2a2 2 0 0 1-2.8 0L3 13V3h10l7.6 7.6a2 2 0 0 1 0 2.8z"/><circle cx="7.5" cy="7.5" r="1.5"/>',
   stock:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M9 4v16"/>',
   maquinas:'<rect x="5" y="2" width="14" height="20" rx="2"/><path d="M9 6h6M9 10h6M8 17h8"/>',
+  finanzas:'<rect x="2" y="6" width="20" height="13" rx="2"/><path d="M2 10h20"/><path d="M16 15h2"/><path d="M5 6l4-3h6l4 3"/>',
   ajustes:'<path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/>'
 };
 const icon = (k, s=20) => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[k]}</svg>`;
-const ROUTES = [["inicio","Inicio"],["ventas","Ventas"],["productos","Productos"],["precios","Precios"],["stock","Stock"],["maquinas","Máquinas"],["ajustes","Ajustes"]];
+const ROUTES = [["inicio","Inicio"],["ventas","Ventas"],["productos","Productos"],["precios","Precios"],["stock","Stock"],["maquinas","Máquinas"],["finanzas","Finanzas"],["ajustes","Ajustes"]];
 
 const CATS = ["Bebidas","Sándwiches y panificados","Alfajores","Golosinas","Chocolates y barras","Galletitas","Snacks","Otros"];
 const TIPOS = {chino:"Supermercado chino", kiosco:"Kiosco", pya_market:"PedidosYa Market", pya_comercio:"Comercio en PedidosYa", super:"Supermercado", otro:"Otro"};
 const SIN = "sin";
 
 // ---------- estado ----------
-const S = { productos:{}, stock:{}, relev:{}, competidores:{}, proveedores:{}, maquinas:{}, config:{}, vdias:{}, ready:false, ro:false };
+const S = { productos:{}, stock:{}, relev:{}, competidores:{}, proveedores:{}, maquinas:{}, config:{}, fin:{}, movimientos:{}, vdias:{}, ready:false, ro:false };
 let db = null, assets = null, downloads = null;
 const DEF_CONFIG = { comisionQR: 0, diasPrecioViejo: 45, diasVence: 7, diasCobertura: 7, diasReposicion: 3 };
 const cfg = () => Object.assign({}, DEF_CONFIG, S.config);
@@ -402,7 +417,7 @@ function renderNav(){
 const mtop = () => `<div class="mtop"><div class="brand-mark" aria-hidden="true">S&amp;G</div><strong>S&amp;G Expendedoras</strong></div>`;
 let drawerOpen = false, pending = false;
 function render(){ if (drawerOpen){ pending = true; return; } const v = $("#view"); if (!S.ready){ v.innerHTML = `<div class="empty">Cargando datos…</div>`; return; }
-  const fn = {inicio:vInicio, ventas:vVentas, productos:vProductos, precios:vPrecios, stock:vStock, maquinas:vMaquinas, ajustes:vAjustes}[route];
+  const fn = {inicio:vInicio, ventas:vVentas, productos:vProductos, precios:vPrecios, stock:vStock, maquinas:vMaquinas, finanzas:vFinanzas, ajustes:vAjustes}[route];
   v.innerHTML = mtop() + fn(); bindView(); }
 const li = (rows, empty) => rows.length ? `<div class="list">${rows.join("")}</div>` : `<p class="muted small" style="margin:0">${empty}</p>`;
 const alertasHTML = (al) => al.length ? `<div>${al.map(a=>`<div class="alert"><span class="dot ${a.nivel}" aria-hidden="true"></span>${img(a.p)}<div class="grow" style="flex:1;min-width:0"><div class="t" style="font-weight:600;font-size:14px">${esc(a.t)}</div><div class="small muted">${esc(a.d)}</div></div></div>`).join("")}</div>` : `<p class="muted small" style="margin:0">Sin alertas por ahora. Las de consumo aparecen cuando haya ventas registradas.</p>`;
@@ -632,6 +647,140 @@ function vMaquinas(){
    ${!pron.length && agotan ? `<p class="muted small" style="margin:8px 0 0">Cuando haya ventas registradas vas a ver en cuántos días se agota cada producto.</p>` : ""}</div></div>`;
 }
 
+
+// ---------- finanzas ----------
+const FIN_DEF = { pctMaquina:40, pctReserva:10, pctRetiro:50, socios:[{id:"s1", nombre:"Socio 1", pct:50},{id:"s2", nombre:"Socio 2", pct:50}], metaMaquina:null, inversiones:{} };
+const fcfg = () => Object.assign({}, FIN_DEF, S.fin || {});
+const SOBRES = { reposicion:["Reposición","#5B6B86"], gastos:["Gastos fijos","#A9B2C1"], maquina:["Nueva máquina","#C4161C"], reserva:["Reserva","#E39A2B"], retiro:["Retiro socios","#1B6B3C"] };
+const nombreMesL = (ym) => { const t = nombreMes(ym); return t.charAt(0).toUpperCase() + t.slice(1) + " " + ym.slice(0,4); };
+function mesesTrabajados(){ const evs = eventos(); const hoy = mesDe(0); const primero = evs.length ? evs[evs.length-1].fecha.slice(0,7) : hoy; const out = []; for (let k=0; k>-240; k--){ const ym = mesDe(k); if (ym < primero) break; out.push(ym); } return out; }
+function finMes(ym, soloMaq){
+  const fc = fcfg(), pq = (cfg().comisionQR||0)/100, actual = ym === mesDe(0);
+  const evsAll = delMes(eventos(), ym).filter(e => !soloMaq || e.mid === soloMaq);
+  let qr = 0, ef = 0, mix = 0, costo = 0; const conVentas = new Set();
+  for (const e of evsAll){ const m = S.maquinas[e.mid] || {}; const mp = m.mediosPago || ["qr"]; conVentas.add(e.mid);
+    if (e.medio === "efectivo") ef += e.f; else if (e.medio === "qr" || e.medio === "tarjeta" || !mp.includes("efectivo")) qr += e.f; else mix += e.f;
+    const ca = costoActual(S.productos[e.pid]); costo += (ca != null ? ca : (e.c || 0)) * e.u; }
+  const f = qr + ef + mix, com = (qr + mix) * pq;
+  let canon = 0, otros = 0; const lineasCanon = [];
+  for (const m of maqList()){ if (soloMaq && m.id !== soloMaq) continue; if (!(actual || conVentas.has(m.id))) continue;
+    if (m.alquiler){ canon += m.alquiler; lineasCanon.push([m.nombre, m.alquiler]); } otros += (m.otrosGastos||[]).reduce((t,g)=>t+(g.monto||0),0); }
+  const neta = f - costo - com - canon - otros, pos = Math.max(0, neta);
+  const maq = pos*fc.pctMaquina/100, res = pos*fc.pctReserva/100, ret = pos*fc.pctRetiro/100;
+  const socios = (fc.socios||[]).map(x => ({nombre:x.nombre, pct:x.pct||0, monto: ret*(x.pct||0)/100}));
+  return {ym, f, qr, ef, mix, costo, com, canon, otros, lineasCanon, neta, maq, res, ret, socios, n: evsAll.length};
+}
+const movsList = () => Object.entries(S.movimientos||{}).map(([id,x])=>Object.assign({id},x)).sort((a,b)=>(b.fecha||"").localeCompare(a.fecha||""));
+function finAcum(){
+  const meses = mesesTrabajados(), act = mesDe(0); const filas = meses.map(ym => finMes(ym));
+  const suma = (k) => filas.reduce((t,x)=>t+x[k],0); const movs = movsList();
+  const sal = (sobre) => movs.filter(m=>m.sobre===sobre).reduce((t,m)=>t+(m.monto||0),0);
+  const asign = { reposicion: suma("costo"), gastos: suma("com")+suma("canon")+suma("otros"), maquina: suma("maq"), reserva: suma("res"), retiro: suma("ret") };
+  const saldo = {}; for (const k in SOBRES) saldo[k] = asign[k] - sal(k);
+  const cerrados = filas.filter(x => x.ym !== act && x.n > 0).slice(0,3); const base = cerrados.length ? cerrados : filas.filter(x=>x.n>0);
+  const ritmoMaq = base.length ? base.reduce((t,x)=>t+x.maq,0)/base.length : 0;
+  return {filas, asign, saldo, ritmoMaq, juntado: saldo.maquina};
+}
+function roiMaq(m){
+  const inv = (fcfg().inversiones||{})[m.id] || {}; const total = (inv.maquina||0) + (inv.instalacion||0) + (inv.stockInicial||0);
+  const meses = mesesTrabajados().map(ym => finMes(ym, m.id)).filter(x => x.n > 0);
+  const acum = meses.reduce((t,x)=>t+x.neta,0), prom = meses.length ? acum/meses.length : 0;
+  const roi = total ? acum/total*100 : null, faltan = total && prom > 0 ? Math.max(0, Math.ceil((total-acum)/prom)) : null;
+  return {total, acum, roi, mensual: roi != null && meses.length ? roi/meses.length : null, faltan, meses: meses.length};
+}
+const mesFuturo = (n) => { const d = new Date(); d.setDate(1); d.setMonth(d.getMonth()+n); const t = d.toLocaleDateString("es-AR",{month:"long", year:"numeric"}); return t.replace(" de ", " "); };
+function vFinanzas(){
+  if (UI.fmes == null) UI.fmes = 0;
+  const fc = fcfg(), ym = mesDe(UI.fmes), r = finMes(ym), A = finAcum(), pq = cfg().comisionQR||0;
+  const meses = mesesTrabajados(); const minK = -(meses.length-1);
+  const neg = (v) => `<span class="num neg">− ${fm(v)}</span>`;
+  const sq = (k) => `<span class="sq" style="background:${SOBRES[k][1]}"></span>`;
+  const movsMes = movsList().filter(m => (m.fecha||"").startsWith(ym));
+  const meta = fc.metaMaquina, falt = meta ? Math.max(0, meta - A.juntado) : null, mesesMeta = meta && A.ritmoMaq > 0 ? Math.ceil(falt / A.ritmoMaq) : null;
+  const rois = maqList().map(m => Object.assign({m}, roiMaq(m)));
+  const conInv = rois.filter(x => x.total > 0), invTot = conInv.reduce((t,x)=>t+x.total,0), acumTot = conInv.reduce((t,x)=>t+x.acum,0);
+  const sinConfig = !meta || !invTot;
+  const ventas = r.ef || r.mix ? `<div class="stl"><span>Ventas por QR</span><span class="num">${fm(r.qr)}</span></div><div class="stl"><span>Ventas en efectivo</span><span class="num">${fm(r.ef)}</span></div>${r.mix ? `<div class="stl"><span>QR y efectivo sin separar <span class="muted small">(máquinas con los dos medios)</span></span><span class="num">${fm(r.mix)}</span></div>` : ""}`
+    : `<div class="stl"><span>Ventas por QR</span><span class="num">${fm(r.qr)}</span></div><div class="stl"><span>Ventas en efectivo</span><span class="num">${fm(0)}</span></div>`;
+  const canonL = r.lineasCanon.length ? r.lineasCanon.map(([n,v]) => `<div class="stl"><span>Canon ${esc(n)} (fijo)</span>${neg(v)}</div>`).join("") : `<div class="stl"><span>Canon (fijo) <span class="muted small">· cargalo en Máquinas → ⋮ → Editar</span></span><span class="num">${fm(0)}</span></div>`;
+  return `<div class="head"><div><h1>Finanzas</h1><p class="muted">Qué entró, qué salió y a dónde va</p></div>
+   <div class="row"><div class="mnav"><button class="btn" type="button" data-fmes="${UI.fmes-1}" ${UI.fmes<=minK?"disabled":""} aria-label="Mes anterior">‹</button><strong style="min-width:150px;text-align:center">${nombreMesL(ym)}</strong><button class="btn" type="button" data-fmes="${UI.fmes+1}" ${UI.fmes>=0?"disabled":""} aria-label="Mes siguiente">›</button></div>
+   <button class="btn" type="button" data-act="csv-fin">Descargar</button>${S.ro?"":`<button class="btn" type="button" data-act="fin-config">Configurar</button>`}</div></div>
+  ${sinConfig && !S.ro ? `<div class="card" style="border-color:var(--warn);background:var(--warn-soft);margin-bottom:16px"><div class="row" style="justify-content:space-between"><span><strong>Faltan datos para la meta y el ROI.</strong> Cargá el precio de la próxima máquina, lo que invertiste en cada máquina y los nombres de los socios.</span><button class="btn" type="button" data-act="fin-config">Completar</button></div></div>` : ""}
+  <div class="fin2"><div class="card">
+   <h2>Resultado del mes${UI.fmes===0?' <span class="muted small" style="font-weight:500">· hasta hoy</span>':""}</h2>
+   ${ventas}
+   <div class="stl tot"><span>Total facturado</span><span class="num">${fm(r.f)}</span></div>
+   <div class="stl"><span>Costo de la mercadería vendida <span class="muted small">(a precio de reposición)</span></span>${neg(r.costo)}</div>
+   <div class="stl"><span>Comisión QR (${f1(pq)}%)</span>${neg(r.com)}</div>
+   ${canonL}
+   ${r.otros ? `<div class="stl"><span>Otros gastos fijos</span>${neg(r.otros)}</div>` : ""}
+   <div class="stl tot"><span>Ganancia neta</span><span class="num ${r.neta>=0?"pos":"neg"}">${r.neta<0?"− ":""}${fm(Math.abs(r.neta))}</span></div>
+   <h2 style="margin-top:20px">Reparto de la ganancia</h2>
+   ${r.neta > 0 ? `<div class="stl"><span>${sq("maquina")}Nueva máquina · ${fc.pctMaquina}%</span><span class="num">${fm(r.maq)}</span></div>
+   <div class="stl"><span>${sq("reserva")}Reserva · ${fc.pctReserva}%</span><span class="num">${fm(r.res)}</span></div>
+   <div class="stl"><span>${sq("retiro")}Retiro socios · ${fc.pctRetiro}%</span><span class="num">${fm(r.ret)}</span></div>
+   ${r.socios.map(x=>`<div class="stl sub"><span>${esc(x.nombre)} · ${f1(x.pct)}%</span><span class="num">${fm(x.monto)}</span></div>`).join("")}`
+   : `<p class="muted small" style="margin:0">${r.n ? "Este mes no hubo ganancia para repartir." : "Todavía no hay ventas en " + nombreMes(ym) + ". Cuando se registren, acá vas a ver cómo se reparte la ganancia."}</p>`}
+  </div>
+  <div class="col">
+   <div class="card"><h2>Meta y recupero</h2>
+    <div class="small muted">Nueva máquina</div>
+    ${meta ? `<div class="row" style="justify-content:space-between;align-items:baseline"><strong class="num" style="font:700 20px var(--display)">${fm(Math.max(0,A.juntado))}</strong><span class="muted small">de ${fm(meta)}${mesesMeta != null ? " · " + (mesesMeta === 0 ? "¡meta alcanzada!" : mesFuturo(mesesMeta)) : ""}</span></div><div class="fbar"><i style="width:${Math.min(100,Math.max(0,A.juntado)/meta*100).toFixed(1)}%;background:${SOBRES.maquina[1]}"></i></div>
+      <p class="muted small" style="margin:0 0 14px">${A.ritmoMaq > 0 ? "Al ritmo de " + fm(A.ritmoMaq) + " por mes." : "La fecha aparece cuando haya meses con ganancia."}</p>`
+      : `<p class="muted small" style="margin:2px 0 14px">Cargá el precio de la próxima máquina en Configurar.</p>`}
+    ${rois.map(x => `<div class="small muted">Inversión recuperada · ${esc(x.m.nombre)}${x.roi != null ? " (ROI " + f1(x.roi) + "%)" : ""}</div>
+      ${x.total ? `<div class="row" style="justify-content:space-between;align-items:baseline"><strong class="num" style="font:700 20px var(--display)">${fm(Math.max(0,x.acum))}</strong><span class="muted small">de ${fm(x.total)}${x.faltan != null ? " · " + (x.faltan === 0 ? "¡recuperada!" : mesFuturo(x.faltan)) : ""}</span></div><div class="fbar"><i style="width:${Math.min(100,Math.max(0,x.acum)/x.total*100).toFixed(1)}%;background:var(--ok)"></i></div>
+        <p class="muted small" style="margin:0 0 12px">${x.mensual != null ? "ROI promedio " + f1(x.mensual) + "% por mes" : ""}${x.faltan ? " · faltan " + x.faltan + " meses" : ""}</p>`
+        : `<p class="muted small" style="margin:2px 0 12px">Cargá lo que invertiste en esta máquina en Configurar.</p>`}`).join("")}
+    ${conInv.length > 1 ? `<div class="stl tot"><span>ROI total</span><span class="num">${f1(acumTot/invTot*100)}%</span></div>` : ""}
+   </div>
+   <div class="card"><div class="row" style="justify-content:space-between;margin-bottom:6px"><h2 style="margin:0">Movimientos</h2>${S.ro?"":`<button class="btn sm" type="button" data-act="fin-mov">+ Registrar</button>`}</div>
+    ${movsMes.length ? `<div>${movsMes.map(m=>`<div class="mv" ${S.ro?"":`role="button" tabindex="0" data-mov="${esc(m.id)}"`} style="cursor:${S.ro?"default":"pointer"}"><span class="ic" style="background:${(SOBRES[m.sobre]||SOBRES.reposicion)[1]}">↓</span><div style="flex:1;min-width:0">${esc(m.desc || SOBRES[m.sobre][0])}<div class="small muted">${fdate(m.fecha)} · sale de ${esc((SOBRES[m.sobre]||["—"])[0])}${m.socio ? " · " + esc(((fc.socios||[]).find(s=>s.id===m.socio)||{}).nombre||"") : ""}</div></div><strong class="num">− ${fm(m.monto)}</strong></div>`).join("")}</div>`
+      : `<p class="muted small" style="margin:0">Registrá lo que hacés con la plata: compras de mercadería, pagos, retiros y lo que pasás al ahorro. Así cada sobre muestra su saldo real.</p>`}
+   </div>
+   <div class="card"><h2>Saldo de cada sobre</h2>
+    ${Object.keys(SOBRES).map(k=>`<div class="stl"><span>${sq(k)}${SOBRES[k][0]}</span><span class="num ${A.saldo[k]<0?"neg":""}">${A.saldo[k]<0?"− ":""}${fm(Math.abs(A.saldo[k]))}</span></div>`).join("")}
+    <p class="muted small" style="margin:8px 0 0">Todo lo que se asignó desde el primer mes, menos los movimientos registrados.${Object.values(A.saldo).some(v=>v<0)?" <strong style=\"color:var(--bad)\">Hay un sobre en negativo: se usó plata que le correspondía a otro.</strong>":""}</p>
+   </div>
+  </div></div>`;
+}
+function openFinConfig(){
+  const fc = fcfg(); const socios = (fc.socios||[]).map(x=>Object.assign({},x)); const ms = maqList();
+  const sRow = (x,i) => `<div class="fgrid" data-s="${i}"><label class="field">Socio<input data-k="nombre" value="${esc(x.nombre)}"></label><label class="field">% del retiro<input data-k="pct" inputmode="decimal" value="${esc(x.pct)}"></label></div>`;
+  const body = `<div><h3>Reparto de la ganancia (%)</h3><div class="fgrid" style="margin-top:8px"><label class="field">Nueva máquina<input id="fc-m" inputmode="decimal" value="${esc(fc.pctMaquina)}"></label><label class="field">Reserva<input id="fc-r" inputmode="decimal" value="${esc(fc.pctReserva)}"></label><label class="field">Retiro socios<input id="fc-t" inputmode="decimal" value="${esc(fc.pctRetiro)}"></label></div><p class="muted small" style="margin:6px 0 0">Tienen que sumar 100.</p></div>
+   <div><h3>Socios</h3><div id="fc-ss" style="display:flex;flex-direction:column;gap:10px;margin-top:8px">${socios.map(sRow).join("")}</div><p class="muted small" style="margin:6px 0 0">Cómo se divide el retiro entre los socios. Tiene que sumar 100.</p></div>
+   <div><h3>Meta</h3><div class="fgrid" style="margin-top:8px"><label class="field">Precio de la próxima máquina ($)<input id="fc-meta" inputmode="decimal" value="${esc(fc.metaMaquina)}" placeholder="A definir"></label></div></div>
+   <div><h3>Inversión en cada máquina</h3>${ms.map(m=>{ const iv = (fc.inversiones||{})[m.id] || {}; return `<div class="card" style="margin:8px 0 0" data-inv="${esc(m.id)}"><strong>${esc(m.nombre)}</strong><div class="fgrid" style="margin-top:8px"><label class="field">Máquina ($)<input data-k="maquina" inputmode="decimal" value="${esc(iv.maquina)}"></label><label class="field">Instalación ($)<input data-k="instalacion" inputmode="decimal" value="${esc(iv.instalacion)}"></label><label class="field">Stock inicial ($)<input data-k="stockInicial" inputmode="decimal" value="${esc(iv.stockInicial)}"></label></div></div>`; }).join("")}
+   <p class="muted small" style="margin:8px 0 0">El canon fijo y los otros gastos de cada lugar se cargan en Máquinas → ⋮ → Editar nombre y datos. La comisión del QR, en Ajustes.</p></div>`;
+  openDrawer("Configurar finanzas", body, `<button class="btn" type="button" data-close>Cancelar</button><button class="btn pri" type="button" id="fc-ok">Guardar</button>`, (d, close) => {
+    $("#fc-ok", d).addEventListener("click", async () => {
+      const pm = num($("#fc-m",d).value) || 0, pr = num($("#fc-r",d).value) || 0, pt = num($("#fc-t",d).value) || 0;
+      if (Math.abs(pm+pr+pt-100) > 0.01){ toast("Los porcentajes del reparto tienen que sumar 100"); return; }
+      const ss = [...d.querySelectorAll("[data-s]")].map((el,i) => ({id: socios[i].id, nombre: el.querySelector('[data-k="nombre"]').value.trim() || ("Socio " + (i+1)), pct: num(el.querySelector('[data-k="pct"]').value) || 0}));
+      if (Math.abs(ss.reduce((t,x)=>t+x.pct,0)-100) > 0.01){ toast("El reparto entre socios tiene que sumar 100"); return; }
+      const inversiones = {}; d.querySelectorAll("[data-inv]").forEach(el => { const o = {}; el.querySelectorAll("[data-k]").forEach(i => { o[i.dataset.k] = num(i.value); }); inversiones[el.dataset.inv] = o; });
+      if (await save("config/finanzas", {pctMaquina:pm, pctReserva:pr, pctRetiro:pt, socios:ss, metaMaquina: num($("#fc-meta",d).value), inversiones}, "Finanzas guardadas")){ close(); render(); }
+    });
+  });
+}
+function openMovimiento(id){
+  const fc = fcfg(); const m = id ? Object.assign({id}, S.movimientos[id]) : {fecha: today(), sobre:"reposicion", monto:null, desc:"", socio:null};
+  const ejemplos = {reposicion:"Ej.: Compra Masmelos", gastos:"Ej.: Canon de noviembre", maquina:"Ej.: Seña de la máquina nueva", reserva:"Ej.: Reparación del monedero", retiro:"Ej.: Retiro de noviembre"};
+  const body = `<div class="fgrid"><label class="field">Sale del sobre<select id="mv-s">${Object.entries(SOBRES).map(([k,[l]])=>`<option value="${k}" ${m.sobre===k?"selected":""}>${l}</option>`).join("")}</select></label>
+   <label class="field">Monto ($)<input id="mv-m" inputmode="decimal" value="${esc(m.monto)}"></label><label class="field">Fecha<input id="mv-f" type="date" value="${esc(m.fecha)}"></label></div>
+   <label class="field" id="mv-sw" ${m.sobre==="retiro"?"":"hidden"}>Socio<select id="mv-so">${(fc.socios||[]).map(x=>`<option value="${esc(x.id)}" ${m.socio===x.id?"selected":""}>${esc(x.nombre)}</option>`).join("")}</select></label>
+   <label class="field">Detalle<input id="mv-d" value="${esc(m.desc)}" placeholder="${ejemplos[m.sobre]}"></label>`;
+  openDrawer(id ? "Editar movimiento" : "Registrar movimiento", body, `${id?`<button class="btn ghost danger" type="button" id="mv-del">Borrar</button>`:""}<button class="btn" type="button" data-close>Cancelar</button><button class="btn pri" type="button" id="mv-ok">Guardar</button>`, (d, close) => {
+    const sel = $("#mv-s", d); sel.addEventListener("change", () => { $("#mv-sw", d).hidden = sel.value !== "retiro"; $("#mv-d", d).placeholder = ejemplos[sel.value]; });
+    setTimeout(() => { const i = $("#mv-m", d); if (i) i.focus(); }, 30);
+    const dl = $("#mv-del", d); if (dl) dl.addEventListener("click", async () => { await del("movimientos/"+id, "Movimiento borrado"); close(); render(); });
+    $("#mv-ok", d).addEventListener("click", async () => { const monto = num($("#mv-m",d).value); if (!monto || monto <= 0){ toast("Escribí el monto"); return; }
+      const sobre = sel.value; const data = {fecha: $("#mv-f",d).value || today(), sobre, monto, desc: $("#mv-d",d).value.trim() || null, socio: sobre === "retiro" ? $("#mv-so",d).value : null};
+      if (await save("movimientos/" + (id || uid()), data, "Movimiento guardado")){ close(); render(); } });
+  });
+}
+
 function vAjustes(){
   const c = cfg(); const comps = Object.entries(S.competidores).sort((a,b)=>(a[1].nombre||"").localeCompare(b[1].nombre||"")); const provs = Object.entries(S.proveedores).sort((a,b)=>(a[1].nombre||"").localeCompare(b[1].nombre||""));
   const cuenta = (pid) => prodList().filter(p => p.proveedores && p.proveedores[pid] && p.proveedores[pid].costoUnit != null).length;
@@ -657,6 +806,9 @@ function vAjustes(){
 // ---------- eventos ----------
 function bindSearch(id, key){ const el = $(id); if (!el) return; el.addEventListener("input", e => { UI[key] = e.target.value; const pos = e.target.selectionStart; render(); const n = $(id); if (n){ n.focus(); try{ n.setSelectionRange(pos,pos);}catch(_){} } }); }
 function bindView(){
+  const v0 = $("#view");
+  v0.querySelectorAll("[data-fmes]").forEach(b => b.addEventListener("click", () => { UI.fmes = +b.dataset.fmes; render(); }));
+  v0.querySelectorAll("[data-mov]").forEach(b => { b.addEventListener("click", () => openMovimiento(b.dataset.mov)); b.addEventListener("keydown", e => { if (e.key === "Enter") openMovimiento(b.dataset.mov); }); });
   const v = $("#view");
   bindSearch("#f-q","q"); bindSearch("#f-pq","pq");
   const cat = $("#f-cat"); if (cat) cat.addEventListener("change", e => { UI.cat = e.target.value; render(); });
@@ -698,6 +850,10 @@ const acciones = {
   "volver-maq": () => { UI.maq = null; render(); window.scrollTo(0,0); },
   "contar": () => openConteo(UI.maq),
   "preparar": () => openPreparar(UI.maq),
+  "fin-config": () => openFinConfig(),
+  "fin-mov": () => openMovimiento(null),
+  "csv-fin": () => { const ym = mesDe(UI.fmes||0), r = finMes(ym), fc = fcfg(); const R = (x) => Math.round(x||0);
+    bajar("finanzas-" + ym + ".csv", [["Concepto","Monto"],["Ventas por QR",R(r.qr)],["Ventas en efectivo",R(r.ef)],...(r.mix?[["QR y efectivo sin separar",R(r.mix)]]:[]),["Total facturado",R(r.f)],["Costo de la mercadería (a precio de reposición)",-R(r.costo)],["Comisión QR",-R(r.com)],...r.lineasCanon.map(([n,v])=>["Canon " + n, -R(v)]),["Otros gastos fijos",-R(r.otros)],["Ganancia neta",R(r.neta)],[],["Nueva máquina (" + fc.pctMaquina + "%)",R(r.maq)],["Reserva (" + fc.pctReserva + "%)",R(r.res)],["Retiro socios (" + fc.pctRetiro + "%)",R(r.ret)],...r.socios.map(x=>["  " + x.nombre + " (" + x.pct + "%)", R(x.monto)]),[],["Movimientos"],...movsList().filter(m=>(m.fecha||"").startsWith(ym)).map(m=>[m.fecha + " · " + (SOBRES[m.sobre]||["—"])[0] + (m.desc?" · " + m.desc:""), -R(m.monto)])]); },
   "mas-hist": () => { UI.histN += 60; render(); },
   "copiar-compras": () => copiar("Lista de compras\n" + compras().map(x => x.p.nombre + ": " + x.rec).join("\n")),
   "csv-compras": () => bajar("lista-de-compras.csv", [["Producto","Depósito","Faltan para llenar","Vende por día","Comprar","Mejor proveedor"], ...compras().map(x=>[x.p.nombre, x.dep, x.falta, x.cons ? f1(x.cons) : "", x.rec, proveedorDelCosto(x.p) ? provNombre(proveedorDelCosto(x.p)) : ""])]),
@@ -972,7 +1128,7 @@ function openMaquina(mid){
 // ---------- arranque ----------
 renderNav(); render();
 window.addEventListener("hashchange", setRoute);
-const COLS = ["productos","stock","relev","competidores","proveedores","maquinas","config"];
+const COLS = ["productos","stock","relev","competidores","proveedores","maquinas","config","movimientos"];
 (async function(){
   const C = window.claude; if (!C || !C.use){ $("#view").innerHTML = `<div class="empty">Abrí esta app desde claude.ai para ver y guardar tus datos.</div>`; return; }
   db = await C.use("db");
@@ -985,7 +1141,7 @@ const COLS = ["productos","stock","relev","competidores","proveedores","maquinas
   const err = (e) => { if (e && e.code !== "unavailable") toast("Se cortó la conexión con los datos. Recargá la página."); };
   for (const col of COLS){
     db.collection(col).onSnapshot(snap => { const o = {}; snap.docs.forEach(d => { if (d.exists) o[d.id] = d.data(); });
-      if (col === "config") S.config = o.general || {}; else S[col] = o; listo(col); }, err);
+      if (col === "config"){ S.config = o.general || {}; S.fin = o.finanzas || {}; } else S[col] = o; listo(col); }, err);
   }
   // Ventas: un documento por día (todos, para el historial)
   db.collection("ventasdia").onSnapshot(snap => { const o = {}; snap.docs.forEach(d => { if (d.exists) o[d.id] = d.data(); }); S.vdias = o; listo("ventas"); }, err);
