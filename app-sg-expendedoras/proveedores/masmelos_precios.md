@@ -88,3 +88,15 @@ Precios de lista del catálogo web (sin iniciar sesión), cargados el 2026-11-13
 | Alfajor Bon o Bon triple negro 60 g | ALF,BON O BON TRIPLE NEGRO . 60 G | $1.249,30 |
 
 Quitados de la app: Cindor, Sprite 500, Coca-Cola 500, Coca-Cola Zero 500, mix de frutos secos, Fantoche chocolatada, Mogul oso ácido, Cofler Air almendras.
+
+## Cambios (bombones, Yummy 150 g, Pep 120 g)
+
+| Producto en la app | Artículo Masmelos | Costo por unidad |
+|---|---|---|
+| Yummy Moritas 150 g | GOMA YUMMY MORITAS . 150 G | $1.366,33 |
+| Yummy Dientes 150 g | GOMA, YUMMY DIENTES . 150 G | $1.366,33 |
+| Bombón Bon o Bon leche 15 g | BOMB,BON O BON CLAS . 30 UNI | $450,72 |
+| Bombón Bon o Bon blanco 15 g | BOMB,BON O BON BCO . 30 UNI | $450,72 |
+| Bombón Bon o Bon Chocolinas 15 g | BOMB,BON O BON CHOCOLINAS . 18 UNI | $459,47 |
+
+Quitados: alfajores Bon o Bon (blanco, chocolate, triple), Yummy Moritas 30 g, Yummy Dientes 50 g, Rueditas Pep 74 g (reemplazadas por 120 g en el slot 2).

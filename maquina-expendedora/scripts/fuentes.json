@@ -640,15 +640,15 @@
   "producto": "Pañuelos Candela",
   "tienda": "web",
   "nombre_en_tienda": "",
-  "imagen": "masmelos (imagen del catálogo, ART13348)",
-  "pagina": "https://secure.sig2k.com/webs/bWFzbWVsb3NAc2lnbWEtYXI.defaultKart/sigkart/3.1/"
+  "imagen": "https://www.farmaciassabin.com/shop/product/panuelos-descartables-candela-x-6-paquetes-de-10-panuelos-WS2187596",
+  "pagina": "https://www.farmaciassabin.com/shop/product/panuelos-descartables-candela-x-6-paquetes-de-10-panuelos-WS2187596"
  },
  "93_yerba_mananita": {
   "producto": "Yerba Mañanita 250 g",
   "tienda": "web",
   "nombre_en_tienda": "",
-  "imagen": "masmelos (imagen del catálogo, ART11512)",
-  "pagina": "https://secure.sig2k.com/webs/bWFzbWVsb3NAc2lnbWEtYXI.defaultKart/sigkart/3.1/"
+  "imagen": "https://superpreciosdigital.com.ar/productos/yerba-mananita-4flex-250gr/",
+  "pagina": "https://superpreciosdigital.com.ar/productos/yerba-mananita-4flex-250gr/"
  },
  "94_pep_120": {
   "producto": "Pep Rueditas pizza 120 g",
@@ -691,5 +691,40 @@
   "nombre_en_tienda": "",
   "imagen": "masmelos (imagen del catálogo, ART3368)",
   "pagina": "https://secure.sig2k.com/webs/bWFzbWVsb3NAc2lnbWEtYXI.defaultKart/sigkart/3.1/"
+ },
+ "100_yummy_moritas_150": {
+  "producto": "Yummy Moritas 150 g",
+  "tienda": "web",
+  "nombre_en_tienda": "",
+  "imagen": "masmelos (imagen del catálogo, ART403)",
+  "pagina": "https://secure.sig2k.com/webs/bWFzbWVsb3NAc2lnbWEtYXI.defaultKart/sigkart/3.1/"
+ },
+ "101_yummy_dientes_150": {
+  "producto": "Yummy Dientes 150 g",
+  "tienda": "web",
+  "nombre_en_tienda": "",
+  "imagen": "masmelos (imagen del catálogo, ART3961)",
+  "pagina": "https://secure.sig2k.com/webs/bWFzbWVsb3NAc2lnbWEtYXI.defaultKart/sigkart/3.1/"
+ },
+ "102_bombon_leche": {
+  "producto": "Bombón Bon o Bon leche 15 g",
+  "tienda": "carrefour",
+  "nombre_en_tienda": "Bombón Bon O Bon chocolate con leche 15 g.",
+  "imagen": "https://carrefourar.vteximg.com.br/arquivos/ids/864028/77958921_02.jpg",
+  "pagina": "https://www.carrefour.com.ar/bombon-bon-o-bon-chocolate-con-leche-15-g-40634-40634/p"
+ },
+ "103_bombon_blanco": {
+  "producto": "Bombón Bon o Bon blanco 15 g",
+  "tienda": "carrefour",
+  "nombre_en_tienda": "Bombón chocolate blanco Bon o Bon 15 g.",
+  "imagen": "https://carrefourar.vteximg.com.br/arquivos/ids/914691/77961815_E01.jpg",
+  "pagina": "https://www.carrefour.com.ar/bombon-chocolate-blanco-bon-o-bon-15-g-41014/p"
+ },
+ "104_bombon_chocolinas": {
+  "producto": "Bombón Bon o Bon Chocolinas 15 g",
+  "tienda": "web",
+  "nombre_en_tienda": "",
+  "imagen": "https://pampadirect.com/bon-o-bon-traditional-chocolate-bite-filled-with-chocolinas-cookies-box-of-18-bites-270-g-9-5-oz-complete-box/",
+  "pagina": "https://pampadirect.com/bon-o-bon-traditional-chocolate-bite-filled-with-chocolinas-cookies-box-of-18-bites-270-g-9-5-oz-complete-box/"
  }
 }
