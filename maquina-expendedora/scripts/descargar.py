@@ -9,7 +9,10 @@ for f in sorted(glob.glob(f"{BASE}/scripts/candidatos*.json")):
 sel = json.load(open(f"{BASE}/scripts/seleccion.json"))
 fuentes = {}
 for slug, label, store, name, i in sel:
-    if store == "web":
+    if store == "web" and name.startswith("masmelos:"):
+        url, page = "masmelos (imagen del catálogo, " + name.split(":")[1] + ")", "https://secure.sig2k.com/webs/bWFzbWVsb3NAc2lnbWEtYXI.defaultKart/sigkart/3.1/"
+        if not os.path.exists(f"{BASE}/productos_raw/{slug}.img"): print("FALTA", slug); continue
+    elif store == "web":
         url, page = name, name
     else:
         c = idx.get((store, name))

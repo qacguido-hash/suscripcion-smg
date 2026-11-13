@@ -488,5 +488,75 @@
   "nombre_en_tienda": "Palitos Salados Nikitos 80 Gr",
   "imagen": "https://jumboargentina.vteximg.com.br/arquivos/ids/533877/Palitos-Salados-Nikitos-X-80grs-1-668258.jpg",
   "pagina": "https://www.jumbo.com.ar/palitos-salados-nikitos-80-gr/p"
+ },
+ "71_agua_villamanaos": {
+  "producto": "Agua Villamanaos sin gas 600 ml",
+  "tienda": "carrefour",
+  "nombre_en_tienda": "Agua sin gas Villamanaos 600 ml",
+  "imagen": "https://carrefourar.vteximg.com.br/arquivos/ids/823984/7798113300270_01.jpg",
+  "pagina": "https://www.carrefour.com.ar/agua-sin-gas-villamanaos-600-ml-530884/p"
+ },
+ "72_coca_600": {
+  "producto": "Coca-Cola 600 ml",
+  "tienda": "jumbo",
+  "nombre_en_tienda": "Gaseosa Sabor Original 600 Ml Coca-cola",
+  "imagen": "https://jumboargentina.vteximg.com.br/arquivos/ids/881682/Gaseosa-Sabor-Original-600-Ml-Coca-cola-2-1040310.jpg",
+  "pagina": "https://www.jumbo.com.ar/gaseosa-sabor-original-x-600-ml-coca-cola/p"
+ },
+ "73_coca_zero_600": {
+  "producto": "Coca-Cola Zero 600 ml",
+  "tienda": "jumbo",
+  "nombre_en_tienda": "Gaseosa Zero Sabor Cola 600 Ml Coca Cola",
+  "imagen": "https://jumboargentina.vteximg.com.br/arquivos/ids/881683/Gaseosa-Zero-600-Ml-Coca-cola-2-1040309.jpg",
+  "pagina": "https://www.jumbo.com.ar/gaseosa-zero-x-600-ml-coca-cola/p"
+ },
+ "74_sprite_600": {
+  "producto": "Sprite 600 ml",
+  "tienda": "carrefour",
+  "nombre_en_tienda": "Gaseosa Sprite Lima-Limón 600 ml",
+  "imagen": "https://carrefourar.vteximg.com.br/arquivos/ids/693029/7790895650871_E02.jpg",
+  "pagina": "https://www.carrefour.com.ar/gaseosa-sprite-lima-limon-600-ml-763996/p"
+ },
+ "75_fantoche_chocolatada": {
+  "producto": "Leche chocolatada Fantoche 200 ml",
+  "tienda": "web",
+  "nombre_en_tienda": "",
+  "imagen": "masmelos (imagen del catálogo, ART915)",
+  "pagina": "https://secure.sig2k.com/webs/bWFzbWVsb3NAc2lnbWEtYXI.defaultKart/sigkart/3.1/"
+ },
+ "76_integra_ddl": {
+  "producto": "Íntegra proteica dulce de leche 43 g",
+  "tienda": "carrefour",
+  "nombre_en_tienda": "Barra proteica Integra de dulce de leche 43 grs",
+  "imagen": "https://carrefourar.vteximg.com.br/arquivos/ids/941299/7798343751972_02.jpg",
+  "pagina": "https://www.carrefour.com.ar/barra-proteica-integra-de-dulce-de-leche-43-grs-785432/p"
+ },
+ "77_mogul_jelly_beans": {
+  "producto": "Mogul Jelly Beans 50 g",
+  "tienda": "jumbo",
+  "nombre_en_tienda": "Gomitas Jelly Beans Sabor Frutilla Limón Manzana Uva y Arándano 50 Grs Mogul",
+  "imagen": "https://jumboargentina.vteximg.com.br/arquivos/ids/843520/Pastillas-De-Goma-Mogul-Jelly-Beans-50G-Pastillas-De-Goma-Mogul-Jelly-Beans-50g-1-1025648.jpg",
+  "pagina": "https://www.jumbo.com.ar/pastillas-de-goma-mogul-jelly-beans-50g/p"
+ },
+ "78_mogul_oso_acido": {
+  "producto": "Mogul Oso ácido Extreme 50 g",
+  "tienda": "carrefour",
+  "nombre_en_tienda": "Gomitas Mogul extreme acido frutales oso 50 g",
+  "imagen": "https://carrefourar.vteximg.com.br/arquivos/ids/915842/7790580129330_E01.jpg.jpg",
+  "pagina": "https://www.carrefour.com.ar/gomitas-mogul-extreme-acido-frutales-oso-50-g/p"
+ },
+ "79_cofler_air_almendras": {
+  "producto": "Cofler Air almendras 55 g",
+  "tienda": "carrefour",
+  "nombre_en_tienda": "Chocolate Cofler Air con almendras 55 g.",
+  "imagen": "https://carrefourar.vteximg.com.br/arquivos/ids/172244/7790580103439_01.jpg",
+  "pagina": "https://www.carrefour.com.ar/chocolate-cofler-air-con-almendras-55-g-39230-39230/p"
+ },
+ "80_cofler_extra_cookies": {
+  "producto": "Cofler Extra Cookies & Cream 46 g",
+  "tienda": "jumbo",
+  "nombre_en_tienda": "Tableta Sabor Cookies y Cream 46 Grs Cofler Extra",
+  "imagen": "https://jumboargentina.vteximg.com.br/arquivos/ids/921477/Chocolate-Cofler-Extra-Cookie-Cream-46gr-2-1061409.jpg",
+  "pagina": "https://www.jumbo.com.ar/chocolate-extra-cookie-cream-46gr-cofler/p"
  }
 }

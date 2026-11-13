@@ -372,11 +372,11 @@ function vInicio(){
    <div class="row"><a class="btn pri" href="#maquinas">Reponer</a><a class="btn" href="#stock" data-go-stock="compras">Lista de compras</a></div></div>
   ${sinCostos ? `<div class="notice">Para empezar: cargá en <a href="#productos">Productos</a> el costo de cada proveedor y tu precio de venta, y en <a href="#precios">Precios</a> lo que cobra la competencia.</div>` : ""}
   <section class="grid-k" aria-label="Resumen del mes">
-    <div class="card kpi"><div class="l">Facturación de ${nombreMes(ym)}</div><div class="v num">${fm(r.f)}${delta(r.f, ra.f)}</div><div class="s">vs. los mismos días del mes anterior</div></div>
-    <div class="card kpi"><div class="l">Ventas</div><div class="v num">${fint(r.u)} u.${delta(r.u, ra.u)}</div><div class="s">${fint(r.n)} registros de venta</div></div>
-    <div class="card kpi"><div class="l">Ticket promedio</div><div class="v num">${r.u ? fm(r.f / r.u) : "—"}</div><div class="s">Facturación ÷ unidades vendidas</div></div>
-    <div class="card kpi"><div class="l">Ganancia real del mes</div><div class="v num">${r.n || gf ? fm(r.gan - gf) : "—"}</div><div class="s">Menos costo, QR y gastos fijos (${fm(gf)})</div></div>
-    <div class="card kpi"><div class="l">Margen promedio</div><div class="v num">${pct(mprom)}</div><div class="s">Productos con costo y venta</div></div>
+    <div class="card kpi"><div class="l">Facturación de ${nombreMes(ym)}</div><div class="v num">${fm(r.f)}</div></div>
+    <div class="card kpi"><div class="l">Ventas</div><div class="v num">${fint(r.u)} u.</div></div>
+    <div class="card kpi"><div class="l">Ticket promedio</div><div class="v num">${r.u ? fm(r.f / r.u) : "—"}</div></div>
+    <div class="card kpi"><div class="l">Ganancia real del mes</div><div class="v num">${r.n || gf ? fm(r.gan - gf) : "—"}</div></div>
+    <div class="card kpi"><div class="l">Margen promedio</div><div class="v num">${pct(mprom)}</div></div>
   </section>
   <div class="card"><div class="row" style="justify-content:space-between;margin-bottom:6px"><h2>Alertas</h2><span class="pill ${al.length?"p-warn":"p-ok"}">${al.length}</span></div>${alertasHTML(al.slice(0,6))}</div>
   <section class="grid-2" aria-label="Detalle">
