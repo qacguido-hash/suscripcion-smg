@@ -558,5 +558,138 @@
   "nombre_en_tienda": "Tableta Sabor Cookies y Cream 46 Grs Cofler Extra",
   "imagen": "https://jumboargentina.vteximg.com.br/arquivos/ids/921477/Chocolate-Cofler-Extra-Cookie-Cream-46gr-2-1061409.jpg",
   "pagina": "https://www.jumbo.com.ar/chocolate-extra-cookie-cream-46gr-cofler/p"
+ },
+ "81_cofler_air_leche_27": {
+  "producto": "Cofler Air leche 27 g",
+  "tienda": "web",
+  "nombre_en_tienda": "",
+  "imagen": "masmelos (imagen del catálogo, ART153)",
+  "pagina": "https://secure.sig2k.com/webs/bWFzbWVsb3NAc2lnbWEtYXI.defaultKart/sigkart/3.1/"
+ },
+ "82_chochoco": {
+  "producto": "Chocolatada Mr Choco 200 ml",
+  "tienda": "carrefour",
+  "nombre_en_tienda": "Alimento a base leche Mr Choco sabor chocolate 200 cc.",
+  "imagen": "https://carrefourar.vteximg.com.br/arquivos/ids/246252/7798290580205_01.jpg",
+  "pagina": "https://www.carrefour.com.ar/alimento-a-base-leche-mr-choco-sabor-chocolate-200-cc-681615-681615/p"
+ },
+ "83_yummy_moritas": {
+  "producto": "Yummy Moritas 30 g",
+  "tienda": "web",
+  "nombre_en_tienda": "",
+  "imagen": "masmelos (imagen del catálogo, ART13854)",
+  "pagina": "https://secure.sig2k.com/webs/bWFzbWVsb3NAc2lnbWEtYXI.defaultKart/sigkart/3.1/"
+ },
+ "84_yummy_dientes": {
+  "producto": "Yummy Dientes 50 g",
+  "tienda": "web",
+  "nombre_en_tienda": "",
+  "imagen": "masmelos (imagen del catálogo, ART17629)",
+  "pagina": "https://secure.sig2k.com/webs/bWFzbWVsb3NAc2lnbWEtYXI.defaultKart/sigkart/3.1/"
+ },
+ "85_aquarius_pomelo": {
+  "producto": "Aquarius pomelo 600 ml",
+  "tienda": "carrefour",
+  "nombre_en_tienda": "Agua saborizada Aquarius pomelo 600 ml",
+  "imagen": "https://carrefourar.vteximg.com.br/arquivos/ids/778634/7790895009228_E01.jpg",
+  "pagina": "https://www.carrefour.com.ar/agua-saborizada-aquarius-pomelo-600-ml-590067/p"
+ },
+ "86_fulbito_mani": {
+  "producto": "Alfajor Fulbito maní 30 g",
+  "tienda": "dia",
+  "nombre_en_tienda": "Alfajor Fulbito Maní 30 Gr.",
+  "imagen": "https://ardiaprod.vteximg.com.br/arquivos/ids/326520/Alfajor-Fulbito-Mani-30-Gr-_1.jpg",
+  "pagina": "https://diaonline.supermercadosdia.com.ar/alfajor-fulbito-mani-30-gr-289319/p"
+ },
+ "87_fulbito_choco": {
+  "producto": "Alfajor Fulbito chocolate 30 g",
+  "tienda": "web",
+  "nombre_en_tienda": "",
+  "imagen": "masmelos (imagen del catálogo, ART5741)",
+  "pagina": "https://secure.sig2k.com/webs/bWFzbWVsb3NAc2lnbWEtYXI.defaultKart/sigkart/3.1/"
+ },
+ "88_fulbito_black": {
+  "producto": "Alfajor Fulbito Black 30 g",
+  "tienda": "web",
+  "nombre_en_tienda": "",
+  "imagen": "masmelos (imagen del catálogo, ART16930)",
+  "pagina": "https://secure.sig2k.com/webs/bWFzbWVsb3NAc2lnbWEtYXI.defaultKart/sigkart/3.1/"
+ },
+ "89_giga": {
+  "producto": "Alfajor Giga chocolate 72 g",
+  "tienda": "web",
+  "nombre_en_tienda": "",
+  "imagen": "masmelos (imagen del catálogo, ART6707)",
+  "pagina": "https://secure.sig2k.com/webs/bWFzbWVsb3NAc2lnbWEtYXI.defaultKart/sigkart/3.1/"
+ },
+ "90_hershey": {
+  "producto": "Hershey's chocolate con leche 82 g",
+  "tienda": "carrefour",
+  "nombre_en_tienda": "Chocolate con leche Hersheys 82 grs",
+  "imagen": "https://carrefourar.vteximg.com.br/arquivos/ids/886226/7899970402814_E02.jpg",
+  "pagina": "https://www.carrefour.com.ar/chocolate-con-leche-hersheys-82-grs-777686/p"
+ },
+ "91_batatas_nikitos": {
+  "producto": "Batatas fritas Nikitos 70 g",
+  "tienda": "web",
+  "nombre_en_tienda": "",
+  "imagen": "masmelos (imagen del catálogo, ART13154)",
+  "pagina": "https://secure.sig2k.com/webs/bWFzbWVsb3NAc2lnbWEtYXI.defaultKart/sigkart/3.1/"
+ },
+ "92_panuelos_candela": {
+  "producto": "Pañuelos Candela",
+  "tienda": "web",
+  "nombre_en_tienda": "",
+  "imagen": "masmelos (imagen del catálogo, ART13348)",
+  "pagina": "https://secure.sig2k.com/webs/bWFzbWVsb3NAc2lnbWEtYXI.defaultKart/sigkart/3.1/"
+ },
+ "93_yerba_mananita": {
+  "producto": "Yerba Mañanita 250 g",
+  "tienda": "web",
+  "nombre_en_tienda": "",
+  "imagen": "masmelos (imagen del catálogo, ART11512)",
+  "pagina": "https://secure.sig2k.com/webs/bWFzbWVsb3NAc2lnbWEtYXI.defaultKart/sigkart/3.1/"
+ },
+ "94_pep_120": {
+  "producto": "Pep Rueditas pizza 120 g",
+  "tienda": "web",
+  "nombre_en_tienda": "",
+  "imagen": "masmelos (imagen del catálogo, ART2856)",
+  "pagina": "https://secure.sig2k.com/webs/bWFzbWVsb3NAc2lnbWEtYXI.defaultKart/sigkart/3.1/"
+ },
+ "95_pipas": {
+  "producto": "Pipas girasol gigantes",
+  "tienda": "web",
+  "nombre_en_tienda": "",
+  "imagen": "masmelos (imagen del catálogo, ART1733)",
+  "pagina": "https://secure.sig2k.com/webs/bWFzbWVsb3NAc2lnbWEtYXI.defaultKart/sigkart/3.1/"
+ },
+ "96_pochoclos_nikitos": {
+  "producto": "Pochoclos Nikitos premium 95 g",
+  "tienda": "web",
+  "nombre_en_tienda": "",
+  "imagen": "masmelos (imagen del catálogo, ART7965)",
+  "pagina": "https://secure.sig2k.com/webs/bWFzbWVsb3NAc2lnbWEtYXI.defaultKart/sigkart/3.1/"
+ },
+ "97_bonobon_blanco": {
+  "producto": "Alfajor Bon o Bon blanco 40 g",
+  "tienda": "web",
+  "nombre_en_tienda": "",
+  "imagen": "masmelos (imagen del catálogo, ART1)",
+  "pagina": "https://secure.sig2k.com/webs/bWFzbWVsb3NAc2lnbWEtYXI.defaultKart/sigkart/3.1/"
+ },
+ "98_bonobon_choco": {
+  "producto": "Alfajor Bon o Bon chocolate 40 g",
+  "tienda": "web",
+  "nombre_en_tienda": "",
+  "imagen": "masmelos (imagen del catálogo, ART2)",
+  "pagina": "https://secure.sig2k.com/webs/bWFzbWVsb3NAc2lnbWEtYXI.defaultKart/sigkart/3.1/"
+ },
+ "99_bonobon_triple": {
+  "producto": "Alfajor Bon o Bon triple negro 60 g",
+  "tienda": "web",
+  "nombre_en_tienda": "",
+  "imagen": "masmelos (imagen del catálogo, ART3368)",
+  "pagina": "https://secure.sig2k.com/webs/bWFzbWVsb3NAc2lnbWEtYXI.defaultKart/sigkart/3.1/"
  }
 }

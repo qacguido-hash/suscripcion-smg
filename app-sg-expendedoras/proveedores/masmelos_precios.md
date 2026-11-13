@@ -62,3 +62,29 @@ Precios de lista del catálogo web (sin iniciar sesión), cargados el 2026-11-13
 | p78_mogul_oso_acido | GOMA MOGUL OSO ACIDO E.TREME 10 UNI . 50 G | $826,06 |
 | p79_cofler_air_almendras | CHOCO COFLER AIR ALM . 55 G | $3.202,20 |
 | p80_cofler_extra_cookies | CHOCO COFLER E.TRA COOKIES & CREAM . 46 G | $1.502,49 |
+
+## Agregados después
+
+| Producto en la app | Artículo Masmelos | Costo por unidad |
+|---|---|---|
+| Cofler Air leche 27 g | CHOCO COFLER AIR LECHE . 27 G | $1.660,15 |
+| Chocolatada Mr Choco 200 ml | CHOCOLATADA CHOCHO-CO . 200CC | $673,78 |
+| Yummy Moritas 30 g | GOMA YUMMY MORITAS 12 UNI . 30 G | $370,74 |
+| Yummy Dientes 50 g | GOMA YUMMY DIENTES 10 UNI . 50 G | $587,29 |
+| Aquarius pomelo 600 ml | AQUARIUS POMELO BCO 6 UNI . 600 CC | $1.196,33 |
+| Alfajor Fulbito maní 30 g | ALF,FULBITO MANI 44 UNI . 30 G (01832) | $172,72 |
+| Alfajor Fulbito chocolate 30 g | ALF,FULBITO CHOCO 44 UNI . 30 G | $172,72 |
+| Alfajor Fulbito Black 30 g | ALF,FULBITO BLACK 44 UNI . 30G (01834) | $172,72 |
+| Alfajor Giga chocolate 72 g | ALF, GIGA CHOCO . 72 G | $1.041,67 |
+| Hershey's chocolate con leche 82 g | CHOCO,HERSHEYS C/LECHE . 82 G | $2.180,23 |
+| Batatas fritas Nikitos 70 g | BATATAS FRITAS NIKITOS . 70 G | $700,69 |
+| Pañuelos descartables Candela | PAÑUELOS CANDELA . 6 UNI (1161) | $200,15 |
+| Yerba Mañanita 250 g | YERBA MAÑANITA 4 FLE. . 250 G | $1.339,56 |
+| Pep Rueditas pizza 120 g | PEP RUEDITAS PIZZA . 120 G | $2.521,98 |
+| Pipas de girasol gigantes | PIPAS GIRASOL GIGANTES TIRA . 10 UNI | $548,19 |
+| Pochoclos Nikitos premium 95 g | POCHOCLOS NIKITOS PREMIUM ACARAM, . 95 G | $1.685,39 |
+| Alfajor Bon o Bon blanco 40 g | ALF,BON O BON BCO . 40 G | $788,27 |
+| Alfajor Bon o Bon chocolate 40 g | ALF,BON O BON CHOCO . 40 G | $788,27 |
+| Alfajor Bon o Bon triple negro 60 g | ALF,BON O BON TRIPLE NEGRO . 60 G | $1.249,30 |
+
+Quitados de la app: Cindor, Sprite 500, Coca-Cola 500, Coca-Cola Zero 500, mix de frutos secos, Fantoche chocolatada, Mogul oso ácido, Cofler Air almendras.
