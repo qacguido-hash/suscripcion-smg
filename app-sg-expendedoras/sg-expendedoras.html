@@ -657,16 +657,20 @@ function openProducto(id){
       $("#p-sim", d).innerHTML = box("Costo usado", fm(costoSel())) + box("Ganás por unidad", fm(mm.gan)) + box("Margen real", pct(mm.m)); };
     const bindRadios = () => d.querySelectorAll('[name="p-eleg"]').forEach(r => r.addEventListener("change", () => { elegido = r.value; sim(); }));
     $("#p-pre", d).addEventListener("input", sim); sim(); bindRadios();
-    const add = $("#c-add", d); if (add) add.addEventListener("click", () => { const bul = num($("#c-bul", d).value), un = num($("#c-uni", d).value) || 1, pv = $("#c-prov", d).value;
-      if (bul == null){ toast("Escribí el precio del bulto"); return; } if (!pv){ toast("Elegí un proveedor (o agregalo en Ajustes)"); return; }
+    // Suma el costo escrito (proveedor + precio del bulto). Devuelve false si falta algo.
+    const agregarCosto = (aviso) => { const bulEl = $("#c-bul", d); if (!bulEl) return true; const bul = num(bulEl.value), un = num($("#c-uni", d).value) || 1, pv = $("#c-prov", d).value;
+      if (bul == null){ if (aviso) toast("Escribí el precio del bulto"); return !aviso; } if (!pv){ toast("Elegí un proveedor (o agregalo en Ajustes)"); return false; }
       provs[pv] = {precioBulto: bul, unidadesBulto: un, costoUnit: bul/un, fecha: today()}; p.costos = (p.costos||[]).concat([{fecha: today(), proveedorId: pv, precioBulto: bul, unidadesBulto: un, costoUnit: bul/un}]).slice(-60);
-      $("#prov-tabla", d).innerHTML = tablaProv(); bindRadios(); sim(); $("#c-bul", d).value = ""; toast("Costo agregado: tocá Guardar"); });
+      if (aviso) elegido = pv; $("#prov-tabla", d).innerHTML = tablaProv(); bindRadios(); sim(); bulEl.value = ""; if (aviso) toast("Costo agregado: tocá Guardar"); return true; };
+    const add = $("#c-add", d); if (add) add.addEventListener("click", () => agregarCosto(true));
+    const bulIn = $("#c-bul", d); if (bulIn) bulIn.addEventListener("keydown", e => { if (e.key === "Enter"){ e.preventDefault(); agregarCosto(true); } });
     const f = $("#p-foto", d); if (f) f.addEventListener("change", async () => { const file = f.files[0]; if (!file) return; toast("Subiendo foto…");
       try { const r = await assets.upload(file, {type: file.type || "image/jpeg"}); fotoId = r.id; $("#foto-prev", d).innerHTML = `<img class="thumb lg" src="${esc(r.url)}" alt="">`; toast("Foto lista: tocá Guardar"); }
       catch(e){ toast(e && e.code==="too_large" ? "La foto pesa demasiado (máx. 20 MB)" : e && e.code==="unsupported_type" ? "Usá una foto PNG, JPG o WEBP" : "No se pudo subir la foto"); } });
     const dl = $("#p-del", d); if (dl) dl.addEventListener("click", () => { close(); confirmar("¿Borrar " + p.nombre + "? Se borran también su stock y sus precios de competencia.", async () => { await del("productos/"+id); await del("stock/"+id); await del("relev/"+id, "Producto borrado"); }); });
     const ok = $("#p-ok", d); if (ok) ok.addEventListener("click", async () => {
       const nombre = $("#p-nom", d).value.trim(); if (!nombre){ toast("Falta el nombre"); return; }
+      const pend = $("#c-bul", d); if (pend && num(pend.value) != null){ const pv = $("#c-prov", d).value; if (!agregarCosto(false)) return; elegido = pv; }
       const data = Object.assign(conPrecioHist(p, num($("#p-pre", d).value)), { nombre, marca: $("#p-mar", d).value.trim() || null, categoria: $("#p-cat", d).value, contenido: num($("#p-cont", d).value), unidad: $("#p-uni", d).value,
         ean: $("#p-ean", d).value.trim() || null, imagen: fotoId, proveedores: provs, proveedorElegido: elegido });
       delete data.stockMinimo; delete data.stockObjetivo;
