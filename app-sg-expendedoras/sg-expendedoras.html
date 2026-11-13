@@ -105,8 +105,12 @@ tr.click{cursor:pointer} tr.click:hover td{background:var(--surface-2)}
 .pcard .n{font-weight:600;font-size:14px;line-height:1.25}
 .kv{display:flex;justify-content:space-between;font-size:13px;gap:8px}
 .mgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
-.mtab{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden}
-.mtab .hd,.mtab .rw{display:grid;grid-template-columns:2.3fr 1.1fr 1.1fr .8fr 1.4fr 1.2fr;align-items:center;gap:16px;padding:14px 20px}
+.mtab{background:var(--surface);border:1px solid var(--line);border-radius:14px}
+.mtab .hd{border-radius:14px 14px 0 0}
+.mtab .hd span{white-space:nowrap}
+.mtab .tot{border-radius:0 0 14px 14px}
+.mtab .rw:last-child{border-radius:0 0 14px 14px}
+.mtab .hd,.mtab .rw{display:grid;grid-template-columns:minmax(0,4fr) .95fr .95fr .65fr 1.15fr minmax(0,1fr) 34px;align-items:center;gap:16px;padding:14px 20px}
 .mtab .hd{background:var(--surface-2);font-size:12.5px;color:var(--muted);font-weight:600;border-bottom:1px solid var(--line)}
 .mtab .rw{padding:16px 20px;cursor:pointer}
 .mtab .rw+.rw{border-top:1px solid var(--line)}
@@ -115,17 +119,25 @@ tr.click{cursor:pointer} tr.click:hover td{background:var(--surface-2)}
 .mtab .ic{width:38px;height:50px;border-radius:7px;background:var(--accent);position:relative;flex:0 0 38px}
 .mtab .ic::before{content:"";position:absolute;left:5px;top:6px;width:20px;height:36px;background:#1d2027;border-radius:3px}
 .mtab .ic::after{content:"";position:absolute;right:4px;top:8px;width:5px;height:13px;background:#fff;opacity:.8;border-radius:2px}
-.mtab .n{font-weight:700;font-size:15.5px}
+.mtab .n{font-weight:700;font-size:15.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+.mtab .rw{position:relative}
+.mopt{position:relative;justify-self:end}
+.kebab{width:32px;height:32px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--muted);display:grid;place-items:center;cursor:pointer}
+.kebab:hover{color:var(--fg);border-color:var(--muted)}
+.mmenu{position:absolute;right:0;top:38px;background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.14);padding:6px;width:210px;z-index:20;display:flex;flex-direction:column}
+.mmenu[hidden]{display:none}
+.mmenu button{all:unset;padding:9px 10px;border-radius:7px;font-size:14px;cursor:pointer;color:var(--fg)}
+.mmenu button:hover,.mmenu button:focus-visible{background:var(--surface-2)}
 .mtab .v{font-family:var(--display);font-weight:700;font-size:18px}
 .mtab .sub{font-size:12.5px;color:var(--muted)}
 .mtab .lbl{display:none}
 .mtab .meter{height:8px;background:var(--info-soft);border-radius:99px;overflow:hidden;margin-top:6px}
 .mtab .meter i{display:block;height:100%;background:var(--ok);border-radius:99px}
 .mtab .meter.w i{background:#E39A2B} .mtab .meter.b i{background:var(--bad)}
-.mtab .spark{width:100%;max-width:130px;height:34px;display:block}
+.mtab .spark{width:100%;max-width:110px;height:34px;display:block}
 .mtab .tot{display:flex;flex-wrap:wrap;gap:10px 28px;padding:14px 20px;background:var(--surface-2);border-top:1px solid var(--line);font-size:14px}
 .mtab .tot b{font-family:var(--display);font-size:17px}
-@media (max-width:899px){.mtab .hd{display:none}.mtab .rw{grid-template-columns:1fr 1fr;gap:12px 16px}.mtab .rw>.nm{grid-column:1/-1}.mtab .lbl{display:block;font-size:12px;color:var(--muted)}}
+@media (max-width:899px){.mtab .hd{display:none}.mtab .rw{grid-template-columns:1fr 1fr;gap:12px 16px}.mtab .rw>.nm{grid-column:1/-1;padding-right:40px}.mtab .mopt{position:absolute;top:14px;right:14px}.mtab .n{white-space:normal}.mtab .lbl{display:block;font-size:12px;color:var(--muted)}}
 .mcard{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:10px;cursor:pointer;text-align:left}
 .mcard:hover{border-color:var(--muted)}
 .mcard .n{font-family:var(--display);font-size:20px;font-weight:700}
@@ -576,15 +588,17 @@ function vMaquinas(){
       return {m, n, x, real, pctS, vacios, rep, bajos, spark}; });
     const T = filas.reduce((a,r)=>({f:a.f+r.x.f, u:a.u+r.x.u, real:a.real+r.real}), {f:0,u:0,real:0});
     return `<div class="head"><div><h1>Máquinas</h1><p class="muted">${ms.length} ${ms.length===1?"máquina":"máquinas"}</p></div>${S.ro?"":`<button class="btn pri" type="button" data-act="nueva-maq">Agregar máquina</button>`}</div>
-    ${ms.length ? `<div class="mtab"><div class="hd"><span>Máquina</span><span>Ventas del mes</span><span>Ganancia real</span><span>Ticket</span><span>Stock en máquina</span><span>Últimos 14 días</span></div>
+    ${ms.length ? `<div class="mtab"><div class="hd"><span>Máquina</span><span>Ventas del mes</span><span>Ganancia real</span><span>Ticket</span><span>Stock en máquina</span><span>Últimos 14 días</span><span></span></div>
     ${filas.map(r => `<div class="rw" role="button" tabindex="0" data-maq="${esc(r.m.id)}">
-      <div class="nm"><div class="ic" aria-hidden="true"></div><div style="min-width:0"><div class="row" style="gap:8px;flex-wrap:nowrap"><span class="n">${esc(r.m.nombre)}</span>${S.ro?"":`<button class="btn ghost sm" type="button" data-edit-maq="${esc(r.m.id)}" aria-label="Editar ${esc(r.m.nombre)}">Editar</button>`}</div><div class="sub">${esc(r.m.ubicacion||"")}${r.m.ubicacion?" · ":""}${r.n} slots</div>
+      <div class="nm"><div class="ic" aria-hidden="true"></div><div style="min-width:0"><span class="n" title="${esc(r.m.nombre)}">${esc(r.m.nombre)}</span><div class="sub">${esc(r.m.ubicacion||"")}${r.m.ubicacion?" · ":""}${r.n} slots</div>
         ${r.bajos.length ? `<span class="pill p-warn" style="margin-top:6px">Reponer ${r.rep.reduce((t,x)=>t+x.falta,0)} u. en ${r.rep.length} slots</span>` : r.pctS == null ? `<span class="pill p-info" style="margin-top:6px">Cargá las capacidades de los slots</span>` : `<span class="pill p-ok" style="margin-top:6px">Todo en orden</span>`}</div></div>
       <div><span class="lbl">Ventas del mes</span><div class="v num">${fm(r.x.f)}</div><div class="sub">${fint(r.x.u)} u.</div></div>
       <div><span class="lbl">Ganancia real</span><div class="v num">${fm(r.real)}</div><div class="sub">${r.x.f ? "margen " + pct(r.real/r.x.f*100) : "con gastos fijos"}</div></div>
       <div><span class="lbl">Ticket</span><div class="v num">${r.x.u ? fm(r.x.f/r.x.u) : "—"}</div></div>
       <div><span class="lbl">Stock en máquina</span>${r.pctS == null ? '<div class="sub">Sin capacidades cargadas</div>' : `<div class="sub">${r.pctS}% lleno · ${r.vacios} ${r.vacios===1?"vacío":"vacíos"}</div><div class="meter ${r.pctS<40?"b":r.pctS<70?"w":""}"><i style="width:${r.pctS}%"></i></div>`}</div>
-      <div><span class="lbl">Últimos 14 días</span>${r.spark}</div></div>`).join("")}
+      <div><span class="lbl">Últimos 14 días</span>${r.spark}</div>
+      <div class="mopt">${S.ro?"":`<button class="kebab" type="button" data-kebab aria-haspopup="menu" aria-expanded="false" aria-label="Opciones de ${esc(r.m.nombre)}"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg></button>
+        <div class="mmenu" role="menu" hidden><button type="button" role="menuitem" data-mm="editar" data-id="${esc(r.m.id)}">Editar nombre y datos</button><button type="button" role="menuitem" data-mm="contar" data-id="${esc(r.m.id)}">Contar y reponer</button><button type="button" role="menuitem" data-mm="preparar" data-id="${esc(r.m.id)}">Preparar reposición</button></div>`}</div></div>`).join("")}
     ${ms.length > 1 ? `<div class="tot"><span class="muted">Total del mes</span><span><b class="num">${fm(T.f)}</b> <span class="muted">facturado</span></span><span><b class="num">${fm(T.real)}</b> <span class="muted">ganancia real</span></span><span><b class="num">${fint(T.u)}</b> <span class="muted">unidades</span></span></div>` : ""}</div>`
       : `<div class="empty">Todavía no hay máquinas.</div>`}`;
   }
@@ -653,7 +667,12 @@ function bindView(){
   v.querySelectorAll("[data-go-stock]").forEach(b => b.addEventListener("click", () => { UI.stockTab = b.dataset.goStock; }));
   v.querySelectorAll("[data-lotes]").forEach(b => b.addEventListener("click", () => openLotes(b.dataset.lotes)));
   const irMaq = (id) => { UI.maq = id; if (route !== "maquinas"){ location.hash = "maquinas"; } else { render(); window.scrollTo(0,0); } };
-  v.querySelectorAll("[data-maq]").forEach(b => { b.addEventListener("click", (e) => { if (e.target.closest("[data-edit-maq]")) return; irMaq(b.dataset.maq); }); b.addEventListener("keydown", e => { if (e.key === "Enter" && e.target === b) irMaq(b.dataset.maq); }); });
+  const cerrarMenus = () => v.querySelectorAll(".mmenu").forEach(mn => { mn.hidden = true; const k = mn.previousElementSibling; if (k) k.setAttribute("aria-expanded","false"); });
+  v.querySelectorAll("[data-kebab]").forEach(k => k.addEventListener("click", (e) => { e.stopPropagation(); const mn = k.nextElementSibling, abrir = mn.hidden; cerrarMenus(); if (abrir){ mn.hidden = false; k.setAttribute("aria-expanded","true"); mn.querySelector("button").focus(); } }));
+  v.querySelectorAll(".mmenu").forEach(mn => mn.addEventListener("keydown", (e) => { if (e.key === "Escape"){ cerrarMenus(); mn.previousElementSibling.focus(); } }));
+  v.querySelectorAll("[data-mm]").forEach(b => b.addEventListener("click", (e) => { e.stopPropagation(); cerrarMenus(); const id = b.dataset.id; if (b.dataset.mm === "editar") openMaquina(id); else if (b.dataset.mm === "contar") openConteo(id); else openPreparar(id); }));
+  if (!window.__menuDoc){ window.__menuDoc = true; document.addEventListener("click", (e) => { if (!e.target.closest(".mopt")) document.querySelectorAll(".mmenu").forEach(mn => { mn.hidden = true; }); }); }
+  v.querySelectorAll("[data-maq]").forEach(b => { b.addEventListener("click", (e) => { if (e.target.closest("[data-edit-maq]") || e.target.closest(".mopt")) return; irMaq(b.dataset.maq); }); b.addEventListener("keydown", e => { if (e.key === "Enter" && e.target === b) irMaq(b.dataset.maq); }); });
   v.querySelectorAll("[data-ir-maq]").forEach(b => b.addEventListener("click", () => { const id = b.dataset.irMaq; location.hash = "maquinas"; setTimeout(()=>{ UI.maq = id; render(); }, 0); }));
   v.querySelectorAll("[data-edit-maq]").forEach(b => b.addEventListener("click", (e) => { e.stopPropagation(); openMaquina(b.dataset.editMaq); }));
   v.querySelectorAll("[data-slot]").forEach(b => b.addEventListener("click", () => openSlot(UI.maq, b.dataset.slot)));
