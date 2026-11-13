@@ -53,8 +53,8 @@ button,input,select,textarea{font:inherit;color:inherit}
 @media (max-width:899px){
   .side{display:none}
   .main{padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))}
-  .tabs{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--surface);border-top:1px solid var(--line);padding:4px max(4px,env(safe-area-inset-right,0px)) calc(8px + env(safe-area-inset-bottom,0px)) max(4px,env(safe-area-inset-left,0px))}
-  .tabs a{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 2px;min-height:48px;text-decoration:none;color:var(--muted);font-size:11px;font-weight:500}
+  .tabs{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--surface);border-top:1px solid var(--line);padding:4px max(4px,env(safe-area-inset-right,0px)) calc(8px + env(safe-area-inset-bottom,0px)) max(4px,env(safe-area-inset-left,0px))}
+  .tabs a{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 1px;min-height:48px;text-decoration:none;color:var(--muted);font-size:10px;font-weight:500;overflow:hidden}
   .tabs a.on{color:var(--fg);font-weight:700}
   .tabs a.on svg{color:var(--accent)}
   .mtop{display:flex}
@@ -135,6 +135,25 @@ tr.click{cursor:pointer} tr.click:hover td{background:var(--surface-2)}
 .sim .box .l{font-size:12px;color:var(--muted)}
 .sim .box .v{font-size:18px;font-weight:700}
 .radio{display:flex;align-items:center;gap:8px;min-height:44px;cursor:pointer}
+.delta{font-size:12px;font-weight:700;padding:2px 7px;border-radius:999px;margin-left:6px;vertical-align:middle}
+.d-up{background:var(--ok-soft);color:var(--ok)} .d-dn{background:var(--bad-soft);color:var(--bad)} .d-eq{background:var(--info-soft);color:var(--muted)}
+.chart{width:100%;height:auto;display:block}
+.chart text{fill:var(--muted);font-size:11px;font-family:var(--font)}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:12px;color:var(--muted);margin-top:6px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+.hb{display:flex;flex-direction:column;gap:8px}
+.hb .r{display:grid;grid-template-columns:minmax(0,180px) minmax(0,1fr) auto;gap:10px;align-items:center;font-size:13px}
+.hb .r .n{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hb .r .b{height:12px;border-radius:3px;background:var(--line-2);overflow:hidden}
+.hb .r .b i{display:block;height:100%;background:var(--accent)}
+.alert{display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-top:1px solid var(--line-2)}
+.alert:first-child{border-top:0}
+.alert .dot{width:10px;height:10px;border-radius:50%;margin-top:6px;flex:0 0 10px}
+.dot.bad{background:var(--bad)} .dot.warn{background:#D98A1A} .dot.info{background:#3C7BD9}
+.cnt{display:grid;grid-template-columns:44px minmax(0,1fr) 92px;gap:10px;align-items:center;padding:8px 0;border-top:1px solid var(--line-2)}
+.cnt:first-child{border-top:0}
+.cnt input{min-height:44px;padding:8px;border:1px solid var(--line);border-radius:9px;background:var(--surface);color:var(--fg);font-size:16px;width:100%;text-align:center}
+.reptxt{font-size:16px;line-height:1.6;background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:12px 14px;word-break:break-word}
 @media (prefers-reduced-motion:no-preference){.drawer{animation:slide .18s ease-out}@keyframes slide{from{transform:translateX(24px);opacity:.6}to{transform:none;opacity:1}}}
 </style>
 
@@ -155,11 +174,17 @@ const esc = (v) => String(v ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&
 const money0 = new Intl.NumberFormat("es-AR",{style:"currency",currency:"ARS",maximumFractionDigits:0});
 const fm = (n) => (n == null || !isFinite(n)) ? "—" : money0.format(Math.round(n));
 const fint = (n) => (n == null || !isFinite(n)) ? "—" : Math.round(n).toLocaleString("es-AR");
-const pct = (n) => (n == null || !isFinite(n)) ? "—" : (Math.round(n*10)/10).toString().replace(".",",") + "%";
+const f1 = (n) => (n == null || !isFinite(n)) ? "—" : (Math.round(n*10)/10).toString().replace(".",",");
+const pct = (n) => (n == null || !isFinite(n)) ? "—" : f1(n) + "%";
 function num(v){ if (v == null) return null; const s = String(v).trim(); if (!s) return null;
   const t = s.replace(/\s|\$/g,"").replace(/\./g,"").replace(",","."); const n = Number(t); return isFinite(n) ? n : null; }
-const today = () => { const d = new Date(); return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0"); };
-const mes = () => today().slice(0,7);
+const iso = (d) => d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0");
+const today = () => iso(new Date());
+const hora = () => { const d = new Date(); return String(d.getHours()).padStart(2,"0") + ":" + String(d.getMinutes()).padStart(2,"0"); };
+const mesDe = (offset) => { const d = new Date(); d.setDate(1); d.setMonth(d.getMonth() + offset); return iso(d).slice(0,7); };
+const addDays = (s, n) => { const d = new Date(s + "T00:00:00"); d.setDate(d.getDate() + n); return iso(d); };
+const diasDelMes = (ym) => { const [y,m] = ym.split("-").map(Number); return new Date(y, m, 0).getDate(); };
+const nombreMes = (ym) => { const [y,m] = ym.split("-").map(Number); return new Date(y, m-1, 1).toLocaleDateString("es-AR",{month:"long"}); };
 function days(a){ if (!a) return null; return Math.round((new Date(a+"T00:00:00") - new Date(today()+"T00:00:00"))/86400000); }
 function ago(d){ if (!d) return "sin fecha"; const n = -days(d); return n <= 0 ? "hoy" : n === 1 ? "hace 1 día" : "hace " + n + " días"; }
 function fdate(d){ if (!d) return "—"; const [y,m,dd] = d.split("-"); return dd + "/" + m + "/" + y.slice(2); }
@@ -168,44 +193,47 @@ const norm = (s) => String(s ?? "").normalize("NFD").replace(/[̀-ͯ]/g,"").toLo
 const coincide = (p, q) => { const words = norm(q).split(/\s+/).filter(Boolean); if (!words.length) return true;
   const hay = norm([p.nombre, p.marca, p.categoria, p.ean].join(" ")); return words.every(w => hay.includes(w)); };
 const img = (p, cls="thumb") => p && p.imagen ? `<img class="${cls}" src="/_blob/${esc(p.imagen)}" alt="" loading="lazy">` : `<div class="${cls} ph" aria-hidden="true">sin foto</div>`;
+const delta = (a, b) => { if (!b) return a ? '<span class="delta d-eq">nuevo</span>' : ""; const d = (a/b - 1)*100; const c = d > 0.5 ? "d-up" : d < -0.5 ? "d-dn" : "d-eq"; return `<span class="delta ${c}">${d>0?"+":""}${Math.round(d)}%</span>`; };
+const dur = (d) => d == null ? "sin datos" : d < 1 ? "se agota hoy" : d < 2 ? "se agota mañana" : "≈ " + Math.floor(d) + " días";
 
 const ICONS = {
   inicio:'<path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/>',
+  ventas:'<path d="M3 20h18"/><rect x="5" y="11" width="3" height="7"/><rect x="10.5" y="6" width="3" height="12"/><rect x="16" y="9" width="3" height="9"/>',
   productos:'<path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/>',
   precios:'<path d="M20.6 13.4l-7.2 7.2a2 2 0 0 1-2.8 0L3 13V3h10l7.6 7.6a2 2 0 0 1 0 2.8z"/><circle cx="7.5" cy="7.5" r="1.5"/>',
   stock:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M9 4v16"/>',
   maquinas:'<rect x="5" y="2" width="14" height="20" rx="2"/><path d="M9 6h6M9 10h6M8 17h8"/>',
-  ajustes:'<path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/>'
+  ajustes:'<path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/>'
 };
 const icon = (k, s=20) => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[k]}</svg>`;
-const ROUTES = [["inicio","Inicio"],["productos","Productos"],["precios","Precios"],["stock","Stock"],["maquinas","Máquinas"],["ajustes","Ajustes"]];
+const ROUTES = [["inicio","Inicio"],["ventas","Ventas"],["productos","Productos"],["precios","Precios"],["stock","Stock"],["maquinas","Máquinas"],["ajustes","Ajustes"]];
 
 const CATS = ["Bebidas","Sándwiches y panificados","Alfajores","Golosinas","Chocolates y barras","Galletitas","Snacks","Otros"];
 const TIPOS = {chino:"Supermercado chino", kiosco:"Kiosco", pya_market:"PedidosYa Market", pya_comercio:"Comercio en PedidosYa", super:"Supermercado", otro:"Otro"};
-const SIN = "sin"; // compras sin proveedor
+const SIN = "sin";
 
 // ---------- estado ----------
-const S = { productos:{}, stock:{}, relev:{}, competidores:{}, proveedores:{}, maquinas:{}, config:{}, ventas:null, ready:false, ro:false };
+const S = { productos:{}, stock:{}, relev:{}, competidores:{}, proveedores:{}, maquinas:{}, config:{}, vdias:{}, ready:false, ro:false };
 let db = null, assets = null, downloads = null;
-const DEF_CONFIG = { comisionQR: 0, diasPrecioViejo: 45, diasVence: 7 };
+const DEF_CONFIG = { comisionQR: 0, diasPrecioViejo: 45, diasVence: 7, diasCobertura: 7, diasReposicion: 3 };
 const cfg = () => Object.assign({}, DEF_CONFIG, S.config);
+const UI = { q:"", cat:"", stockTab:"deposito", maq:null, precioFiltro:"todos", pq:"", orden:"nombre", vmes:0, histN:40 };
 
-// ---------- cálculos ----------
+// ---------- costos y márgenes ----------
 const provNombre = (id) => id === SIN ? "Sin proveedor" : ((S.proveedores[id]||{}).nombre || "Proveedor borrado");
-function preciosProv(p){ // lista {id, costoUnit, precioBulto, unidadesBulto, fecha}, más barato primero
-  return Object.entries(p.proveedores||{}).filter(([,x]) => x && x.costoUnit != null).map(([id,x]) => Object.assign({id}, x)).sort((a,b)=>a.costoUnit-b.costoUnit); }
-function costoActual(p){ const l = preciosProv(p); if (l.length){ const el = l.find(x => x.id === p.proveedorElegido); return (el || l[0]).costoUnit; }
+function preciosProv(p){ return Object.entries(p.proveedores||{}).filter(([,x]) => x && x.costoUnit != null).map(([id,x]) => Object.assign({id}, x)).sort((a,b)=>a.costoUnit-b.costoUnit); }
+function costoActual(p){ if (!p) return null; const l = preciosProv(p); if (l.length){ const el = l.find(x => x.id === p.proveedorElegido); return (el || l[0]).costoUnit; }
   const h = p.costos||[]; return h.length ? h[h.length-1].costoUnit ?? null : null; }
 function proveedorDelCosto(p){ const l = preciosProv(p); if (!l.length) return null; const el = l.find(x => x.id === p.proveedorElegido); return (el || l[0]).id; }
 function margen(precio, costo){ if (precio == null || costo == null || !precio) return {neto:null,gan:null,m:null};
   const neto = precio*(1 - (cfg().comisionQR||0)/100); const gan = neto - costo; return {neto, gan, m: gan/precio*100}; }
 function compStats(pid){
-  const r = S.relev[pid]; const out = {kiosco:[],chino:[],pya:[],otro:[],viejo:0,total:0,masViejo:null};
+  const r = S.relev[pid]; const out = {kiosco:[],chino:[],pya:[],otro:[],viejo:0,total:0,ultima:null};
   if (!r || !r.precios) return out;
   for (const [cid, e] of Object.entries(r.precios)){
     const c = S.competidores[cid]; if (!c || e.lista == null) continue;
     out.total++; if (-days(e.fecha) > cfg().diasPrecioViejo) out.viejo++;
-    if (out.masViejo == null || (e.fecha||"") < out.masViejo) out.masViejo = e.fecha||"";
+    if (!out.ultima || (e.fecha||"") > out.ultima) out.ultima = e.fecha||null;
     const item = {c, e, unit: e.lista};
     if (c.tipo === "kiosco") out.kiosco.push(item); else if (c.tipo === "chino") out.chino.push(item);
     else if (c.tipo === "pya_market" || c.tipo === "pya_comercio") out.pya.push(item); else out.otro.push(item);
@@ -213,31 +241,60 @@ function compStats(pid){
   return out;
 }
 const avg = (a) => a.length ? a.reduce((s,x)=>s+x.unit,0)/a.length : null;
-function stockDep(pid){ const s = S.stock[pid]; return s && s.lotes ? s.lotes.reduce((t,l)=>t+(l.cantidad||0),0) : 0; }
-function stockMaq(pid){ let t=0; for (const m of Object.values(S.maquinas)) for (const [n, sl] of Object.entries(m.slots||{})) if (+n <= (m.cantidadSlots||60) && sl.productoId===pid) t += sl.cantidad||0; return t; }
-function slotState(sl){ if (!sl || !sl.productoId || !sl.capacidad) return null; const r = (sl.cantidad||0)/sl.capacidad; return r <= .25 ? "b" : r <= .5 ? "w" : ""; }
+
+// ---------- stock y máquinas ----------
 const prodList = () => Object.entries(S.productos).map(([id,p])=>Object.assign({id},p)).sort((a,b)=>(a.nombre||"").localeCompare(b.nombre||"","es"));
 const maqList = () => Object.entries(S.maquinas).map(([id,m])=>Object.assign({id},m)).sort((a,b)=>(a.orden||0)-(b.orden||0) || (a.nombre||"").localeCompare(b.nombre||""));
 const slotsDe = (m) => Object.entries(m.slots||{}).filter(([n]) => +n <= (m.cantidadSlots||60));
-
-function vencimientos(){
-  const out = [], lim = cfg().diasVence;
-  for (const [pid, s] of Object.entries(S.stock)) for (const l of (s.lotes||[])) if (l.vence && l.cantidad>0){ const d = days(l.vence); if (d <= lim) out.push({pid, d, cant:l.cantidad, lugar:"Depósito", vence:l.vence}); }
-  for (const m of maqList()) for (const [n, sl] of slotsDe(m)) if (sl.productoId && sl.vence && sl.cantidad>0){ const d = days(sl.vence); if (d <= lim) out.push({pid:sl.productoId, d, cant:sl.cantidad, lugar:m.nombre + " · slot " + n, vence:sl.vence}); }
-  return out.sort((a,b)=>a.d-b.d);
-}
+function stockDep(pid){ const s = S.stock[pid]; return s && s.lotes ? s.lotes.reduce((t,l)=>t+(l.cantidad||0),0) : 0; }
+function stockMaq(pid, mid){ let t=0; for (const m of maqList()) if (!mid || m.id === mid) for (const [, sl] of slotsDe(m)) if (sl.productoId===pid) t += sl.cantidad||0; return t; }
+function slotState(sl){ if (!sl || !sl.productoId || !sl.capacidad) return null; const r = (sl.cantidad||0)/sl.capacidad; return r <= .25 ? "b" : r <= .5 ? "w" : ""; }
 function reposicion(m){
   const out = [];
   for (const [n, sl] of slotsDe(m)) if (sl.productoId && sl.capacidad){ const falta = sl.capacidad - (sl.cantidad||0); if (falta > 0) out.push({n:+n, pid:sl.productoId, falta, cant:sl.cantidad||0, cap:sl.capacidad, st:slotState(sl)}); }
   return out.sort((a,b)=>a.n-b.n);
 }
-// Lista de compras: lo que falta para llenar todas las máquinas, menos lo que ya hay en el depósito
-function compras(){
-  const falta = {}; for (const m of maqList()) for (const r of reposicion(m)) falta[r.pid] = (falta[r.pid]||0) + r.falta;
-  return Object.entries(falta).map(([pid, f]) => { const p = Object.assign({id:pid}, S.productos[pid]||{}); const dep = stockDep(pid); return {p, falta:f, dep, sug: Math.max(0, f - dep)}; })
-    .filter(x => x.sug > 0).sort((a,b)=>(a.p.nombre||"").localeCompare(b.p.nombre||"","es"));
+function vencimientos(){
+  const out = [], lim = cfg().diasVence;
+  for (const [pid, s] of Object.entries(S.stock)) for (const l of (s.lotes||[])) if (l.vence && l.cantidad>0){ const d = days(l.vence); if (d <= lim) out.push({pid, d, cant:l.cantidad, lugar:"Depósito", vence:l.vence}); }
+  for (const m of maqList()) for (const [n, sl] of slotsDe(m)) if (sl.productoId && sl.vence && sl.cantidad>0){ const d = days(sl.vence); if (d <= lim) out.push({pid:sl.productoId, mid:m.id, d, cant:sl.cantidad, lugar:m.nombre + " · slot " + n, vence:sl.vence}); }
+  return out.sort((a,b)=>a.d-b.d);
 }
-function ventasMes(){ const v = S.ventas || {}; return {u: v.unidades||0, f: v.facturacion||0, productos: v.productos||{}, maquinas: v.maquinas||{}}; }
+
+// ---------- ventas (cada venta con fecha y hora) ----------
+function eventos(){ const out = []; for (const [fecha, doc] of Object.entries(S.vdias)) for (const e of (doc.eventos||[])) out.push(Object.assign({fecha}, e)); return out.sort((a,b)=> (b.fecha+b.h).localeCompare(a.fecha+a.h)); }
+function delMes(evs, ym, hastaDia){ return evs.filter(e => e.fecha.startsWith(ym) && (!hastaDia || +e.fecha.slice(8) <= hastaDia)); }
+function resumen(evs){ let u=0, f=0, cm=0; for (const e of evs){ u += e.u; f += e.f; cm += (e.c != null ? e.c : (costoActual(S.productos[e.pid]) || 0)) * e.u; } const com = f*(cfg().comisionQR||0)/100; return {u, f, cm, com, gan: f - com - cm, n: evs.length}; }
+const gastosFijos = (m) => (m.alquiler||0) + (m.otrosGastos||[]).reduce((t,g)=>t+(g.monto||0),0);
+// Consumo promedio diario de un producto (en una máquina o en todas), con las ventas de los últimos 30 días
+function ventanaDias(){ const evs = eventos(); if (!evs.length) return null; const primero = evs[evs.length-1].fecha; return Math.max(1, Math.min(30, -days(primero) + 1)); }
+function consumo(pid, mid){ const v = ventanaDias(); if (!v) return null; const desde = addDays(today(), -(v-1)); let u = 0;
+  for (const e of eventos()) if (e.fecha >= desde && e.pid === pid && (!mid || e.mid === mid)) u += e.u; return u / v; }
+function diasStock(cant, cons){ return cons > 0 ? cant / cons : null; }
+// Compra recomendada: lo que falta para llenar las máquinas + lo que se vende en N días − depósito
+function recomendacion(pid){ let falta = 0; for (const m of maqList()) for (const r of reposicion(m)) if (r.pid === pid) falta += r.falta;
+  const cons = consumo(pid) || 0; const rec = Math.max(0, Math.ceil(falta + cons * cfg().diasCobertura - stockDep(pid))); return {falta, cons, rec}; }
+function compras(){ return prodList().map(p => Object.assign({p, dep: stockDep(p.id)}, recomendacion(p.id))).filter(x => x.rec > 0); }
+
+// Alertas inteligentes
+function alertas(){
+  const out = [], c = cfg(), hayVentas = !!ventanaDias(), v = ventanaDias() || 0;
+  for (const m of maqList()){
+    const porProd = {}; for (const [n, sl] of slotsDe(m)) if (sl.productoId){ const x = porProd[sl.productoId] || {slots:[], cant:0, cap:0}; x.slots.push(n); x.cant += sl.cantidad||0; x.cap += sl.capacidad||0; porProd[sl.productoId] = x; }
+    for (const [pid, x] of Object.entries(porProd)){
+      const p = S.productos[pid] || {}; const cons = consumo(pid, m.id); const ds = diasStock(x.cant, cons);
+      if (cons > 0 && ds != null && ds < 2) out.push({nivel:"bad", p, t:`${p.nombre}: ${ds < 1 ? "se agota hoy" : "se agota mañana"} en ${m.nombre}`, d:`Vende ${f1(cons)} u./día y quedan ${x.cant} (slot ${x.slots.join(", ")}).`});
+      if (cons > 0 && x.cap && x.cap < cons * c.diasReposicion) out.push({nivel:"info", p, t:`${p.nombre} se vende mucho en ${m.nombre}`, d:`Un slot lleno dura ${f1(x.cap/cons)} días y reponés cada ${c.diasReposicion}: aumentá la capacidad del slot ${x.slots.join(", ")} o sumale otro slot.`});
+      if (hayVentas && v >= 14 && consumo(pid, m.id) === 0) out.push({nivel:"warn", p, t:`${p.nombre} no se vendió en ${v} días en ${m.nombre}`, d:`Probá cambiarlo por otro producto o moverlo a un slot más visible.`});
+    }
+  }
+  for (const x of vencimientos()) if (x.mid){ const cons = consumo(x.pid, x.mid); if (cons != null && x.d >= 0 && x.cant > cons * (x.d + 1)) { const p = S.productos[x.pid]||{}; out.push({nivel:"warn", p, t:`${p.nombre}: no se va a vender todo antes de vencer`, d:`Quedan ${x.cant} en ${x.lugar}, vence ${x.d===0?"hoy":"en "+x.d+" días"} y se venden ${f1(cons)} u./día.`}); } }
+  for (const p of prodList()){
+    const pv = proveedorDelCosto(p); if (pv){ const h = (p.costos||[]).filter(k => k.proveedorId === pv); if (h.length >= 2){ const a = h[h.length-2].costoUnit, b = h[h.length-1].costoUnit; if (a && b > a*1.08) out.push({nivel:"warn", p, t:`Subió el costo de ${p.nombre} un ${Math.round((b/a-1)*100)}%`, d:`Ahora ${fm(b)} c/u con ${provNombre(pv)}. Revisá el precio de venta (${fm(p.precioVenta)}).`}); } }
+    const mm = margen(p.precioVenta, costoActual(p)).m; if (mm != null && mm < 15) out.push({nivel:"warn", p, t:`${p.nombre} deja poco margen (${pct(mm)})`, d:`Costo ${fm(costoActual(p))}, venta ${fm(p.precioVenta)}.`});
+  }
+  const orden = {bad:0, warn:1, info:2}; return out.sort((a,b)=>orden[a.nivel]-orden[b.nivel]);
+}
 
 // ---------- persistencia ----------
 let toastT = null;
@@ -251,16 +308,34 @@ async function save(path, data, msg){
 }
 async function del(path, msg){ if (!db) return; try { await db.doc(path).delete(); if (msg) toast(msg); } catch(e){ toast("No se pudo borrar"); } }
 const strip = (o) => { const c = Object.assign({}, o); delete c.id; return c; };
-
-// Ventas: se registran al contar un slot (lo que falta desde la última carga se vendió)
-async function registrarVenta(mid, pid, unidades){
-  if (!unidades || unidades <= 0) return; const p = S.productos[pid] || {}; const precio = p.precioVenta || 0; const f = unidades * precio;
-  const v = JSON.parse(JSON.stringify(S.ventas || {})); v.mes = mes(); v.unidades = (v.unidades||0) + unidades; v.facturacion = (v.facturacion||0) + f;
-  v.productos = v.productos || {}; const vp = v.productos[pid] || {u:0,f:0}; vp.u += unidades; vp.f += f; v.productos[pid] = vp;
-  v.maquinas = v.maquinas || {}; const vm = v.maquinas[mid] || {u:0,f:0}; vm.u += unidades; vm.f += f; v.maquinas[mid] = vm;
-  const d = today().slice(8); v.dias = v.dias || {}; const vd = v.dias[d] || {u:0,f:0}; vd.u += unidades; vd.f += f; v.dias[d] = vd;
-  S.ventas = v; await save("ventas/" + mes(), v);
+function conPrecioHist(p, nuevo){ const d = strip(p); if (nuevo !== p.precioVenta && nuevo != null) d.precioHist = (p.precioHist||[]).concat([{fecha: today(), precio: nuevo}]).slice(-40); d.precioVenta = nuevo; return d; }
+// Registra ventas (lista de {mid, pid, u}) en el documento del día, con hora, precio y costo del momento
+async function registrarVentas(items){
+  items = items.filter(x => x.pid && x.u > 0); if (!items.length) return;
+  const f = today(), h = hora(); const doc = JSON.parse(JSON.stringify(S.vdias[f] || {fecha: f, eventos: []}));
+  for (const x of items){ const p = S.productos[x.pid] || {}; doc.eventos.push({h, mid: x.mid, pid: x.pid, u: x.u, pv: p.precioVenta || 0, f: (p.precioVenta || 0) * x.u, c: costoActual(p)}); }
+  S.vdias[f] = doc; await save("ventasdia/" + f, doc);
 }
+
+// ---------- gráficos ----------
+function barrasDia(ym, evs, evsAnt){
+  const n = diasDelMes(ym), W = 760, H = 210, L = 46, B = 24, T = 10, cw = (W - L - 8) / n;
+  const act = Array(n).fill(0), ant = Array(31).fill(0); for (const e of evs) act[+e.fecha.slice(8)-1] += e.f; for (const e of evsAnt) ant[+e.fecha.slice(8)-1] += e.f;
+  const max = Math.max(1, ...act, ...ant.slice(0,n)); const y = (v) => T + (H - T - B) * (1 - v/max);
+  let s = `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Facturación por día de ${nombreMes(ym)} comparada con el mes anterior">`;
+  for (let k=0;k<=3;k++){ const v = max*k/3, yy = y(v); s += `<line x1="${L}" x2="${W-4}" y1="${yy}" y2="${yy}" stroke="var(--line)" stroke-width="1"/><text x="${L-6}" y="${yy+4}" text-anchor="end">${v>=1000?Math.round(v/1000)+"k":Math.round(v)}</text>`; }
+  for (let i=0;i<n;i++){ const x = L + i*cw; if (act[i]) s += `<rect x="${x+cw*0.15}" y="${y(act[i])}" width="${cw*0.7}" height="${H-B-y(act[i])}" rx="2" fill="var(--accent)"/>`;
+    if (ant[i]) s += `<rect x="${x+cw*0.25}" y="${y(ant[i])-1.5}" width="${cw*0.5}" height="3" rx="1.5" fill="var(--fg)" opacity=".55"/>`;
+    if ((i+1) % 5 === 0 || i === 0) s += `<text x="${x+cw/2}" y="${H-6}" text-anchor="middle">${i+1}</text>`; }
+  return s + `</svg><div class="legend"><span><i style="background:var(--accent)"></i>${nombreMes(ym)}</span><span><i style="background:var(--fg);opacity:.55;height:3px"></i>mismo día del mes anterior</span></div>`;
+}
+function barrasHora(evs){
+  const W = 760, H = 150, L = 8, B = 22, T = 10, cw = (W - L*2) / 24; const v = Array(24).fill(0); for (const e of evs) v[+(e.h||"00").slice(0,2)] += e.u; const max = Math.max(1, ...v);
+  let s = `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Unidades vendidas por hora del día">`;
+  for (let i=0;i<24;i++){ const x = L + i*cw, hh = (H-B-T)*v[i]/max; if (v[i]) s += `<rect x="${x+cw*0.15}" y="${H-B-hh}" width="${cw*0.7}" height="${hh}" rx="2" fill="#3C7BD9"/>`; if (i % 3 === 0) s += `<text x="${x+cw/2}" y="${H-6}" text-anchor="middle">${i}h</text>`; }
+  return s + `<line x1="${L}" x2="${W-L}" y1="${H-B}" y2="${H-B}" stroke="var(--line)"/></svg>`;
+}
+const hbar = (rows) => { const max = Math.max(1, ...rows.map(r=>r.v)); return `<div class="hb">${rows.map(r=>`<div class="r"><span class="n" title="${esc(r.n)}">${esc(r.n)}</span><span class="b"><i style="width:${Math.max(2, r.v/max*100)}%"></i></span><span class="num small">${r.t}</span></div>`).join("")}</div>`; };
 
 // ---------- navegación ----------
 let route = "inicio";
@@ -271,51 +346,89 @@ function renderNav(){
   $("#tabs").innerHTML = ROUTES.map(([k,l]) => `<a href="#${k}" class="${route===k?"on":""}" ${route===k?'aria-current="page"':""}>${icon(k,22)}<span>${l}</span></a>`).join("");
 }
 const mtop = () => `<div class="mtop"><div class="brand-mark" aria-hidden="true">S&amp;G</div><strong>S&amp;G Expendedoras</strong></div>`;
-
 let drawerOpen = false, pending = false;
 function render(){ if (drawerOpen){ pending = true; return; } const v = $("#view"); if (!S.ready){ v.innerHTML = `<div class="empty">Cargando datos…</div>`; return; }
-  const fn = {inicio:vInicio, productos:vProductos, precios:vPrecios, stock:vStock, maquinas:vMaquinas, ajustes:vAjustes}[route];
+  const fn = {inicio:vInicio, ventas:vVentas, productos:vProductos, precios:vPrecios, stock:vStock, maquinas:vMaquinas, ajustes:vAjustes}[route];
   v.innerHTML = mtop() + fn(); bindView(); }
-
-const UI = { q:"", cat:"", stockTab:"deposito", maq:null, precioFiltro:"todos", pq:"" };
+const li = (rows, empty) => rows.length ? `<div class="list">${rows.join("")}</div>` : `<p class="muted small" style="margin:0">${empty}</p>`;
+const alertasHTML = (al) => al.length ? `<div>${al.map(a=>`<div class="alert"><span class="dot ${a.nivel}" aria-hidden="true"></span>${img(a.p)}<div class="grow" style="flex:1;min-width:0"><div class="t" style="font-weight:600;font-size:14px">${esc(a.t)}</div><div class="small muted">${esc(a.d)}</div></div></div>`).join("")}</div>` : `<p class="muted small" style="margin:0">Sin alertas por ahora. Las de consumo aparecen cuando haya ventas registradas.</p>`;
 
 // ---------- vistas ----------
 function vInicio(){
-  const ps = prodList(), c = cfg(), vm = ventasMes();
-  let gan = 0, ganOk = false; for (const [pid, x] of Object.entries(vm.productos)){ const p = S.productos[pid]; const co = p ? costoActual(p) : null; if (co != null && x.u){ ganOk = true; gan += x.f*(1-(c.comisionQR||0)/100) - co*x.u; } }
-  const ms = ps.map(p => margen(p.precioVenta, costoActual(p)).m).filter(x=>x!=null);
-  const mprom = ms.length ? ms.reduce((a,b)=>a+b,0)/ms.length : null;
-  const maqs = maqList(); const rep = maqs.flatMap(m => reposicion(m).filter(r=>r.st).map(r=>Object.assign({m},r)));
-  const venc = vencimientos();
-  const bajos = ps.map(p=>({p, mm:margen(p.precioVenta, costoActual(p)).m})).filter(x=>x.mm!=null && x.mm < 25).sort((a,b)=>a.mm-b.mm);
-  const compra = compras();
-  const top = Object.entries(vm.productos).map(([pid,x])=>({p:Object.assign({id:pid}, S.productos[pid]||{}), u:x.u, f:x.f})).sort((a,b)=>b.u-a.u).slice(0,5);
+  const c = cfg(), evs = eventos(), ym = mesDe(0), dia = new Date().getDate();
+  const r = resumen(delMes(evs, ym)), ra = resumen(delMes(evs, mesDe(-1), dia));
+  const maqs = maqList(); const gf = maqs.reduce((t,m)=>t+gastosFijos(m),0);
+  const ps = prodList(); const ms = ps.map(p => margen(p.precioVenta, costoActual(p)).m).filter(x=>x!=null); const mprom = ms.length ? ms.reduce((a,b)=>a+b,0)/ms.length : null;
+  const porProd = {}; for (const e of delMes(evs, ym)){ const x = porProd[e.pid] || {u:0,f:0}; x.u += e.u; x.f += e.f; porProd[e.pid] = x; }
+  const enMaq = new Set(); for (const m of maqs) for (const [,sl] of slotsDe(m)) if (sl.productoId) enMaq.add(sl.productoId);
+  const top = Object.entries(porProd).map(([pid,x])=>({p:S.productos[pid]||{}, u:x.u, f:x.f})).sort((a,b)=>b.u-a.u).slice(0,5);
+  const menos = [...enMaq].map(pid => ({p:S.productos[pid]||{}, u:(porProd[pid]||{}).u||0})).sort((a,b)=>a.u-b.u).slice(0,5);
+  const agot = []; for (const m of maqs){ const vistos = new Set(); for (const [n, sl] of slotsDe(m)) if (sl.productoId && !vistos.has(sl.productoId)){ vistos.add(sl.productoId); const cant = stockMaq(sl.productoId, m.id), cons = consumo(sl.productoId, m.id), ds = diasStock(cant, cons); if (ds != null && ds < 3) agot.push({m, p:S.productos[sl.productoId]||{}, ds, cons, cant}); } }
+  agot.sort((a,b)=>a.ds-b.ds);
+  const venc = vencimientos(), compra = compras(), al = alertas();
   const sinCostos = !ps.some(p => costoActual(p) != null);
-  const li = (rows, empty) => rows.length ? `<div class="list">${rows.join("")}</div>` : `<p class="muted small" style="margin:0">${empty}</p>`;
-  const nombreMes = new Date().toLocaleDateString("es-AR",{month:"long"});
   return `
   <div class="head"><div><h1>Inicio</h1><p class="muted">${new Date().toLocaleDateString("es-AR",{weekday:"long",day:"numeric",month:"long"})}</p></div>
-   <div class="row"><a class="btn pri" href="#maquinas">Armar reposición</a><a class="btn" href="#stock" data-go-stock="compras">Lista de compras</a></div></div>
+   <div class="row"><a class="btn pri" href="#maquinas">Reponer</a><a class="btn" href="#stock" data-go-stock="compras">Lista de compras</a></div></div>
   ${sinCostos ? `<div class="notice">Para empezar: cargá en <a href="#productos">Productos</a> el costo de cada proveedor y tu precio de venta, y en <a href="#precios">Precios</a> lo que cobra la competencia.</div>` : ""}
   <section class="grid-k" aria-label="Resumen del mes">
-    <div class="card kpi"><div class="l">Facturación de ${nombreMes}</div><div class="v num">${fm(vm.f)}</div><div class="s">${maqs.length > 1 ? "Todas las máquinas" : "Precio de venta × unidades"}</div></div>
-    <div class="card kpi"><div class="l">Ventas de ${nombreMes}</div><div class="v num">${fint(vm.u)} u.</div><div class="s">Productos vendidos</div></div>
-    <div class="card kpi"><div class="l">Ganancia estimada</div><div class="v num">${ganOk ? fm(gan) : "—"}</div><div class="s">Descontados costo y QR, sin alquiler</div></div>
-    <div class="card kpi"><div class="l">Margen promedio</div><div class="v num">${pct(mprom)}</div><div class="s">De los productos con costo y precio</div></div>
+    <div class="card kpi"><div class="l">Facturación de ${nombreMes(ym)}</div><div class="v num">${fm(r.f)}${delta(r.f, ra.f)}</div><div class="s">vs. los mismos días del mes anterior</div></div>
+    <div class="card kpi"><div class="l">Ventas</div><div class="v num">${fint(r.u)} u.${delta(r.u, ra.u)}</div><div class="s">${fint(r.n)} registros de venta</div></div>
+    <div class="card kpi"><div class="l">Ticket promedio</div><div class="v num">${r.u ? fm(r.f / r.u) : "—"}</div><div class="s">Facturación ÷ unidades vendidas</div></div>
+    <div class="card kpi"><div class="l">Ganancia real del mes</div><div class="v num">${r.n || gf ? fm(r.gan - gf) : "—"}</div><div class="s">Menos costo, QR y gastos fijos (${fm(gf)})</div></div>
+    <div class="card kpi"><div class="l">Margen promedio</div><div class="v num">${pct(mprom)}</div><div class="s">Productos con costo y venta</div></div>
   </section>
-  <p class="muted small" style="margin:-8px 0 0">Las ventas se registran al contar cada slot en Máquinas. Cuando conectemos la app con el panel de la máquina se van a cargar solas.</p>
-  <section class="grid-2" aria-label="Avisos">
-    <div class="card"><div class="row" style="justify-content:space-between;margin-bottom:6px"><h2>Más vendidos del mes</h2></div>
-      ${li(top.map(x=>`<div class="li">${img(x.p)}<div class="grow"><div class="t">${esc(x.p.nombre)}</div><div class="d">${fint(x.u)} u.</div></div><span class="num" style="font-weight:600">${fm(x.f)}</span></div>`), "Todavía no hay ventas registradas este mes.")}</div>
-    <div class="card"><div class="row" style="justify-content:space-between;margin-bottom:6px"><h2>Por agotarse</h2><span class="pill ${rep.length?"p-bad":"p-ok"}">${rep.length} slots</span></div>
-      ${li(rep.slice(0,5).map(r=>{ const p = S.productos[r.pid]||{}; return `<div class="li">${img(p)}<div class="grow"><div class="t">Slot ${r.n} · ${esc(p.nombre)}</div><div class="d">${esc(r.m.nombre)} · quedan ${r.cant} de ${r.cap}</div></div><span class="pill ${r.st==="b"?"p-bad":"p-warn"}">llevar ${r.falta}</span></div>`; }), "Ningún slot está por debajo de la mitad.")}</div>
+  <div class="card"><div class="row" style="justify-content:space-between;margin-bottom:6px"><h2>Alertas</h2><span class="pill ${al.length?"p-warn":"p-ok"}">${al.length}</span></div>${alertasHTML(al.slice(0,6))}</div>
+  <section class="grid-2" aria-label="Detalle">
+    <div class="card"><h2>Más vendidos del mes</h2>${li(top.map(x=>`<div class="li">${img(x.p)}<div class="grow"><div class="t">${esc(x.p.nombre)}</div><div class="d">${fint(x.u)} u.</div></div><span class="num" style="font-weight:600">${fm(x.f)}</span></div>`), "Todavía no hay ventas registradas este mes.")}</div>
+    <div class="card"><h2>Menos vendidos del mes</h2>${li(r.n ? menos.map(x=>`<div class="li">${img(x.p)}<div class="grow"><div class="t">${esc(x.p.nombre)}</div><div class="d">${x.u ? fint(x.u) + " u." : "Sin ventas"}</div></div></div>`) : [], "Aparecen cuando haya ventas registradas.")}</div>
+    <div class="card"><div class="row" style="justify-content:space-between;margin-bottom:6px"><h2>Pronóstico: se agotan pronto</h2><span class="pill ${agot.length?"p-bad":"p-ok"}">${agot.length}</span></div>
+      ${li(agot.slice(0,5).map(x=>`<div class="li">${img(x.p)}<div class="grow"><div class="t">${esc(x.p.nombre)}</div><div class="d">${esc(x.m.nombre)} · vende ${f1(x.cons)} u./día · quedan ${x.cant}</div></div><span class="pill ${x.ds<2?"p-bad":"p-warn"}">${dur(x.ds)}</span></div>`), hayDatos() ? "Nada se agota en los próximos 3 días." : "El pronóstico aparece cuando la máquina tenga ventas registradas.")}</div>
     <div class="card"><div class="row" style="justify-content:space-between;margin-bottom:6px"><h2>Vencen pronto</h2><span class="pill ${venc.length?"p-warn":"p-ok"}">${venc.length}</span></div>
       ${li(venc.slice(0,5).map(v=>{ const p = S.productos[v.pid]||{}; return `<div class="li">${img(p)}<div class="grow"><div class="t">${esc(p.nombre)}</div><div class="d">${esc(v.lugar)} · ${v.cant} u.</div></div><span class="pill ${v.d<=1?"p-bad":"p-warn"}">${v.d<0?"vencido":v.d===0?"hoy":v.d===1?"mañana":"en "+v.d+" días"}</span></div>`; }), "Nada vence en los próximos " + c.diasVence + " días.")}</div>
-    <div class="card"><div class="row" style="justify-content:space-between;margin-bottom:6px"><h2>Margen bajo (menos de 25%)</h2><span class="pill ${bajos.length?"p-warn":"p-ok"}">${bajos.length}</span></div>
-      ${li(bajos.slice(0,5).map(x=>`<div class="li">${img(x.p)}<div class="grow"><div class="t">${esc(x.p.nombre)}</div><div class="d">Costo ${fm(costoActual(x.p))} · precio ${fm(x.p.precioVenta)}</div></div><span class="pill ${x.mm<10?"p-bad":"p-warn"}">${pct(x.mm)}</span></div>`), "Todos los productos con precio tienen 25% o más.")}</div>
     <div class="card"><div class="row" style="justify-content:space-between;margin-bottom:6px"><h2>Para comprar</h2><span class="pill ${compra.length?"p-warn":"p-ok"}">${compra.length}</span></div>
-      ${li(compra.slice(0,5).map(x=>`<div class="li">${img(x.p)}<div class="grow"><div class="t">${esc(x.p.nombre)}</div><div class="d">Faltan ${x.falta} para llenar · depósito ${x.dep}</div></div><span class="pill p-warn">comprar ${x.sug}</span></div>`), "El depósito alcanza para llenar las máquinas.")}</div>
-  </section>`;
+      ${li(compra.slice(0,5).map(x=>`<div class="li">${img(x.p)}<div class="grow"><div class="t">${esc(x.p.nombre)}</div><div class="d">Depósito ${x.dep} · faltan ${x.falta} para llenar${x.cons ? " · vende " + f1(x.cons) + "/día" : ""}</div></div><span class="pill p-warn">comprar ${x.rec}</span></div>`), "El depósito alcanza.")}</div>
+  </section>
+  <p class="muted small" style="margin:0">Las ventas se registran al contar los slots en Máquinas. Cuando conectemos la app con el panel de la máquina se van a cargar solas, venta por venta.</p>`;
+}
+const hayDatos = () => !!ventanaDias();
+
+function vVentas(){
+  const evs = eventos(), ym = mesDe(UI.vmes), ymAnt = mesDe(UI.vmes - 1), esActual = UI.vmes === 0, dia = esActual ? new Date().getDate() : 31;
+  const em = delMes(evs, ym), ea = delMes(evs, ymAnt), eaComp = delMes(evs, ymAnt, dia);
+  const r = resumen(em), ra = resumen(eaComp); const maqs = maqList();
+  const seg = `<div class="seg" role="group" aria-label="Mes">${[[0,"Este mes"],[-1,"Mes anterior"]].map(([k,l])=>`<button type="button" class="${UI.vmes===k?"on":""}" data-vmes="${k}">${l}</button>`).join("")}</div>`;
+  const rentRows = maqs.map(m => { const x = resumen(em.filter(e=>e.mid===m.id)); const gf = gastosFijos(m); return {m, x, gf, real: x.gan - gf}; });
+  const porProd = {}; for (const e of em){ const x = porProd[e.pid] || {u:0,f:0,cm:0}; x.u += e.u; x.f += e.f; x.cm += (e.c ?? costoActual(S.productos[e.pid]) ?? 0)*e.u; porProd[e.pid] = x; }
+  const prodRows = Object.entries(porProd).map(([pid,x])=>({n:(S.productos[pid]||{}).nombre||"Producto borrado", v:x.f, t:fm(x.f) + " · " + fint(x.u) + " u."})).sort((a,b)=>b.v-a.v).slice(0,10);
+  const cats = {}; for (const [pid,x] of Object.entries(porProd)){ const cat = (S.productos[pid]||{}).categoria || "Otros"; const k = cats[cat] || {u:0,f:0,cm:0}; k.u += x.u; k.f += x.f; k.cm += x.cm; cats[cat] = k; }
+  const com = (cfg().comisionQR||0)/100;
+  const catRows = Object.entries(cats).map(([n,k])=>({n, u:k.u, f:k.f, gan:k.f*(1-com)-k.cm})).sort((a,b)=>b.f-a.f);
+  const hist = em.slice(0, UI.histN);
+  return `<div class="head"><div><h1>Ventas</h1><p class="muted">${nombreMes(ym)}${esActual ? " hasta hoy" : ""}</p></div><div class="row">${seg}${em.length ? `<button class="btn" type="button" data-act="csv-ventas">Descargar CSV</button>` : ""}</div></div>
+  <section class="grid-k">
+    <div class="card kpi"><div class="l">Facturación</div><div class="v num">${fm(r.f)}${delta(r.f, ra.f)}</div><div class="s">${esActual ? "vs. mismos días del mes anterior" : "vs. el mes anterior"}</div></div>
+    <div class="card kpi"><div class="l">Unidades vendidas</div><div class="v num">${fint(r.u)}${delta(r.u, ra.u)}</div><div class="s">${fint(r.n)} registros</div></div>
+    <div class="card kpi"><div class="l">Ticket promedio</div><div class="v num">${r.u ? fm(r.f/r.u) : "—"}</div><div class="s">Mes anterior: ${ra.u ? fm(ra.f/ra.u) : "—"}</div></div>
+    <div class="card kpi"><div class="l">Ganancia real</div><div class="v num">${fm(rentRows.reduce((t,x)=>t+x.real,0))}</div><div class="s">Todas las máquinas, con gastos fijos</div></div>
+  </section>
+  ${em.length || ea.length ? `
+  <div class="card"><h2>Facturación por día</h2>${barrasDia(ym, em, ea)}</div>
+  <div class="card"><h2>Rentabilidad real por máquina</h2><div class="tablebox"><table style="min-width:720px"><thead><tr><th>Máquina</th><th>Unidades</th><th>Facturación</th><th>Costo mercadería</th><th>Comisión QR</th><th>Gastos fijos</th><th>Ganancia real</th></tr></thead><tbody>
+    ${rentRows.map(x=>`<tr class="click" data-ir-maq="${esc(x.m.id)}"><td><strong>${esc(x.m.nombre)}</strong></td><td class="num">${fint(x.x.u)}</td><td class="num">${fm(x.x.f)}</td><td class="num">${fm(x.x.cm)}</td><td class="num">${fm(x.x.com)}</td><td class="num">${fm(x.gf)}</td><td class="num"><span class="pill ${x.real>=0?"p-ok":"p-bad"}">${fm(x.real)}</span></td></tr>`).join("")}
+  </tbody></table></div><p class="muted small" style="margin:8px 0 0">Ganancia real = facturación − costo de lo vendido − comisión del QR − alquiler y otros gastos del mes.</p></div>
+  <div class="grid-2">
+    <div class="card"><h2>Por producto (top 10)</h2>${prodRows.length ? hbar(prodRows) : '<p class="muted small">Sin ventas este mes.</p>'}</div>
+    <div class="card"><h2>Por máquina</h2>${hbar(rentRows.map(x=>({n:x.m.nombre, v:x.x.f, t:fm(x.x.f)})))}</div>
+  </div>
+  <div class="card"><h2>Por categoría</h2><div class="tablebox"><table style="min-width:560px"><thead><tr><th>Categoría</th><th>Unidades</th><th>Facturación</th><th>Ganancia bruta</th><th>Margen</th></tr></thead><tbody>
+    ${catRows.map(k=>`<tr><td><strong>${esc(k.n)}</strong></td><td class="num">${fint(k.u)}</td><td class="num">${fm(k.f)}</td><td class="num">${fm(k.gan)}</td><td>${pct(k.f ? k.gan/k.f*100 : null)}</td></tr>`).join("") || '<tr><td colspan="5" class="muted">Sin ventas este mes.</td></tr>'}
+  </tbody></table></div></div>
+  <div class="card"><h2>Ventas por hora</h2>${barrasHora(em)}</div>
+  <div class="card"><h2>Historial de ventas</h2><div class="tablebox"><table style="min-width:620px"><thead><tr><th>Fecha</th><th>Hora</th><th>Máquina</th><th>Producto</th><th>Unidades</th><th>Importe</th></tr></thead><tbody>
+    ${hist.map(e=>`<tr><td>${fdate(e.fecha)}</td><td class="num">${esc(e.h)}</td><td>${esc((S.maquinas[e.mid]||{}).nombre||"—")}</td><td>${esc((S.productos[e.pid]||{}).nombre||"—")}</td><td class="num">${e.u}</td><td class="num">${fm(e.f)}</td></tr>`).join("") || '<tr><td colspan="6" class="muted">Sin ventas este mes.</td></tr>'}
+  </tbody></table></div>${em.length > UI.histN ? `<div class="row" style="justify-content:center;margin-top:10px"><button class="btn" type="button" data-act="mas-hist">Ver más</button></div>` : ""}</div>`
+  : `<div class="empty">Todavía no hay ventas en ${nombreMes(ym)}. Se registran al contar los slots en Máquinas → "Contar y reponer", y cuando conectemos el panel de la máquina se van a cargar solas.</div>`}`;
 }
 
 function vProductos(){
@@ -334,85 +447,101 @@ function vPrecios(){
     return {p, st, co, mm, k: avg(st.kiosco), ch: avg(st.chino), py: avg(st.pya)}; });
   if (UI.precioFiltro === "viejo") rows = rows.filter(r => r.st.viejo > 0);
   if (UI.precioFiltro === "sin") rows = rows.filter(r => r.st.total === 0);
+  const nul = (v, dir) => v == null ? (dir > 0 ? Infinity : -Infinity) : v;
+  if (UI.orden === "margen") rows.sort((a,b)=> nul(b.mm.m,-1) - nul(a.mm.m,-1));
+  if (UI.orden === "ganancia") rows.sort((a,b)=> nul(b.mm.gan,-1) - nul(a.mm.gan,-1));
+  if (UI.orden === "costo_asc") rows.sort((a,b)=> nul(a.co,1) - nul(b.co,1));
+  if (UI.orden === "costo_desc") rows.sort((a,b)=> nul(b.co,-1) - nul(a.co,-1));
   const f = (k,l) => `<button type="button" class="${UI.precioFiltro===k?"on":""}" data-pf="${k}">${l}</button>`;
+  const ultimaAct = (r) => { const fechas = [r.st.ultima, ...(r.p.precioHist||[]).map(x=>x.fecha), ...preciosProv(r.p).map(x=>x.fecha)].filter(Boolean).sort(); return fechas.length ? fechas[fechas.length-1] : null; };
   return `<div class="head"><div><h1>Precios y competencia</h1><p class="muted">Tocá un producto para cargar precios de la competencia y probar tu precio de venta.</p></div></div>
-  <div class="fgrid"><label class="field">Buscar<input id="f-pq" type="search" value="${esc(UI.pq)}" placeholder="Nombre o marca"></label></div>
+  <div class="fgrid"><label class="field">Buscar<input id="f-pq" type="search" value="${esc(UI.pq)}" placeholder="Nombre o marca"></label>
+   <label class="field">Ordenar por<select id="f-orden">${[["nombre","Nombre"],["margen","Mejor margen real"],["ganancia","Mayor ganancia por unidad"],["costo_asc","Menor costo"],["costo_desc","Mayor costo"]].map(([k,l])=>`<option value="${k}" ${UI.orden===k?"selected":""}>${l}</option>`).join("")}</select></label></div>
   <div class="row"><div class="seg" role="group" aria-label="Filtro">${f("todos","Todos")}${f("viejo","Precios viejos")}${f("sin","Sin relevar")}</div>
-   <span class="muted small">Comisión QR ${pct(c.comisionQR)} · un precio es viejo con más de ${c.diasPrecioViejo} días</span></div>
-  <div class="card" style="padding:8px 8px 4px"><div class="tablebox"><table style="min-width:780px"><thead><tr><th>Producto</th><th>Tu costo</th><th>Tu venta</th><th>Margen</th><th>Kioscos</th><th>Chinos</th><th>PedidosYa</th><th>Relevado</th></tr></thead><tbody>
-  ${rows.length ? rows.map(r=>`<tr class="click" data-precio="${esc(r.p.id)}" tabindex="0"><td><div class="row" style="flex-wrap:nowrap;gap:10px">${img(r.p)}<strong>${esc(r.p.nombre)}</strong></div></td>
-   <td class="num">${fm(r.co)}</td><td class="num"><strong>${fm(r.p.precioVenta)}</strong></td><td><span class="pill ${r.mm.m==null?"p-info":r.mm.m<10?"p-bad":r.mm.m<25?"p-warn":"p-ok"}">${pct(r.mm.m)}</span></td>
-   <td class="num">${fm(r.k)}</td><td class="num">${fm(r.ch)}</td><td class="num">${fm(r.py)}</td><td class="small ${r.st.viejo?"":"muted"}" ${r.st.viejo?'style="color:var(--warn);font-weight:600"':""}>${r.st.total? ago(r.st.masViejo) : "sin datos"}</td></tr>`).join("") : `<tr><td colspan="8" class="muted" style="text-align:center;padding:24px">No hay productos con este filtro.</td></tr>`}
+   <span class="muted small">Margen real: después de la comisión del QR (${pct(c.comisionQR)}) · un precio es viejo con más de ${c.diasPrecioViejo} días</span></div>
+  <div class="card" style="padding:8px 8px 4px"><div class="tablebox"><table style="min-width:900px"><thead><tr><th>Producto</th><th>Tu costo</th><th>Tu venta</th><th>Margen real</th><th>Ganás c/u</th><th>Kioscos</th><th>Chinos</th><th>PedidosYa</th><th>Última actualización</th></tr></thead><tbody>
+  ${rows.length ? rows.map(r=>{ const ua = ultimaAct(r); const vieja = ua && -days(ua) > c.diasPrecioViejo; return `<tr class="click" data-precio="${esc(r.p.id)}" tabindex="0"><td><div class="row" style="flex-wrap:nowrap;gap:10px">${img(r.p)}<strong>${esc(r.p.nombre)}</strong></div></td>
+   <td class="num">${fm(r.co)}</td><td class="num"><strong>${fm(r.p.precioVenta)}</strong></td><td><span class="pill ${r.mm.m==null?"p-info":r.mm.m<10?"p-bad":r.mm.m<25?"p-warn":"p-ok"}">${pct(r.mm.m)}</span></td><td class="num">${fm(r.mm.gan)}</td>
+   <td class="num">${fm(r.k)}</td><td class="num">${fm(r.ch)}</td><td class="num">${fm(r.py)}</td><td class="small" ${vieja?'style="color:var(--warn);font-weight:600"':""}>${ua ? fdate(ua) + " · " + ago(ua) : '<span class="muted">sin datos</span>'}</td></tr>`; }).join("") : `<tr><td colspan="9" class="muted" style="text-align:center;padding:24px">No hay productos con este filtro.</td></tr>`}
   </tbody></table></div></div>
-  <p class="muted small" style="margin:0">Kioscos y chinos: promedio de los precios cargados. PedidosYa: precio de 1 unidad.</p>`;
+  <p class="muted small" style="margin:0">Kioscos y chinos: promedio de los precios cargados. PedidosYa: precio de 1 unidad. Última actualización: el último cambio de costo, venta o competencia.</p>`;
 }
 
 function vStock(){
-  const t = UI.stockTab; const tab = (k,l) => `<button type="button" class="${t===k?"on":""}" data-st="${k}">${l}</button>`;
+  const t = UI.stockTab, c = cfg(); const tab = (k,l) => `<button type="button" class="${t===k?"on":""}" data-st="${k}">${l}</button>`;
   let body = "";
   if (t === "deposito"){
     const ps = prodList().filter(p => coincide(p, UI.q));
     body = `<div class="fgrid"><label class="field">Buscar<input id="f-q" type="search" value="${esc(UI.q)}" placeholder="Nombre o marca"></label></div>
-    <div class="card" style="padding:8px 8px 4px"><div class="tablebox"><table style="min-width:560px"><thead><tr><th>Producto</th><th>Depósito</th><th>En máquinas</th><th>Próximo vencimiento</th><th></th></tr></thead><tbody>
-    ${ps.map(p=>{ const lots = ((S.stock[p.id]||{}).lotes||[]).filter(l=>l.cantidad>0).sort((a,b)=>(a.vence||"9").localeCompare(b.vence||"9")); const dep = stockDep(p.id), mq = stockMaq(p.id), nx = lots.find(l=>l.vence);
+    <div class="card" style="padding:8px 8px 4px"><div class="tablebox"><table style="min-width:900px"><thead><tr><th>Producto</th><th>Depósito</th><th>En máquinas</th><th>Vende por día</th><th>Días de stock</th><th>Próximo vencimiento</th><th>Recomendación compra</th><th></th></tr></thead><tbody>
+    ${ps.map(p=>{ const lots = ((S.stock[p.id]||{}).lotes||[]).filter(l=>l.cantidad>0).sort((a,b)=>(a.vence||"9").localeCompare(b.vence||"9")); const dep = stockDep(p.id), mq = stockMaq(p.id), nx = lots.find(l=>l.vence), rc = recomendacion(p.id), ds = diasStock(dep + mq, rc.cons);
       return `<tr><td><div class="row" style="flex-wrap:nowrap;gap:10px">${img(p)}<strong>${esc(p.nombre)}</strong></div></td><td class="num"><strong>${dep}</strong> <span class="muted small">${lots.length>1?"("+lots.length+" lotes)":""}</span></td><td class="num">${mq}</td>
+      <td class="num">${rc.cons != null && rc.cons > 0 ? f1(rc.cons) : '<span class="muted">—</span>'}</td><td>${ds != null ? `<span class="pill ${ds<3?"p-bad":ds<7?"p-warn":"p-ok"}">${dur(ds)}</span>` : '<span class="muted">—</span>'}</td>
       <td class="small">${nx?fdate(nx.vence)+" · "+(days(nx.vence)<0?"vencido":"en "+days(nx.vence)+" días"):'<span class="muted">—</span>'}</td>
+      <td>${rc.rec > 0 ? `<span class="pill p-warn">comprar ${rc.rec}</span>` : '<span class="pill p-ok">alcanza</span>'}</td>
       <td style="text-align:right">${S.ro?"":`<button class="btn sm" type="button" data-lotes="${esc(p.id)}">Lotes</button>`}</td></tr>`; }).join("")}
-    </tbody></table></div></div>`;
+    </tbody></table></div></div>
+    <p class="muted small" style="margin:0">Recomendación de compra = lo que falta para llenar los slots + lo que se vende en ${c.diasCobertura} días − lo que hay en el depósito. Vende por día y días de stock aparecen cuando haya ventas.</p>`;
   } else if (t === "vence"){
     const v = vencimientos();
     body = v.length ? `<div class="card"><div class="list">${v.map(x=>{ const p = S.productos[x.pid]||{}; return `<div class="li">${img(p)}<div class="grow"><div class="t">${esc(p.nombre)}</div><div class="d">${esc(x.lugar)} · ${x.cant} u. · vence ${fdate(x.vence)}</div></div><span class="pill ${x.d<=1?"p-bad":"p-warn"}">${x.d<0?"vencido":x.d===0?"hoy":x.d===1?"mañana":"en "+x.d+" días"}</span></div>`; }).join("")}</div></div>`
-      : `<div class="empty">Nada vence en los próximos ${cfg().diasVence} días. Cargá la fecha de vencimiento al registrar cada compra.</div>`;
+      : `<div class="empty">Nada vence en los próximos ${c.diasVence} días. Cargá la fecha de vencimiento al registrar cada compra.</div>`;
   } else {
     const cs = compras();
     body = cs.length ? `<div class="card"><div class="row" style="justify-content:space-between;margin-bottom:8px"><h2>${cs.length} productos para comprar</h2><div class="row"><button class="btn" type="button" data-act="copiar-compras">Copiar lista</button><button class="btn" type="button" data-act="csv-compras">Descargar CSV</button></div></div>
-      <p class="muted small" style="margin:0 0 6px">Lo que falta para llenar todos los slots, menos lo que ya tenés en el depósito.</p>
-      <div class="list">${cs.map(x=>`<div class="li">${img(x.p)}<div class="grow"><div class="t">${esc(x.p.nombre)}</div><div class="d">Faltan ${x.falta} para llenar · depósito ${x.dep}${proveedorDelCosto(x.p)?" · mejor precio: "+esc(provNombre(proveedorDelCosto(x.p))):""}</div></div><span class="pill p-warn">comprar ${x.sug}</span></div>`).join("")}</div></div>`
-      : `<div class="empty">No hace falta comprar nada: el depósito alcanza para llenar las máquinas (o falta cargar la capacidad de los slots).</div>`;
+      <p class="muted small" style="margin:0 0 6px">Para llenar los slots y cubrir ${c.diasCobertura} días de ventas, menos lo que ya tenés en el depósito.</p>
+      <div class="list">${cs.map(x=>`<div class="li">${img(x.p)}<div class="grow"><div class="t">${esc(x.p.nombre)}</div><div class="d">Depósito ${x.dep} · faltan ${x.falta} para llenar${x.cons ? " · vende " + f1(x.cons) + "/día" : ""}${proveedorDelCosto(x.p)?" · mejor precio: "+esc(provNombre(proveedorDelCosto(x.p))):""}</div></div><span class="pill p-warn">comprar ${x.rec}</span></div>`).join("")}</div></div>`
+      : `<div class="empty">No hace falta comprar nada (o falta cargar la capacidad de los slots).</div>`;
   }
   return `<div class="head"><div><h1>Stock</h1><p class="muted">Depósito, vencimientos y compras</p></div>${S.ro?"":`<button class="btn pri" type="button" data-act="compra">Registrar compra</button>`}</div>
   <div class="seg" role="group" aria-label="Vista">${tab("deposito","Depósito")}${tab("vence","Vencimientos")}${tab("compras","Lista de compras")}</div>${body}`;
 }
 
 function vMaquinas(){
-  const ms = maqList(); const vm = ventasMes();
+  const ms = maqList(), evs = eventos(), ym = mesDe(0);
   if (!UI.maq || !S.maquinas[UI.maq]){
     UI.maq = null;
     return `<div class="head"><div><h1>Máquinas</h1><p class="muted">${ms.length} ${ms.length===1?"máquina":"máquinas"}</p></div>${S.ro?"":`<button class="btn pri" type="button" data-act="nueva-maq">Agregar máquina</button>`}</div>
-    ${ms.length ? `<div class="mgrid">${ms.map(m => { const rep = reposicion(m); const n = m.cantidadSlots||60; const asignados = slotsDe(m).filter(([,s])=>s.productoId).length; const v = vm.maquinas[m.id] || {u:0,f:0};
-      return `<button type="button" class="mcard" data-maq="${esc(m.id)}"><span class="n">${esc(m.nombre)}</span><span class="muted small">${esc(m.ubicacion||"")}</span>
+    ${ms.length ? `<div class="mgrid">${ms.map(m => { const rep = reposicion(m); const n = m.cantidadSlots||60; const asignados = slotsDe(m).filter(([,s])=>s.productoId).length; const x = resumen(delMes(evs, ym).filter(e=>e.mid===m.id)); const real = x.gan - gastosFijos(m);
+      return `<div class="mcard" role="button" tabindex="0" data-maq="${esc(m.id)}"><div class="row" style="justify-content:space-between;flex-wrap:nowrap"><span class="n">${esc(m.nombre)}</span>${S.ro?"":`<button class="btn ghost sm" type="button" data-edit-maq="${esc(m.id)}" aria-label="Editar ${esc(m.nombre)}">Editar</button>`}</div><span class="muted small">${esc(m.ubicacion||"")}</span>
       <div class="kv"><span class="muted">Slots</span><span class="num">${asignados} de ${n} asignados</span></div>
       <div class="kv"><span class="muted">Para reponer</span><span class="pill ${rep.length?"p-warn":"p-ok"}">${rep.reduce((t,r)=>t+r.falta,0)} u. en ${rep.length} slots</span></div>
-      <div class="kv"><span class="muted">Ventas del mes</span><span class="num">${fint(v.u)} u. · ${fm(v.f)}</span></div>
-      <div class="kv"><span class="muted">Cobro</span><span>${(m.mediosPago||[]).map(x=>x==="qr"?"QR":x==="efectivo"?"Efectivo":x==="tarjeta"?"Tarjeta":x).join(" · ")||"—"}</span></div></button>`; }).join("")}</div>`
+      <div class="kv"><span class="muted">Ventas del mes</span><span class="num">${fint(x.u)} u. · ${fm(x.f)}</span></div>
+      <div class="kv"><span class="muted">Ganancia real del mes</span><span class="num"><strong>${fm(real)}</strong></span></div></div>`; }).join("")}</div>`
       : `<div class="empty">Todavía no hay máquinas.</div>`}`;
   }
   const m = Object.assign({id:UI.maq}, S.maquinas[UI.maq]);
-  const n = m.cantidadSlots || 60, rep = reposicion(m); const gastos = (m.alquiler||0) + (m.otrosGastos||[]).reduce((t,g)=>t+(g.monto||0),0); const v = vm.maquinas[m.id] || {u:0,f:0};
-  const slots = []; for (let i=1;i<=n;i++){ const sl = (m.slots||{})[i] || {}; const p = sl.productoId ? S.productos[sl.productoId] : null; const st = slotState(sl);
+  const n = m.cantidadSlots || 60, rep = reposicion(m), gf = gastosFijos(m);
+  const x = resumen(delMes(evs, ym).filter(e=>e.mid===m.id)), xa = resumen(delMes(evs, mesDe(-1), new Date().getDate()).filter(e=>e.mid===m.id));
+  const pron = []; const vistos = new Set(); for (const [, sl] of slotsDe(m)) if (sl.productoId && !vistos.has(sl.productoId)){ vistos.add(sl.productoId); const cant = stockMaq(sl.productoId, m.id), cons = consumo(sl.productoId, m.id); if (cons > 0) pron.push({p:S.productos[sl.productoId]||{}, cant, cons, ds: diasStock(cant, cons), slots: slotsDe(m).filter(([,s])=>s.productoId===sl.productoId).map(([k])=>k)}); }
+  pron.sort((a,b)=>a.ds-b.ds);
+  const slots = []; for (let i=1;i<=n;i++){ const sl = (m.slots||{})[i] || {}; const p = sl.productoId ? S.productos[sl.productoId] : null; const st = slotState(sl); const cons = p ? consumo(sl.productoId, m.id) : null; const ds = p ? diasStock(stockMaq(sl.productoId, m.id), cons) : null;
     slots.push(`<button type="button" class="slot" data-slot="${i}" aria-label="Slot ${i}${p?": "+esc(p.nombre):" vacío"}"><span class="no">Slot ${i}</span>${p?img(p,""):`<div class="ph" aria-hidden="true">vacío</div>`}<span class="nm">${p?esc(p.nombre):'<span class="muted">Sin asignar</span>'}</span>
-    ${p && sl.capacidad ? `<span class="small num">${sl.cantidad||0}/${sl.capacidad}</span><div class="bar ${st||""}"><i style="width:${Math.min(100,Math.round((sl.cantidad||0)/sl.capacidad*100))}%"></i></div>` : ""}</button>`); }
+    ${p && sl.capacidad ? `<span class="small num">${sl.cantidad||0}/${sl.capacidad}${ds != null ? " · " + dur(ds) : ""}</span><div class="bar ${st||""}"><i style="width:${Math.min(100,Math.round((sl.cantidad||0)/sl.capacidad*100))}%"></i></div>` : ""}</button>`); }
   return `<button type="button" class="back" data-act="volver-maq">← Todas las máquinas</button>
-  <div class="head"><div><h1>${esc(m.nombre)}</h1><p class="muted">${esc(m.ubicacion||"")}</p></div><div class="row">${S.ro?"":`<button class="btn" type="button" data-act="editar-maq">Datos y gastos</button>`}</div></div>
-  <section class="grid-k"><div class="card kpi"><div class="l">Ventas del mes</div><div class="v num">${fm(v.f)}</div><div class="s">${fint(v.u)} u. vendidas</div></div>
-   <div class="card kpi"><div class="l">Gastos fijos por mes</div><div class="v num">${fm(gastos)}</div><div class="s">Alquiler ${m.alquiler!=null?fm(m.alquiler):"a definir"}</div></div>
+  <div class="head"><div><h1>${esc(m.nombre)}</h1><p class="muted">${esc(m.ubicacion||"")}</p></div><div class="row">${S.ro?"":`<button class="btn" type="button" data-act="editar-maq">Editar nombre y datos</button><button class="btn" type="button" data-act="contar">Contar y reponer</button><button class="btn pri" type="button" data-act="preparar">Preparar reposición</button>`}</div></div>
+  <section class="grid-k"><div class="card kpi"><div class="l">Ventas del mes</div><div class="v num">${fm(x.f)}${delta(x.f, xa.f)}</div><div class="s">${fint(x.u)} u. · ticket ${x.u ? fm(x.f/x.u) : "—"}</div></div>
+   <div class="card kpi"><div class="l">Rentabilidad real del mes</div><div class="v num">${fm(x.gan - gf)}</div><div class="s">Costo ${fm(x.cm)} · QR ${fm(x.com)} · gastos ${fm(gf)}</div></div>
    <div class="card kpi"><div class="l">Para reponer</div><div class="v num">${rep.reduce((t,r)=>t+r.falta,0)} u.</div><div class="s">en ${rep.length} slots · ${n} slots en total</div></div></section>
-  <div class="card"><div class="row" style="justify-content:space-between;margin-bottom:6px"><h2>Lista de reposición</h2>${rep.length && !S.ro?`<div class="row"><button class="btn" type="button" data-act="copiar-repo">Copiar</button><button class="btn pri" type="button" data-act="reponer-todo">Marcar todo como repuesto</button></div>`:""}</div>
-   ${rep.length ? `<div class="list">${rep.map(r=>{ const p = S.productos[r.pid]||{}; const dep = stockDep(r.pid); return `<div class="li">${img(p)}<div class="grow"><div class="t">Slot ${r.n} · ${esc(p.nombre)}</div><div class="d">Quedan ${r.cant} de ${r.cap} · en depósito ${dep}${dep<r.falta?' <strong style="color:var(--warn)">(no alcanza)</strong>':""}</div></div><span class="pill ${r.st==="b"?"p-bad":r.st==="w"?"p-warn":"p-info"}">llevar ${r.falta}</span></div>`; }).join("")}</div>`
-     : `<p class="muted small" style="margin:0">Todos los slots están llenos (o falta cargar la capacidad de cada slot).</p>`}</div>
-  <div class="card"><div class="row" style="justify-content:space-between;margin-bottom:10px"><h2>Slots</h2><span class="muted small">Tocá un slot para contar lo que quedó, reponer o cambiar el producto</span></div><div class="slots">${slots.join("")}</div></div>`;
+  <div class="card"><div class="row" style="justify-content:space-between;margin-bottom:6px"><h2>Pronóstico de stock</h2><span class="muted small">Según lo vendido en los últimos ${ventanaDias() || 0} días</span></div>
+   ${pron.length ? `<div class="list">${pron.slice(0,12).map(x=>`<div class="li">${img(x.p)}<div class="grow"><div class="t">${esc(x.p.nombre)} <span class="muted small">· slot ${x.slots.join(", ")}</span></div><div class="d">Vende ${f1(x.cons)} u./día · quedan ${x.cant}</div></div><span class="pill ${x.ds<2?"p-bad":x.ds<4?"p-warn":"p-ok"}">${dur(x.ds)}</span></div>`).join("")}</div>`
+     : `<p class="muted small" style="margin:0">Cuando la máquina tenga ventas registradas vas a ver cuántas unidades vende por día cada producto y para cuántos días le queda stock.</p>`}</div>
+  <div class="card"><div class="row" style="justify-content:space-between;margin-bottom:10px"><h2>Slots</h2><span class="muted small">Tocá un slot para cambiar el producto, la capacidad o la cantidad</span></div><div class="slots">${slots.join("")}</div></div>`;
 }
 
 function vAjustes(){
   const c = cfg(); const comps = Object.entries(S.competidores).sort((a,b)=>(a[1].nombre||"").localeCompare(b[1].nombre||"")); const provs = Object.entries(S.proveedores).sort((a,b)=>(a[1].nombre||"").localeCompare(b[1].nombre||""));
   const cuenta = (pid) => prodList().filter(p => p.proveedores && p.proveedores[pid] && p.proveedores[pid].costoUnit != null).length;
-  return `<div class="head"><div><h1>Ajustes</h1><p class="muted">Cálculos, proveedores y competidores</p></div></div>
+  return `<div class="head"><div><h1>Ajustes</h1><p class="muted">Cálculos, máquinas, proveedores y competidores</p></div></div>
   <form class="card" id="f-cfg"><h2>Cálculos</h2><div class="fgrid" style="margin-top:10px">
    <label class="field">Comisión del cobro con QR (%)<input id="c-com" inputmode="decimal" value="${esc(c.comisionQR)}"></label>
-   <label class="field">Precio de competencia viejo después de (días)<input id="c-vie" inputmode="numeric" value="${esc(c.diasPrecioViejo)}"></label>
-   <label class="field">Avisar vencimientos con (días)<input id="c-ven" inputmode="numeric" value="${esc(c.diasVence)}"></label></div>
-   <p class="muted small">La comisión de Mercado Pago depende de tu plan y del plazo de acreditación: fijate el porcentaje en tu cuenta.</p>
+   <label class="field">Precio viejo después de (días)<input id="c-vie" inputmode="numeric" value="${esc(c.diasPrecioViejo)}"></label>
+   <label class="field">Avisar vencimientos con (días)<input id="c-ven" inputmode="numeric" value="${esc(c.diasVence)}"></label>
+   <label class="field">Comprar para cubrir (días de venta)<input id="c-cob" inputmode="numeric" value="${esc(c.diasCobertura)}"></label>
+   <label class="field">Cada cuántos días reponés<input id="c-rep" inputmode="numeric" value="${esc(c.diasReposicion)}"></label></div>
+   <p class="muted small">La comisión de Mercado Pago depende de tu plan y del plazo de acreditación: fijate el porcentaje en tu cuenta. "Cada cuántos días reponés" se usa para avisarte cuando un slot se vacía antes de la próxima visita.</p>
    ${S.ro?"":`<div class="row" style="justify-content:flex-end"><button class="btn pri" type="submit">Guardar</button></div>`}</form>
+  <div class="card"><h2>Máquinas</h2><div class="list">${maqList().map(m=>`<div class="li"><div class="grow"><div class="t">${esc(m.nombre)}</div><div class="d">${esc(m.ubicacion||"")} · ${m.cantidadSlots||60} slots</div></div>${S.ro?"":`<button class="btn sm" type="button" data-edit-maq="${esc(m.id)}">Editar nombre y datos</button>`}</div>`).join("") || '<p class="muted small">Sin máquinas.</p>'}</div></div>
   <div class="grid-2">
    <div class="card"><h2>Proveedores</h2><p class="muted small" style="margin:0 0 6px">Cargá la lista de precios de un proveedor de una vez, solo con los productos que te cotizó.</p><div class="list">${provs.map(([id,x])=>`<div class="li"><div class="grow"><div class="t">${esc(x.nombre)}</div><div class="d">${cuenta(id)} productos con precio</div></div>${S.ro?"":`<button class="btn sm" type="button" data-lista-prov="${esc(id)}">Cargar precios</button><button class="btn ghost danger sm" type="button" data-del-prov="${esc(id)}" aria-label="Borrar ${esc(x.nombre)}">Borrar</button>`}</div>`).join("") || '<p class="muted small">Sin proveedores todavía.</p>'}</div>
     ${S.ro?"":`<form id="f-prov" class="fgrid" style="margin-top:10px"><label class="field">Nombre<input id="n-prov" required placeholder="Ej.: Masmelos"></label><div class="field" style="justify-content:flex-end"><button class="btn" type="submit">Agregar</button></div></form>`}</div>
@@ -428,19 +557,24 @@ function bindView(){
   const v = $("#view");
   bindSearch("#f-q","q"); bindSearch("#f-pq","pq");
   const cat = $("#f-cat"); if (cat) cat.addEventListener("change", e => { UI.cat = e.target.value; render(); });
+  const ord = $("#f-orden"); if (ord) ord.addEventListener("change", e => { UI.orden = e.target.value; render(); });
   v.querySelectorAll("[data-prod]").forEach(b => b.addEventListener("click", () => openProducto(b.dataset.prod)));
   v.querySelectorAll("[data-precio]").forEach(b => { b.addEventListener("click", () => openPrecio(b.dataset.precio)); b.addEventListener("keydown", e => { if (e.key==="Enter") openPrecio(b.dataset.precio); }); });
   v.querySelectorAll("[data-pf]").forEach(b => b.addEventListener("click", () => { UI.precioFiltro = b.dataset.pf; render(); }));
   v.querySelectorAll("[data-st]").forEach(b => b.addEventListener("click", () => { UI.stockTab = b.dataset.st; render(); }));
+  v.querySelectorAll("[data-vmes]").forEach(b => b.addEventListener("click", () => { UI.vmes = +b.dataset.vmes; UI.histN = 40; render(); }));
   v.querySelectorAll("[data-go-stock]").forEach(b => b.addEventListener("click", () => { UI.stockTab = b.dataset.goStock; }));
   v.querySelectorAll("[data-lotes]").forEach(b => b.addEventListener("click", () => openLotes(b.dataset.lotes)));
-  v.querySelectorAll("[data-maq]").forEach(b => b.addEventListener("click", () => { UI.maq = b.dataset.maq; render(); window.scrollTo(0,0); }));
+  const irMaq = (id) => { UI.maq = id; if (route !== "maquinas"){ location.hash = "maquinas"; } else { render(); window.scrollTo(0,0); } };
+  v.querySelectorAll("[data-maq]").forEach(b => { b.addEventListener("click", (e) => { if (e.target.closest("[data-edit-maq]")) return; irMaq(b.dataset.maq); }); b.addEventListener("keydown", e => { if (e.key === "Enter" && e.target === b) irMaq(b.dataset.maq); }); });
+  v.querySelectorAll("[data-ir-maq]").forEach(b => b.addEventListener("click", () => { const id = b.dataset.irMaq; location.hash = "maquinas"; setTimeout(()=>{ UI.maq = id; render(); }, 0); }));
+  v.querySelectorAll("[data-edit-maq]").forEach(b => b.addEventListener("click", (e) => { e.stopPropagation(); openMaquina(b.dataset.editMaq); }));
   v.querySelectorAll("[data-slot]").forEach(b => b.addEventListener("click", () => openSlot(UI.maq, b.dataset.slot)));
   v.querySelectorAll("[data-lista-prov]").forEach(b => b.addEventListener("click", () => openListaProveedor(b.dataset.listaProv)));
   v.querySelectorAll("[data-del-comp]").forEach(b => b.addEventListener("click", () => confirmar("¿Borrar este competidor? Sus precios cargados dejan de contar.", () => del("competidores/"+b.dataset.delComp, "Competidor borrado"))));
   v.querySelectorAll("[data-del-prov]").forEach(b => b.addEventListener("click", () => confirmar("¿Borrar este proveedor? Sus precios dejan de aparecer.", () => del("proveedores/"+b.dataset.delProv, "Proveedor borrado"))));
   v.querySelectorAll("[data-act]").forEach(b => b.addEventListener("click", () => acciones[b.dataset.act] && acciones[b.dataset.act]()));
-  const fc = $("#f-cfg"); if (fc) fc.addEventListener("submit", e => { e.preventDefault(); save("config/general", { comisionQR: num($("#c-com").value) ?? 0, diasPrecioViejo: num($("#c-vie").value) ?? 45, diasVence: num($("#c-ven").value) ?? 7 }, "Ajustes guardados"); });
+  const fc = $("#f-cfg"); if (fc) fc.addEventListener("submit", e => { e.preventDefault(); save("config/general", { comisionQR: num($("#c-com").value) ?? 0, diasPrecioViejo: num($("#c-vie").value) ?? 45, diasVence: num($("#c-ven").value) ?? 7, diasCobertura: num($("#c-cob").value) ?? 7, diasReposicion: num($("#c-rep").value) ?? 3 }, "Ajustes guardados"); });
   const fcp = $("#f-comp"); if (fcp) fcp.addEventListener("submit", e => { e.preventDefault(); const n = $("#n-comp").value.trim(); if (!n) return; save("competidores/"+uid(), {nombre:n, tipo:$("#t-comp").value}, "Competidor agregado"); });
   const fpv = $("#f-prov"); if (fpv) fpv.addEventListener("submit", e => { e.preventDefault(); const n = $("#n-prov").value.trim(); if (!n) return; save("proveedores/"+uid(), {nombre:n}, "Proveedor agregado"); });
 }
@@ -454,10 +588,12 @@ const acciones = {
   "nueva-maq": () => openMaquina(null),
   "editar-maq": () => openMaquina(UI.maq),
   "volver-maq": () => { UI.maq = null; render(); window.scrollTo(0,0); },
-  "copiar-repo": () => { const m = S.maquinas[UI.maq]; copiar("Reposición " + m.nombre + "\n" + reposicion(m).map(r => "Slot " + r.n + ": " + ((S.productos[r.pid]||{}).nombre||"") + " x " + r.falta).join("\n")); },
-  "reponer-todo": () => confirmar("Se van a llenar todos los slots y descontar las unidades del depósito (primero las que vencen antes). Si todavía no contaste lo que quedó en cada slot, hacelo antes para que se registren las ventas. ¿Seguimos?", reponerTodo),
-  "copiar-compras": () => copiar("Lista de compras\n" + compras().map(x => x.p.nombre + ": " + x.sug).join("\n")),
-  "csv-compras": () => bajar("lista-de-compras.csv", [["Producto","Faltan para llenar","Depósito","Comprar","Mejor proveedor"], ...compras().map(x=>[x.p.nombre, x.falta, x.dep, x.sug, proveedorDelCosto(x.p) ? provNombre(proveedorDelCosto(x.p)) : ""])]),
+  "contar": () => openConteo(UI.maq),
+  "preparar": () => openPreparar(UI.maq),
+  "mas-hist": () => { UI.histN += 60; render(); },
+  "copiar-compras": () => copiar("Lista de compras\n" + compras().map(x => x.p.nombre + ": " + x.rec).join("\n")),
+  "csv-compras": () => bajar("lista-de-compras.csv", [["Producto","Depósito","Faltan para llenar","Vende por día","Comprar","Mejor proveedor"], ...compras().map(x=>[x.p.nombre, x.dep, x.falta, x.cons ? f1(x.cons) : "", x.rec, proveedorDelCosto(x.p) ? provNombre(proveedorDelCosto(x.p)) : ""])]),
+  "csv-ventas": () => { const ym = mesDe(UI.vmes); bajar("ventas-" + ym + ".csv", [["Fecha","Hora","Máquina","Producto","Categoría","Unidades","Precio","Importe","Costo unitario"], ...delMes(eventos(), ym).map(e=>[e.fecha, e.h, (S.maquinas[e.mid]||{}).nombre||"", (S.productos[e.pid]||{}).nombre||"", (S.productos[e.pid]||{}).categoria||"", e.u, Math.round(e.pv||0), Math.round(e.f), e.c==null?"":Math.round(e.c)])]); },
   "csv-prod": () => bajar("productos.csv", [["Producto","Categoría","Costo","Proveedor","Venta","Margen %","Depósito","Máquinas","Kioscos prom.","Chinos prom.","PedidosYa"], ...prodList().map(p=>{ const st = compStats(p.id), co = costoActual(p), mm = margen(p.precioVenta, co).m; const r = (x) => x==null?"":Math.round(x); const pv = proveedorDelCosto(p); return [p.nombre, p.categoria, r(co), pv?provNombre(pv):"", r(p.precioVenta), mm==null?"":Math.round(mm*10)/10, stockDep(p.id), stockMaq(p.id), r(avg(st.kiosco)), r(avg(st.chino)), r(avg(st.pya))]; })])
 };
 
@@ -481,7 +617,6 @@ function setPrecioProveedor(p, provId, precioBulto, unidadesBulto, fecha){
   return Object.assign({}, p, {proveedores: provs, costos});
 }
 
-// Producto: datos, costo (por proveedor) y venta
 function openProducto(id){
   let p = id ? Object.assign({id}, S.productos[id]) : {nombre:"", categoria:CATS[0], unidad:"g", proveedores:{}, costos:[]};
   let fotoId = p.imagen || null; let elegido = p.proveedorElegido || null; let provs = Object.assign({}, p.proveedores||{});
@@ -489,6 +624,7 @@ function openProducto(id){
     const act = (l.find(x=>x.id===elegido) || l[0]).id;
     return `<div class="list">${l.map((x,i)=>`<label class="li radio"><input type="radio" name="p-eleg" value="${esc(x.id)}" ${x.id===act?"checked":""} ${S.ro?"disabled":""}><div class="grow"><div class="t">${esc(provNombre(x.id))} ${i===0?'<span class="pill p-ok">más barato</span>':""}</div><div class="d">${fdate(x.fecha)}${x.unidadesBulto>1?" · bulto de "+x.unidadesBulto+" a "+fm(x.precioBulto):""}</div></div><strong class="num">${fm(x.costoUnit)} c/u</strong></label>`).join("")}</div>
       <p class="muted small" style="margin:6px 0 0">El proveedor marcado es el que se usa como costo para calcular el margen.</p>`; };
+  const histC = (p.costos||[]).slice().reverse().slice(0,10), histV = (p.precioHist||[]).slice().reverse().slice(0,10);
   const body = `
    <div class="row" style="flex-wrap:nowrap;align-items:flex-start"><div id="foto-prev">${img(p,"thumb lg")}</div><div class="grow" style="flex:1;min-width:0">
      <label class="field">Nombre<input id="p-nom" value="${esc(p.nombre)}" required></label>
@@ -509,13 +645,16 @@ function openProducto(id){
    <div class="card"><p class="sec-t">2 · Precio de venta</p>
      <label class="field">Tu precio de venta en la máquina ($)<input id="p-pre" inputmode="decimal" value="${esc(p.precioVenta)}"></label>
      <div class="sim" id="p-sim" style="margin-top:10px"></div>
-     <p class="muted small" style="margin:8px 0 0">Para comparar con la competencia, usá la sección Precios.</p>
-   </div>`;
+   </div>
+   ${id ? `<div class="card"><p class="sec-t">Historial de precios</p><div class="grid-2" style="gap:16px">
+     <div><h3 style="margin-bottom:4px">Costo de compra</h3>${histC.length ? `<div class="list">${histC.map(h=>`<div class="li"><div class="grow"><div class="t num">${fm(h.costoUnit)} c/u</div><div class="d">${fdate(h.fecha)} · ${esc(provNombre(h.proveedorId))}</div></div></div>`).join("")}</div>` : '<p class="muted small" style="margin:0">Sin registros.</p>'}</div>
+     <div><h3 style="margin-bottom:4px">Precio de venta</h3>${histV.length ? `<div class="list">${histV.map(h=>`<div class="li"><div class="grow"><div class="t num">${fm(h.precio)}</div><div class="d">${fdate(h.fecha)}</div></div></div>`).join("")}</div>` : '<p class="muted small" style="margin:0">Sin cambios registrados todavía.</p>'}</div>
+   </div></div>` : ""}`;
   const foot = S.ro ? `<button class="btn" type="button" data-close>Cerrar</button>` : `${id?`<button class="btn ghost danger" type="button" id="p-del">Borrar</button>`:""}<button class="btn" type="button" data-close>Cancelar</button><button class="btn pri" type="button" id="p-ok">Guardar</button>`;
   openDrawer(id ? p.nombre : "Nuevo producto", body, foot, (d, close) => {
     const costoSel = () => { const l = preciosProv({proveedores:provs}); if (!l.length) return null; return (l.find(x=>x.id===elegido) || l[0]).costoUnit; };
     const sim = () => { const mm = margen(num($("#p-pre", d).value), costoSel()); const box = (l,v) => `<div class="box"><div class="l">${l}</div><div class="v num">${v}</div></div>`;
-      $("#p-sim", d).innerHTML = box("Costo usado", fm(costoSel())) + box("Ganás por unidad", fm(mm.gan)) + box("Margen", pct(mm.m)); };
+      $("#p-sim", d).innerHTML = box("Costo usado", fm(costoSel())) + box("Ganás por unidad", fm(mm.gan)) + box("Margen real", pct(mm.m)); };
     const bindRadios = () => d.querySelectorAll('[name="p-eleg"]').forEach(r => r.addEventListener("change", () => { elegido = r.value; sim(); }));
     $("#p-pre", d).addEventListener("input", sim); sim(); bindRadios();
     const add = $("#c-add", d); if (add) add.addEventListener("click", () => { const bul = num($("#c-bul", d).value), un = num($("#c-uni", d).value) || 1, pv = $("#c-prov", d).value;
@@ -528,15 +667,14 @@ function openProducto(id){
     const dl = $("#p-del", d); if (dl) dl.addEventListener("click", () => { close(); confirmar("¿Borrar " + p.nombre + "? Se borran también su stock y sus precios de competencia.", async () => { await del("productos/"+id); await del("stock/"+id); await del("relev/"+id, "Producto borrado"); }); });
     const ok = $("#p-ok", d); if (ok) ok.addEventListener("click", async () => {
       const nombre = $("#p-nom", d).value.trim(); if (!nombre){ toast("Falta el nombre"); return; }
-      const data = Object.assign(strip(p), { nombre, marca: $("#p-mar", d).value.trim() || null, categoria: $("#p-cat", d).value, contenido: num($("#p-cont", d).value), unidad: $("#p-uni", d).value,
-        ean: $("#p-ean", d).value.trim() || null, precioVenta: num($("#p-pre", d).value), imagen: fotoId, proveedores: provs, proveedorElegido: elegido });
+      const data = Object.assign(conPrecioHist(p, num($("#p-pre", d).value)), { nombre, marca: $("#p-mar", d).value.trim() || null, categoria: $("#p-cat", d).value, contenido: num($("#p-cont", d).value), unidad: $("#p-uni", d).value,
+        ean: $("#p-ean", d).value.trim() || null, imagen: fotoId, proveedores: provs, proveedorElegido: elegido });
       delete data.stockMinimo; delete data.stockObjetivo;
       if (await save("productos/" + (id || uid()), data, "Producto guardado")) close();
     });
   });
 }
 
-// Lista de precios de un proveedor: cargar varios productos de una vez
 function openListaProveedor(provId){
   const prov = S.proveedores[provId] || {}; let q = "";
   const filas = () => prodList().filter(p => coincide(p, q)).map(p => { const x = (p.proveedores||{})[provId] || {};
@@ -547,24 +685,24 @@ function openListaProveedor(provId){
   const cambios = {};
   openDrawer("Precios de " + (prov.nombre||""), body, `<button class="btn" type="button" data-close>Cancelar</button><button class="btn pri" type="button" id="lp-ok">Guardar precios</button>`, (d, close) => {
     const leer = () => d.querySelectorAll("[data-pid]").forEach(el => { const bul = num(el.querySelector('[data-k="bul"]').value), uni = num(el.querySelector('[data-k="uni"]').value) || 1; const pid = el.dataset.pid; const x = (S.productos[pid].proveedores||{})[provId] || {};
-      if (bul != null && (bul !== x.precioBulto || uni !== x.unidadesBulto)) cambios[pid] = {bul, uni}; else if (bul == null) delete cambios[pid]; });
+      if (bul != null && (bul !== x.precioBulto || uni !== x.unidadesBulto)) cambios[pid] = {bul, uni}; else delete cambios[pid]; });
     $("#lp-q", d).addEventListener("input", e => { leer(); q = e.target.value; $("#lp-list", d).innerHTML = filas();
       for (const [pid, c] of Object.entries(cambios)){ const el = d.querySelector(`[data-pid="${CSS.escape(pid)}"]`); if (el){ el.querySelector('[data-k="bul"]').value = c.bul; el.querySelector('[data-k="uni"]').value = c.uni; } } });
     $("#lp-ok", d).addEventListener("click", async () => { leer(); const ids = Object.keys(cambios); if (!ids.length){ toast("No cargaste ningún precio nuevo"); return; }
-      let ok = 0; for (const pid of ids){ const p = S.productos[pid]; const np = setPrecioProveedor(p, provId, cambios[pid].bul, cambios[pid].uni); delete np.id; if (await save("productos/"+pid, np)) ok++; }
+      let ok = 0; for (const pid of ids){ const np = setPrecioProveedor(S.productos[pid], provId, cambios[pid].bul, cambios[pid].uni); delete np.id; if (await save("productos/"+pid, np)) ok++; }
       toast(ok + " precios guardados de " + prov.nombre); close(); });
   });
 }
 
-// Precios de competencia de un producto + simulador
 function openPrecio(pid){
   const p = Object.assign({id:pid}, S.productos[pid]); const r = S.relev[pid] || {precios:{}, historial:[]}; const co = costoActual(p); const c = cfg();
   const comps = Object.entries(S.competidores).sort((a,b)=>(a[1].tipo+a[1].nombre).localeCompare(b[1].tipo+b[1].nombre));
   const filas = comps.map(([cid, cp]) => { const e = r.precios[cid]; if (!e || e.lista == null) return "";
     const viejo = -days(e.fecha) > c.diasPrecioViejo, otroFormato = e.contenido && p.contenido && e.contenido !== p.contenido;
+    const prev = (r.historial||[]).filter(h => h.competidorId === cid).slice(-5, -1).reverse();
     return `<div class="li"><div class="grow"><div class="t">${esc(cp.nombre)} <span class="muted small">· ${esc(TIPOS[cp.tipo]||"")}</span></div>
-      <div class="d">${fm(e.lista)} por unidad${e.envio ? " · envío " + fm(e.envio) : ""}${otroFormato ? " · formato " + e.contenido + " " + esc(p.unidad) : ""}</div>
-      <div class="d">${ago(e.fecha)}${viejo?' · <strong style="color:var(--warn)">desactualizado</strong>':""}</div></div>${S.ro?"":`<button class="btn ghost sm" type="button" data-edit-c="${esc(cid)}">Editar</button>`}</div>`; }).join("");
+      <div class="d">${fm(e.lista)} por unidad${e.envio ? " · envío " + fm(e.envio) : ""}${otroFormato ? " · formato " + e.contenido + " " + esc(p.unidad) : ""} · ${fdate(e.fecha)} (${ago(e.fecha)})${viejo?' · <strong style="color:var(--warn)">desactualizado</strong>':""}</div>
+      ${prev.length ? `<div class="d">Antes: ${prev.map(h => fm(h.lista) + " (" + fdate(h.fecha) + ")").join(" · ")}</div>` : ""}</div>${S.ro?"":`<button class="btn ghost sm" type="button" data-edit-c="${esc(cid)}">Editar</button>`}</div>`; }).join("");
   const body = `
    <div class="row" style="flex-wrap:nowrap">${img(p,"thumb lg")}<div><div style="font-weight:700">${esc(p.nombre)}</div><div class="muted small">Costo ${fm(co)} · venta actual ${fm(p.precioVenta)}</div></div></div>
    <div class="card"><h2>Probá un precio de venta</h2>
@@ -582,11 +720,11 @@ function openPrecio(pid){
   openDrawer("Precios", body, `<button class="btn" type="button" data-close>Cerrar</button>`, (d, close) => {
     const out = $("#s-out", d), inp = $("#s-pre", d); const st = compStats(pid);
     const calc = () => { const pr = num(inp.value); const mm = margen(pr, co); const box = (l,v) => `<div class="box"><div class="l">${l}</div><div class="v num">${v}</div></div>`;
-      out.innerHTML = box("Ganás por unidad", fm(mm.gan)) + box("Margen", pct(mm.m)) + box("Te queda después del QR", fm(mm.neto)) +
+      out.innerHTML = box("Ganás por unidad", fm(mm.gan)) + box("Margen real", pct(mm.m)) + box("Te queda después del QR", fm(mm.neto)) +
         box("Kioscos (promedio)", fm(avg(st.kiosco))) + box("Chinos (promedio)", fm(avg(st.chino))) + box("PedidosYa", fm(avg(st.pya))) +
         (co == null ? `<div class="box" style="grid-column:1/-1"><div class="l">Sin costo cargado: el margen aparece cuando cargues el costo en Productos.</div></div>` : ""); };
     inp.addEventListener("input", calc); calc();
-    const sv = $("#s-save", d); if (sv) sv.addEventListener("click", async () => { const pr = num(inp.value); if (pr == null){ toast("Escribí un precio"); return; } await save("productos/"+pid, Object.assign(strip(S.productos[pid] ? Object.assign({}, S.productos[pid]) : p), {precioVenta: pr}), "Precio de venta actualizado a " + fm(pr)); });
+    const sv = $("#s-save", d); if (sv) sv.addEventListener("click", async () => { const pr = num(inp.value); if (pr == null){ toast("Escribí un precio"); return; } const cur = Object.assign({}, S.productos[pid]); await save("productos/"+pid, conPrecioHist(cur, pr), "Precio de venta actualizado a " + fm(pr)); });
     const form = $("#c-form", d); if (!form) return;
     const load = (cid) => { const e = r.precios[cid]; $("#c-comp", d).value = cid; $("#c-title", d).textContent = e ? "Editar precio" : "Cargar precio"; $("#c-del", d).hidden = !e;
       $("#c-lis", d).value = e ? e.lista : ""; $("#c-env", d).value = e && e.envio ? e.envio : ""; $("#c-cont", d).value = e && e.contenido ? e.contenido : ""; $("#c-fec", d).value = today(); };
@@ -601,7 +739,6 @@ function openPrecio(pid){
   });
 }
 
-// Compra = ingreso de stock con costo y vencimiento
 function openCompra(pid){
   const body = `<div class="fgrid">
     <label class="field" style="grid-column:1/-1">Producto<select id="k-prod">${prodList().map(p=>`<option value="${esc(p.id)}" ${p.id===pid?"selected":""}>${esc(p.nombre)}</option>`).join("")}</select></label>
@@ -637,48 +774,86 @@ function sacarDeposito(stock, pid, cant){ const s = stock[pid]; const lotes = ((
   let falta = cant, venceMin = null; for (const l of lotes){ if (falta<=0) break; const t = Math.min(l.cantidad, falta); if (t>0){ l.cantidad -= t; falta -= t; if (l.vence && (!venceMin || l.vence < venceMin)) venceMin = l.vence; } }
   return {lotes: lotes.filter(l=>l.cantidad>0), sacado: cant - falta, venceMin}; }
 
+// Aplica un conteo de toda la máquina: registra ventas y, si se pide, repone hasta llenar
+async function aplicarConteo(mid, quedan, reponer){
+  const m = JSON.parse(JSON.stringify(S.maquinas[mid])); const stock = JSON.parse(JSON.stringify(S.stock)); const ventas = []; const tocados = new Set(); let repuestas = 0, cortos = 0;
+  for (const [n, sl] of slotsDe(m)){ if (!sl.productoId) continue;
+    if (quedan[n] != null){ const q = quedan[n]; if ((sl.cantidad||0) > q) ventas.push({mid, pid: sl.productoId, u: (sl.cantidad||0) - q}); sl.cantidad = q; }
+    if (reponer && sl.capacidad && sl.cantidad < sl.capacidad){ const need = sl.capacidad - sl.cantidad; const x = sacarDeposito(stock, sl.productoId, need); stock[sl.productoId] = {lotes: x.lotes}; tocados.add(sl.productoId);
+      sl.cantidad += x.sacado; repuestas += x.sacado; if (x.sacado < need) cortos++; if (x.venceMin && (!sl.vence || x.venceMin < sl.vence)) sl.vence = x.venceMin; } }
+  const agrupadas = {}; for (const v of ventas){ agrupadas[v.pid] = agrupadas[v.pid] || {mid, pid: v.pid, u: 0}; agrupadas[v.pid].u += v.u; }
+  await registrarVentas(Object.values(agrupadas));
+  for (const pid of tocados) await save("stock/"+pid, stock[pid]);
+  const vend = ventas.reduce((t,v)=>t+v.u,0);
+  await save("maquinas/"+mid, m, (vend ? vend + " vendidas registradas" : "Conteo guardado") + (reponer ? " · repuestas " + repuestas + " u." + (cortos ? " (" + cortos + " slots quedaron cortos)" : "") : ""));
+}
+function openConteo(mid){
+  const m = S.maquinas[mid]; const filas = slotsDe(m).filter(([,s])=>s.productoId).sort((a,b)=>a[0]-b[0]);
+  const body = `<p class="muted small" style="margin:0">Escribí cuántas unidades quedan en cada slot. La diferencia con la última carga se registra como venta, con la fecha y hora de ahora.</p>
+   <div>${filas.map(([n,s])=>{ const p = S.productos[s.productoId]||{}; return `<div class="cnt">${img(p)}<div style="min-width:0"><div style="font-weight:600;font-size:14px">Slot ${n} · ${esc(p.nombre)}</div><div class="small muted">Había ${s.cantidad||0}${s.capacidad?" de "+s.capacidad:""}</div></div><input data-n="${n}" inputmode="numeric" value="${esc(s.cantidad||0)}" aria-label="Quedan en slot ${n}"></div>`; }).join("") || '<p class="muted">No hay slots con producto asignado.</p>'}</div>`;
+  openDrawer("Contar y reponer · " + m.nombre, body, `<button class="btn" type="button" data-close>Cancelar</button><button class="btn" type="button" id="cn-ok">Guardar conteo</button><button class="btn pri" type="button" id="cn-rep">Guardar y reponer todo</button>`, (d, close) => {
+    const leer = () => { const q = {}; d.querySelectorAll("[data-n]").forEach(i => { const v = num(i.value); if (v != null) q[i.dataset.n] = Math.max(0, v); }); return q; };
+    d.querySelectorAll("[data-n]").forEach(i => i.addEventListener("focus", () => i.select()));
+    $("#cn-ok", d).addEventListener("click", async () => { const q = leer(); close(); await aplicarConteo(mid, q, false); });
+    $("#cn-rep", d).addEventListener("click", async () => { const q = leer(); close(); await aplicarConteo(mid, q, true); });
+  });
+}
+function openPreparar(mid){
+  const m = S.maquinas[mid]; const tot = {}; for (const r of reposicion(m)){ tot[r.pid] = tot[r.pid] || {u:0, slots:[]}; tot[r.pid].u += r.falta; tot[r.pid].slots.push(r.n); }
+  const items = Object.entries(tot).map(([pid,x])=>({p:S.productos[pid]||{}, pid, u:x.u, slots:x.slots, dep: stockDep(pid)})).sort((a,b)=>(a.p.nombre||"").localeCompare(b.p.nombre||"","es"));
+  const corto = (n) => String(n||"").replace(/\s+\d+([.,]\d+)?\s*(ml|g|grs|gr|lts?|cc)\b.*$/i, "").trim();
+  const texto = items.map(x => corto(x.p.nombre) + " " + x.u).join(" | ");
+  const body = items.length ? `<p class="muted small" style="margin:0">Lo que tenés que llevar para dejar ${esc(m.nombre)} llena, según lo que quedó la última vez que contaste.</p>
+    <div class="reptxt" id="rp-txt">${esc(texto)}</div>
+    <div class="list">${items.map(x=>`<div class="li">${img(x.p)}<div class="grow"><div class="t">${esc(x.p.nombre)}</div><div class="d">Slot ${x.slots.join(", ")} · en depósito ${x.dep}${x.dep < x.u ? ' <strong style="color:var(--warn)">(no alcanza)</strong>' : ""}</div></div><span class="pill p-warn">${x.u}</span></div>`).join("")}</div>
+    <p class="muted small" style="margin:0">Total: ${items.reduce((t,x)=>t+x.u,0)} unidades de ${items.length} productos.</p>`
+    : `<div class="empty">No hay nada para reponer: todos los slots están llenos, o falta cargar la capacidad de cada slot.</div>`;
+  openDrawer("Preparar reposición · " + m.nombre, body, items.length ? `<button class="btn" type="button" data-close>Cerrar</button><button class="btn" type="button" id="rp-copy">Copiar lista</button><button class="btn pri" type="button" id="rp-ok">Ya repuse todo</button>` : `<button class="btn" type="button" data-close>Cerrar</button>`, (d, close) => {
+    const cp = $("#rp-copy", d); if (cp) cp.addEventListener("click", () => copiar("Reposición " + m.nombre + "\n" + texto));
+    const ok = $("#rp-ok", d); if (ok) ok.addEventListener("click", async () => { close(); await aplicarConteo(mid, {}, true); });
+  });
+}
+
 function openSlot(mid, n){
   const m = S.maquinas[mid]; const sl = Object.assign({}, (m.slots||{})[n]); const p = sl.productoId ? S.productos[sl.productoId] : null;
+  const cons = p ? consumo(sl.productoId, mid) : null;
   const body = `<div class="fgrid"><label class="field" style="grid-column:1/-1">Producto<select id="o-prod"><option value="">Vacío</option>${prodList().map(x=>`<option value="${esc(x.id)}" ${x.id===sl.productoId?"selected":""}>${esc(x.nombre)}</option>`).join("")}</select></label>
    <label class="field">Capacidad (u.)<input id="o-cap" inputmode="numeric" value="${esc(sl.capacidad)}"></label><label class="field">Quedan ahora (u.)<input id="o-can" inputmode="numeric" value="${esc(sl.cantidad ?? 0)}"></label>
    <label class="field">Vence (el más próximo)<input id="o-ven" type="date" value="${esc(sl.vence||"")}"></label></div>
-   <div class="notice">Al contar lo que quedó, la diferencia con la última carga (${sl.cantidad ?? 0} u.) se registra como venta${p && p.precioVenta ? " a " + fm(p.precioVenta) + " c/u" : ""}.${p ? " En depósito hay " + stockDep(sl.productoId) + " u." : ""}</div>`;
+   ${cons > 0 ? `<div class="notice">Este producto vende ${f1(cons)} u./día en ${esc(m.nombre)} · ${dur(diasStock(stockMaq(sl.productoId, mid), cons))}.${sl.capacidad ? " Lleno dura ≈ " + f1(sl.capacidad/cons) + " días." : ""}</div>` : ""}
+   <div class="notice">Si bajás la cantidad, la diferencia se registra como venta. ${p ? "En depósito hay " + stockDep(sl.productoId) + " u." : ""}</div>`;
   openDrawer(m.nombre + " · slot " + n, body, S.ro ? `<button class="btn" type="button" data-close>Cerrar</button>` : `<button class="btn" type="button" data-close>Cancelar</button><button class="btn" type="button" id="o-fill">Reponer hasta llenar</button><button class="btn pri" type="button" id="o-ok">Guardar</button>`, (d, close) => {
     const leer = () => ({productoId: $("#o-prod",d).value || null, capacidad: num($("#o-cap",d).value), cantidad: num($("#o-can",d).value) || 0, vence: $("#o-ven",d).value || null});
     const vendidas = (x) => (x.productoId && x.productoId === sl.productoId && (sl.cantidad||0) > x.cantidad) ? (sl.cantidad||0) - x.cantidad : 0;
     const guardar = async (nsl, msg) => { const cur = S.maquinas[mid]; const slots = Object.assign({}, cur.slots||{}); if (nsl.productoId) slots[n] = nsl; else delete slots[n]; return save("maquinas/"+mid, Object.assign({}, cur, {slots}), msg); };
-    const ok = $("#o-ok", d); if (ok) ok.addEventListener("click", async () => { const x = leer(); const v = vendidas(x); await registrarVenta(mid, x.productoId, v);
+    const ok = $("#o-ok", d); if (ok) ok.addEventListener("click", async () => { const x = leer(); const v = vendidas(x); await registrarVentas([{mid, pid: x.productoId, u: v}]);
       if (await guardar(x, "Slot " + n + " guardado" + (v ? " · " + v + " vendidas" : ""))) close(); });
     const fill = $("#o-fill", d); if (fill) fill.addEventListener("click", async () => { const x = leer(); if (!x.productoId || !x.capacidad){ toast("Elegí producto y capacidad"); return; }
       const v = vendidas(x); const need = x.capacidad - x.cantidad; if (need <= 0){ toast("El slot ya está lleno"); return; }
       const r = sacarDeposito(S.stock, x.productoId, need); if (r.sacado <= 0){ toast("No hay stock en el depósito"); return; }
-      await registrarVenta(mid, x.productoId, v);
+      await registrarVentas([{mid, pid: x.productoId, u: v}]);
       x.cantidad += r.sacado; if (r.venceMin && (!x.vence || r.venceMin < x.vence)) x.vence = r.venceMin;
       await save("stock/"+x.productoId, {lotes: r.lotes}); if (await guardar(x, "Repuestas " + r.sacado + " u." + (r.sacado < need ? " (no alcanzó el depósito)" : ""))) close(); });
   });
 }
-async function reponerTodo(){ const mid = UI.maq, m = JSON.parse(JSON.stringify(S.maquinas[mid])); const stock = JSON.parse(JSON.stringify(S.stock)); let total = 0, cortos = 0; const tocados = new Set();
-  for (const r of reposicion(m)){ const x = sacarDeposito(stock, r.pid, r.falta); stock[r.pid] = {lotes: x.lotes}; tocados.add(r.pid);
-    const sl = m.slots[r.n]; sl.cantidad = (sl.cantidad||0) + x.sacado; if (x.venceMin && (!sl.vence || x.venceMin < sl.vence)) sl.vence = x.venceMin; total += x.sacado; if (x.sacado < r.falta) cortos++; }
-  for (const pid of tocados) await save("stock/"+pid, stock[pid]);
-  await save("maquinas/"+mid, m, "Repuestas " + total + " u." + (cortos ? " · " + cortos + " slots quedaron cortos" : "")); }
 
 function openMaquina(mid){
-  const m = mid ? S.maquinas[mid] : {nombre:"", ubicacion:"", cantidadSlots:60, mediosPago:["qr"], alquiler:null, otrosGastos:[], slots:{}, orden: maqList().length + 1};
+  const m = mid ? S.maquinas[mid] : {nombre:"Máquina " + (maqList().length + 1), ubicacion:"", cantidadSlots:60, mediosPago:["qr"], alquiler:null, otrosGastos:[], slots:{}, orden: maqList().length + 1};
   const gastos = (m.otrosGastos||[]).map(g=>Object.assign({},g));
   const gRow = (g,i) => `<div class="fgrid" data-g="${i}" style="align-items:end"><label class="field">Concepto<input data-k="concepto" value="${esc(g.concepto)}"></label><label class="field">Monto mensual ($)<input data-k="monto" inputmode="decimal" value="${esc(g.monto)}"></label></div>`;
   const body = `<div class="fgrid"><label class="field">Nombre<input id="m-nom" value="${esc(m.nombre)}" placeholder="Ej.: Máquina 2 · Colegio"></label><label class="field">Ubicación<input id="m-ubi" value="${esc(m.ubicacion)}"></label>
    <label class="field">Cantidad de slots<input id="m-n" inputmode="numeric" value="${esc(m.cantidadSlots||60)}"></label><label class="field">Alquiler mensual ($)<input id="m-alq" inputmode="decimal" value="${esc(m.alquiler)}" placeholder="A definir"></label></div>
    <fieldset class="card" style="margin:0"><legend class="small muted" style="padding:0 6px">Medios de pago</legend><div class="row">${[["qr","QR"],["efectivo","Efectivo"],["tarjeta","Tarjeta"]].map(([k,l])=>`<label class="row" style="gap:6px;min-height:44px"><input type="checkbox" data-mp="${k}" ${(m.mediosPago||[]).includes(k)?"checked":""}> ${l}</label>`).join("")}</div></fieldset>
    <div><h3>Otros gastos mensuales</h3><div id="m-gs" style="display:flex;flex-direction:column;gap:10px;margin-top:8px">${gastos.map(gRow).join("")}</div><button class="btn" type="button" id="m-addg" style="margin-top:10px">Agregar gasto</button></div>`;
-  openDrawer(mid ? "Datos de " + m.nombre : "Nueva máquina", body, `${mid?`<button class="btn ghost danger" type="button" id="m-del">Borrar</button>`:""}<button class="btn" type="button" data-close>Cancelar</button><button class="btn pri" type="button" id="m-ok">Guardar</button>`, (d, close) => {
+  openDrawer(mid ? "Editar " + m.nombre : "Nueva máquina", body, `${mid?`<button class="btn ghost danger" type="button" id="m-del">Borrar</button>`:""}<button class="btn" type="button" data-close>Cancelar</button><button class="btn pri" type="button" id="m-ok">Guardar</button>`, (d, close) => {
+    setTimeout(() => { const i = $("#m-nom", d); if (i){ i.focus(); i.select(); } }, 30);
     $("#m-addg", d).addEventListener("click", () => { gastos.push({concepto:"", monto:null}); const w = document.createElement("div"); w.innerHTML = gRow(gastos[gastos.length-1], gastos.length-1); $("#m-gs", d).appendChild(w.firstElementChild); });
-    const dl = $("#m-del", d); if (dl) dl.addEventListener("click", () => { close(); confirmar("¿Borrar la máquina " + m.nombre + " y su planograma?", async () => { await del("maquinas/"+mid, "Máquina borrada"); UI.maq = null; render(); }); });
+    const dl = $("#m-del", d); if (dl) dl.addEventListener("click", () => { close(); confirmar("¿Borrar la máquina " + m.nombre + " y su planograma? Sus ventas quedan en el historial.", async () => { await del("maquinas/"+mid, "Máquina borrada"); UI.maq = null; render(); }); });
     $("#m-ok", d).addEventListener("click", async () => { const nombre = $("#m-nom",d).value.trim(); if (!nombre){ toast("Falta el nombre"); return; }
       d.querySelectorAll("[data-g]").forEach(el => { const g = gastos[+el.dataset.g]; g.concepto = el.querySelector('[data-k="concepto"]').value.trim(); g.monto = num(el.querySelector('[data-k="monto"]').value); });
       const id = mid || uid(); const data = Object.assign({}, m, {nombre, ubicacion: $("#m-ubi",d).value.trim(), cantidadSlots: Math.max(1, Math.min(200, num($("#m-n",d).value) || 60)), alquiler: num($("#m-alq",d).value),
         mediosPago: [...d.querySelectorAll("[data-mp]")].filter(x=>x.checked).map(x=>x.dataset.mp), otrosGastos: gastos.filter(g=>g.concepto && g.monto!=null)});
-      if (await save("maquinas/"+id, data, "Máquina guardada")){ UI.maq = id; close(); render(); } });
+      if (await save("maquinas/"+id, data, "Máquina guardada")){ if (!mid) UI.maq = id; close(); render(); } });
   });
 }
 
@@ -700,7 +875,9 @@ const COLS = ["productos","stock","relev","competidores","proveedores","maquinas
     db.collection(col).onSnapshot(snap => { const o = {}; snap.docs.forEach(d => { if (d.exists) o[d.id] = d.data(); });
       if (col === "config") S.config = o.general || {}; else S[col] = o; listo(col); }, err);
   }
-  db.doc("ventas/" + mes()).onSnapshot(s => { S.ventas = s.exists ? s.data() : null; listo("ventas"); }, err);
+  // Ventas: documentos por día desde hace dos meses (para comparar y calcular el consumo)
+  const desde = mesDe(-2) + "-01";
+  db.collection("ventasdia").where("fecha", ">=", desde).onSnapshot(snap => { const o = {}; snap.docs.forEach(d => { if (d.exists) o[d.id] = d.data(); }); S.vdias = o; listo("ventas"); }, err);
   setRoute();
 })();
 })();
