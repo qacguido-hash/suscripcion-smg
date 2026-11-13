@@ -726,5 +726,19 @@
   "nombre_en_tienda": "",
   "imagen": "https://pampadirect.com/bon-o-bon-traditional-chocolate-bite-filled-with-chocolinas-cookies-box-of-18-bites-270-g-9-5-oz-complete-box/",
   "pagina": "https://pampadirect.com/bon-o-bon-traditional-chocolate-bite-filled-with-chocolinas-cookies-box-of-18-bites-270-g-9-5-oz-complete-box/"
+ },
+ "105_ilolay_pro_frutilla": {
+  "producto": "Yogur bebible Ilolay proteína frutilla 220 g",
+  "tienda": "dia",
+  "nombre_en_tienda": "Yogur Bebible Pro Frutilla Ilolay 220 Gr.",
+  "imagen": "https://ardiaprod.vteximg.com.br/arquivos/ids/393388/Yogur-Bebible-Pro-Frutilla-Ilolay-220-Gr-_1.jpg",
+  "pagina": "https://diaonline.supermercadosdia.com.ar/yogur-bebible-pro-frutilla-ilolay-220-gr-314797/p"
+ },
+ "106_ilolay_pro_vainilla": {
+  "producto": "Yogur bebible Ilolay proteína vainilla 220 g",
+  "tienda": "dia",
+  "nombre_en_tienda": "Yogur Bebible Pro Vainilla Ilolay 220 Gr.",
+  "imagen": "https://ardiaprod.vteximg.com.br/arquivos/ids/393390/Yogur-Bebible-Pro-Vainilla-Ilolay-220-Gr-_1.jpg",
+  "pagina": "https://diaonline.supermercadosdia.com.ar/yogur-bebible-pro-vainilla-ilolay-220-gr-314809/p"
  }
 }
