@@ -322,12 +322,12 @@ function barrasDia(ym, evs, evsAnt){
   const n = diasDelMes(ym), W = 760, H = 210, L = 46, B = 24, T = 10, cw = (W - L - 8) / n;
   const act = Array(n).fill(0), ant = Array(31).fill(0); for (const e of evs) act[+e.fecha.slice(8)-1] += e.f; for (const e of evsAnt) ant[+e.fecha.slice(8)-1] += e.f;
   const max = Math.max(1, ...act, ...ant.slice(0,n)); const y = (v) => T + (H - T - B) * (1 - v/max);
-  let s = `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Facturación por día de ${nombreMes(ym)} comparada con el mes anterior">`;
+  let s = `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Facturación por día de ${nombreMes(ym)}">`;
   for (let k=0;k<=3;k++){ const v = max*k/3, yy = y(v); s += `<line x1="${L}" x2="${W-4}" y1="${yy}" y2="${yy}" stroke="var(--line)" stroke-width="1"/><text x="${L-6}" y="${yy+4}" text-anchor="end">${v>=1000?Math.round(v/1000)+"k":Math.round(v)}</text>`; }
   for (let i=0;i<n;i++){ const x = L + i*cw; if (act[i]) s += `<rect x="${x+cw*0.15}" y="${y(act[i])}" width="${cw*0.7}" height="${H-B-y(act[i])}" rx="2" fill="var(--accent)"/>`;
     if (ant[i]) s += `<rect x="${x+cw*0.25}" y="${y(ant[i])-1.5}" width="${cw*0.5}" height="3" rx="1.5" fill="var(--fg)" opacity=".55"/>`;
     if ((i+1) % 5 === 0 || i === 0) s += `<text x="${x+cw/2}" y="${H-6}" text-anchor="middle">${i+1}</text>`; }
-  return s + `</svg><div class="legend"><span><i style="background:var(--accent)"></i>${nombreMes(ym)}</span><span><i style="background:var(--fg);opacity:.55;height:3px"></i>mismo día del mes anterior</span></div>`;
+  return s + `</svg><div class="legend"><span><i style="background:var(--accent)"></i>${nombreMes(ym)}</span>${evsAnt.length ? '<span><i style="background:var(--fg);opacity:.55;height:3px"></i>mismo día del mes anterior</span>' : ""}</div>`;
 }
 function barrasHora(evs){
   const W = 760, H = 150, L = 8, B = 22, T = 10, cw = (W - L*2) / 24; const v = Array(24).fill(0); for (const e of evs) v[+(e.h||"00").slice(0,2)] += e.u; const max = Math.max(1, ...v);
@@ -393,11 +393,35 @@ function vInicio(){
 }
 const hayDatos = () => !!ventanaDias();
 
+function vHistorial(seg){
+  const evs = eventos(), maqs = maqList(), gfTot = maqs.reduce((t,m)=>t+gastosFijos(m),0), hoy = mesDe(0);
+  const meses = []; const primero = evs.length ? evs[evs.length-1].fecha.slice(0,7) : hoy;
+  for (let k = 0; ; k--){ const ym = mesDe(k); if (ym < primero) break; meses.push({k, ym}); if (k < -120) break; }
+  const rows = meses.map(({k, ym}) => { const x = resumen(delMes(evs, ym)); return {k, ym, x, real: x.gan - gfTot, tk: x.u ? x.f/x.u : null}; });
+  rows.forEach((r, i) => { r.ant = rows[i+1] || null; });
+  const anio = (ym) => ym.slice(0,4); const nm = (ym) => { const t = nombreMes(ym); return t.charAt(0).toUpperCase() + t.slice(1) + " " + anio(ym); };
+  const tot = rows.reduce((a,r)=>({f:a.f+r.x.f, u:a.u+r.x.u, real:a.real+r.real}), {f:0,u:0,real:0});
+  const mejor = rows.filter(r=>r.x.f>0).sort((a,b)=>b.x.f-a.x.f)[0];
+  const graf = rows.slice(0,12).reverse();
+  return `<div class="head"><div><h1>Ventas</h1><p class="muted">Historial de todos los meses trabajados</p></div><div class="row">${seg}</div></div>
+  <section class="grid-k">
+    <div class="card kpi"><div class="l">Facturación total</div><div class="v num">${fm(tot.f)}</div><div class="s">${rows.length} ${rows.length===1?"mes":"meses"}</div></div>
+    <div class="card kpi"><div class="l">Unidades vendidas</div><div class="v num">${fint(tot.u)}</div></div>
+    <div class="card kpi"><div class="l">Ganancia real total</div><div class="v num">${fm(tot.real)}</div></div>
+    <div class="card kpi"><div class="l">Mejor mes</div><div class="v num">${mejor ? fm(mejor.x.f) : "—"}</div><div class="s">${mejor ? nm(mejor.ym) : "Sin ventas todavía"}</div></div>
+  </section>
+  <div class="card"><h2>Facturación por mes</h2>${hbar(graf.map(r=>({n:nm(r.ym), v:r.x.f, t:fm(r.x.f)})))}</div>
+  <div class="card"><h2>Mes a mes</h2><div class="tablebox"><table style="min-width:760px"><thead><tr><th>Mes</th><th>Facturación</th><th>vs. mes anterior</th><th>Unidades</th><th>Ticket promedio</th><th>Ganancia real</th></tr></thead><tbody>
+    ${rows.map(r=>`<tr class="click" data-vmes="${r.k}" tabindex="0"><td><strong>${nm(r.ym)}</strong>${r.k===0?' <span class="muted small">(en curso)</span>':""}</td><td class="num">${fm(r.x.f)}</td><td>${r.ant ? delta(r.x.f, r.ant.x.f) : '<span class="muted small">—</span>'}</td><td class="num">${fint(r.x.u)}</td><td class="num">${r.tk!=null ? fm(r.tk) : "—"}</td><td class="num"><span class="pill ${r.real>=0?"p-ok":"p-bad"}">${fm(r.real)}</span></td></tr>`).join("")}
+  </tbody></table></div><p class="muted small" style="margin:8px 0 0">Tocá un mes para ver el detalle. El mes en curso se compara contra el mes anterior completo, así que va a parecer más bajo hasta que termine.</p></div>`;
+}
+
 function vVentas(){
-  const evs = eventos(), ym = mesDe(UI.vmes), ymAnt = mesDe(UI.vmes - 1), esActual = UI.vmes === 0, dia = esActual ? new Date().getDate() : 31;
-  const em = delMes(evs, ym), ea = delMes(evs, ymAnt), eaComp = delMes(evs, ymAnt, dia);
-  const r = resumen(em), ra = resumen(eaComp); const maqs = maqList();
-  const seg = `<div class="seg" role="group" aria-label="Mes">${[[0,"Este mes"],[-1,"Mes anterior"]].map(([k,l])=>`<button type="button" class="${UI.vmes===k?"on":""}" data-vmes="${k}">${l}</button>`).join("")}</div>`;
+  const seg = `<div class="seg" role="group" aria-label="Vista">${[[0,"Este mes"],["hist","Historial"]].map(([k,l])=>`<button type="button" class="${(UI.vmes===k || (k==="hist" && typeof UI.vmes==="number" && UI.vmes<0))?"on":""}" data-vmes="${k}">${l}</button>`).join("")}</div>`;
+  if (UI.vmes === "hist") return vHistorial(seg);
+  const evs = eventos(), ym = mesDe(UI.vmes), esActual = UI.vmes === 0;
+  const em = delMes(evs, ym), ea = [];
+  const r = resumen(em); const maqs = maqList();
   const rentRows = maqs.map(m => { const x = resumen(em.filter(e=>e.mid===m.id)); const gf = gastosFijos(m); return {m, x, gf, real: x.gan - gf}; });
   const porProd = {}; for (const e of em){ const x = porProd[e.pid] || {u:0,f:0,cm:0}; x.u += e.u; x.f += e.f; x.cm += (e.c ?? costoActual(S.productos[e.pid]) ?? 0)*e.u; porProd[e.pid] = x; }
   const prodRows = Object.entries(porProd).map(([pid,x])=>({n:(S.productos[pid]||{}).nombre||"Producto borrado", v:x.f, t:fm(x.f) + " · " + fint(x.u) + " u."})).sort((a,b)=>b.v-a.v).slice(0,10);
@@ -405,14 +429,14 @@ function vVentas(){
   const com = (cfg().comisionQR||0)/100;
   const catRows = Object.entries(cats).map(([n,k])=>({n, u:k.u, f:k.f, gan:k.f*(1-com)-k.cm})).sort((a,b)=>b.f-a.f);
   const hist = em.slice(0, UI.histN);
-  return `<div class="head"><div><h1>Ventas</h1><p class="muted">${nombreMes(ym)}${esActual ? " hasta hoy" : ""}</p></div><div class="row">${seg}${em.length ? `<button class="btn" type="button" data-act="csv-ventas">Descargar CSV</button>` : ""}</div></div>
+  return `${esActual ? "" : `<button type="button" class="back" data-vmes="hist">← Historial</button>`}<div class="head"><div><h1>Ventas</h1><p class="muted">${nombreMes(ym)}${esActual ? " hasta hoy" : " " + ym.slice(0,4)}</p></div><div class="row">${seg}${em.length ? `<button class="btn" type="button" data-act="csv-ventas">Descargar CSV</button>` : ""}</div></div>
   <section class="grid-k">
-    <div class="card kpi"><div class="l">Facturación</div><div class="v num">${fm(r.f)}${delta(r.f, ra.f)}</div><div class="s">${esActual ? "vs. mismos días del mes anterior" : "vs. el mes anterior"}</div></div>
-    <div class="card kpi"><div class="l">Unidades vendidas</div><div class="v num">${fint(r.u)}${delta(r.u, ra.u)}</div><div class="s">${fint(r.n)} registros</div></div>
-    <div class="card kpi"><div class="l">Ticket promedio</div><div class="v num">${r.u ? fm(r.f/r.u) : "—"}</div><div class="s">Mes anterior: ${ra.u ? fm(ra.f/ra.u) : "—"}</div></div>
+    <div class="card kpi"><div class="l">Facturación</div><div class="v num">${fm(r.f)}</div><div class="s">${esActual ? "Mes en curso" : "Total del mes"}</div></div>
+    <div class="card kpi"><div class="l">Unidades vendidas</div><div class="v num">${fint(r.u)}</div><div class="s">${fint(r.n)} registros</div></div>
+    <div class="card kpi"><div class="l">Ticket promedio</div><div class="v num">${r.u ? fm(r.f/r.u) : "—"}</div><div class="s">Por unidad vendida</div></div>
     <div class="card kpi"><div class="l">Ganancia real</div><div class="v num">${fm(rentRows.reduce((t,x)=>t+x.real,0))}</div><div class="s">Todas las máquinas, con gastos fijos</div></div>
   </section>
-  ${em.length || ea.length ? `
+  ${em.length ? `
   <div class="card"><h2>Facturación por día</h2>${barrasDia(ym, em, ea)}</div>
   <div class="card"><h2>Rentabilidad real por máquina</h2><div class="tablebox"><table style="min-width:720px"><thead><tr><th>Máquina</th><th>Unidades</th><th>Facturación</th><th>Costo mercadería</th><th>Comisión QR</th><th>Gastos fijos</th><th>Ganancia real</th></tr></thead><tbody>
     ${rentRows.map(x=>`<tr class="click" data-ir-maq="${esc(x.m.id)}"><td><strong>${esc(x.m.nombre)}</strong></td><td class="num">${fint(x.x.u)}</td><td class="num">${fm(x.x.f)}</td><td class="num">${fm(x.x.cm)}</td><td class="num">${fm(x.x.com)}</td><td class="num">${fm(x.gf)}</td><td class="num"><span class="pill ${x.real>=0?"p-ok":"p-bad"}">${fm(x.real)}</span></td></tr>`).join("")}
@@ -562,7 +586,7 @@ function bindView(){
   v.querySelectorAll("[data-precio]").forEach(b => { b.addEventListener("click", () => openPrecio(b.dataset.precio)); b.addEventListener("keydown", e => { if (e.key==="Enter") openPrecio(b.dataset.precio); }); });
   v.querySelectorAll("[data-pf]").forEach(b => b.addEventListener("click", () => { UI.precioFiltro = b.dataset.pf; render(); }));
   v.querySelectorAll("[data-st]").forEach(b => b.addEventListener("click", () => { UI.stockTab = b.dataset.st; render(); }));
-  v.querySelectorAll("[data-vmes]").forEach(b => b.addEventListener("click", () => { UI.vmes = +b.dataset.vmes; UI.histN = 40; render(); }));
+  v.querySelectorAll("[data-vmes]").forEach(b => b.addEventListener("click", () => { UI.vmes = b.dataset.vmes === "hist" ? "hist" : +b.dataset.vmes; UI.histN = 40; render(); }));
   v.querySelectorAll("[data-go-stock]").forEach(b => b.addEventListener("click", () => { UI.stockTab = b.dataset.goStock; }));
   v.querySelectorAll("[data-lotes]").forEach(b => b.addEventListener("click", () => openLotes(b.dataset.lotes)));
   const irMaq = (id) => { UI.maq = id; if (route !== "maquinas"){ location.hash = "maquinas"; } else { render(); window.scrollTo(0,0); } };
@@ -593,7 +617,7 @@ const acciones = {
   "mas-hist": () => { UI.histN += 60; render(); },
   "copiar-compras": () => copiar("Lista de compras\n" + compras().map(x => x.p.nombre + ": " + x.rec).join("\n")),
   "csv-compras": () => bajar("lista-de-compras.csv", [["Producto","Depósito","Faltan para llenar","Vende por día","Comprar","Mejor proveedor"], ...compras().map(x=>[x.p.nombre, x.dep, x.falta, x.cons ? f1(x.cons) : "", x.rec, proveedorDelCosto(x.p) ? provNombre(proveedorDelCosto(x.p)) : ""])]),
-  "csv-ventas": () => { const ym = mesDe(UI.vmes); bajar("ventas-" + ym + ".csv", [["Fecha","Hora","Máquina","Producto","Categoría","Unidades","Precio","Importe","Costo unitario"], ...delMes(eventos(), ym).map(e=>[e.fecha, e.h, (S.maquinas[e.mid]||{}).nombre||"", (S.productos[e.pid]||{}).nombre||"", (S.productos[e.pid]||{}).categoria||"", e.u, Math.round(e.pv||0), Math.round(e.f), e.c==null?"":Math.round(e.c)])]); },
+  "csv-ventas": () => { const ym = mesDe(typeof UI.vmes === "number" ? UI.vmes : 0); bajar("ventas-" + ym + ".csv", [["Fecha","Hora","Máquina","Producto","Categoría","Unidades","Precio","Importe","Costo unitario"], ...delMes(eventos(), ym).map(e=>[e.fecha, e.h, (S.maquinas[e.mid]||{}).nombre||"", (S.productos[e.pid]||{}).nombre||"", (S.productos[e.pid]||{}).categoria||"", e.u, Math.round(e.pv||0), Math.round(e.f), e.c==null?"":Math.round(e.c)])]); },
   "csv-prod": () => bajar("productos.csv", [["Producto","Categoría","Costo","Proveedor","Venta","Margen %","Depósito","Máquinas","Kioscos prom.","Chinos prom.","PedidosYa"], ...prodList().map(p=>{ const st = compStats(p.id), co = costoActual(p), mm = margen(p.precioVenta, co).m; const r = (x) => x==null?"":Math.round(x); const pv = proveedorDelCosto(p); return [p.nombre, p.categoria, r(co), pv?provNombre(pv):"", r(p.precioVenta), mm==null?"":Math.round(mm*10)/10, stockDep(p.id), stockMaq(p.id), r(avg(st.kiosco)), r(avg(st.chino)), r(avg(st.pya))]; })])
 };
 
