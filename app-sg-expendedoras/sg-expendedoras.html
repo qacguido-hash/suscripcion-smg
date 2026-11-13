@@ -338,7 +338,8 @@ function vencimientos(){
 function eventos(){ const out = []; for (const [fecha, doc] of Object.entries(S.vdias)) for (const e of (doc.eventos||[])) out.push(Object.assign({fecha}, e)); return out.sort((a,b)=> (b.fecha+b.h).localeCompare(a.fecha+a.h)); }
 function delMes(evs, ym, hastaDia){ return evs.filter(e => e.fecha.startsWith(ym) && (!hastaDia || +e.fecha.slice(8) <= hastaDia)); }
 function resumen(evs){ let u=0, f=0, cm=0; for (const e of evs){ u += e.u; f += e.f; cm += (e.c != null ? e.c : (costoActual(S.productos[e.pid]) || 0)) * e.u; } const com = f*(cfg().comisionQR||0)/100; return {u, f, cm, com, gan: f - com - cm, n: evs.length}; }
-const gastosFijos = (m) => (m.alquiler||0) + (m.otrosGastos||[]).reduce((t,g)=>t+(g.monto||0),0);
+const gastosGen = () => ((S.fin||{}).gastosGenerales||[]).reduce((t,g)=>t+(g.monto||0),0);
+const gastosFijos = (m) => (m.alquiler||0) + (m.otrosGastos||[]).reduce((t,g)=>t+(g.monto||0),0) + gastosGen() / Math.max(1, maqList().length);
 // Consumo promedio diario de un producto (en una máquina o en todas), con las ventas de los últimos 30 días
 function ventanaDias(){ const evs = eventos(); if (!evs.length) return null; const primero = evs[evs.length-1].fecha; return Math.max(1, Math.min(30, -days(primero) + 1)); }
 function consumo(pid, mid){ const v = ventanaDias(); if (!v) return null; const desde = addDays(today(), -(v-1)); let u = 0;
@@ -663,7 +664,7 @@ function vMaquinas(){
 
 
 // ---------- finanzas ----------
-const FIN_DEF = { pctMaquina:40, pctReserva:10, pctRetiro:50, socios:[{id:"s1", nombre:"Socio 1", pct:50},{id:"s2", nombre:"Socio 2", pct:50}], metaMaquina:null, inversiones:{} };
+const FIN_DEF = { pctMaquina:40, pctReserva:10, pctRetiro:50, socios:[{id:"s1", nombre:"Socio 1", pct:50},{id:"s2", nombre:"Socio 2", pct:50}], metaMaquina:null, inversiones:{}, gastosGenerales:[{concepto:"Persona para reposición, service y limpieza", monto:null},{concepto:"Retiro de mercadería (flete / viajes al proveedor)", monto:null}] };
 const fcfg = () => Object.assign({}, FIN_DEF, S.fin || {});
 const SOBRES = { reposicion:["Reposición","#5B6B86"], gastos:["Gastos fijos","#A9B2C1"], maquina:["Nueva máquina","#C4161C"], reserva:["Reserva","#E39A2B"], retiro:["Retiro socios","#1B6B3C"] };
 const nombreMesL = (ym) => { const t = nombreMes(ym); return t.charAt(0).toUpperCase() + t.slice(1) + " " + ym.slice(0,4); };
@@ -679,17 +680,20 @@ function finMes(ym, soloMaq){
   let canon = 0, otros = 0; const lineasCanon = [];
   for (const m of maqList()){ if (soloMaq && m.id !== soloMaq) continue; if (!(actual || conVentas.has(m.id))) continue;
     if (m.alquiler){ canon += m.alquiler; lineasCanon.push([m.nombre, m.alquiler]); } otros += (m.otrosGastos||[]).reduce((t,g)=>t+(g.monto||0),0); }
-  const neta = f - costo - com - canon - otros, pos = Math.max(0, neta);
+  const nMaq = Math.max(1, maqList().length), activo = actual || evsAll.length > 0, parte = soloMaq ? 1/nMaq : 1;
+  const lineasGen = activo ? (fc.gastosGenerales||[]).filter(g => g.monto).map(g => [g.concepto, g.monto * parte]) : [];
+  const generales = lineasGen.reduce((t,[,v])=>t+v,0);
+  const neta = f - costo - com - canon - otros - generales, pos = Math.max(0, neta);
   const maq = pos*fc.pctMaquina/100, res = pos*fc.pctReserva/100, ret = pos*fc.pctRetiro/100;
   const socios = (fc.socios||[]).map(x => ({nombre:x.nombre, pct:x.pct||0, monto: ret*(x.pct||0)/100}));
-  return {ym, f, qr, ef, mix, costo, com, canon, otros, lineasCanon, neta, maq, res, ret, socios, n: evsAll.length};
+  return {ym, f, qr, ef, mix, costo, com, canon, otros, lineasCanon, generales, lineasGen, neta, maq, res, ret, socios, n: evsAll.length};
 }
 const movsList = () => Object.entries(S.movimientos||{}).map(([id,x])=>Object.assign({id},x)).sort((a,b)=>(b.fecha||"").localeCompare(a.fecha||""));
 function finAcum(){
   const meses = mesesTrabajados(), act = mesDe(0); const filas = meses.map(ym => finMes(ym));
   const suma = (k) => filas.reduce((t,x)=>t+x[k],0); const movs = movsList();
   const sal = (sobre) => movs.filter(m=>m.sobre===sobre).reduce((t,m)=>t+(m.monto||0),0);
-  const asign = { reposicion: suma("costo"), gastos: suma("com")+suma("canon")+suma("otros"), maquina: suma("maq"), reserva: suma("res"), retiro: suma("ret") };
+  const asign = { reposicion: suma("costo"), gastos: suma("com")+suma("canon")+suma("otros")+suma("generales"), maquina: suma("maq"), reserva: suma("res"), retiro: suma("ret") };
   const saldo = {}; for (const k in SOBRES) saldo[k] = asign[k] - sal(k);
   const cerrados = filas.filter(x => x.ym !== act && x.n > 0).slice(0,3); const base = cerrados.length ? cerrados : filas.filter(x=>x.n>0);
   const ritmoMaq = base.length ? base.reduce((t,x)=>t+x.maq,0)/base.length : 0;
@@ -728,7 +732,9 @@ function vFinanzas(){
    <div class="stl"><span>Costo de la mercadería vendida <span class="muted small">(a precio de reposición)</span></span>${neg(r.costo)}</div>
    <div class="stl"><span>Comisión QR (${f1(pq)}%)</span>${neg(r.com)}</div>
    ${canonL}
-   ${r.otros ? `<div class="stl"><span>Otros gastos fijos</span>${neg(r.otros)}</div>` : ""}
+   ${r.otros ? `<div class="stl"><span>Otros gastos fijos de las máquinas</span>${neg(r.otros)}</div>` : ""}
+   ${r.lineasGen.map(([n,v]) => `<div class="stl"><span>${esc(n)}</span>${neg(v)}</div>`).join("")}
+   ${(fc.gastosGenerales||[]).some(g => !g.monto) && !S.ro ? `<div class="stl"><span class="muted small">Falta el monto de: ${(fc.gastosGenerales||[]).filter(g=>!g.monto).map(g=>esc(g.concepto)).join(", ")}</span><button class="btn sm" type="button" data-act="fin-config">Cargar</button></div>` : ""}
    <div class="stl tot"><span>Ganancia neta</span><span class="num ${r.neta>=0?"pos":"neg"}">${r.neta<0?"− ":""}${fm(Math.abs(r.neta))}</span></div>
    <h2 style="margin-top:20px">Reparto de la ganancia</h2>
    ${r.neta > 0 ? `<div class="stl"><span>${sq("maquina")}Nueva máquina · ${fc.pctMaquina}%</span><span class="num">${fm(r.maq)}</span></div>
@@ -761,20 +767,25 @@ function vFinanzas(){
 }
 function openFinConfig(){
   const fc = fcfg(); const socios = (fc.socios||[]).map(x=>Object.assign({},x)); const ms = maqList();
+  const gastosG = (fc.gastosGenerales||[]).map(g=>Object.assign({},g));
+  const gRow = (g,i) => `<div class="fgrid" data-gg="${i}" style="align-items:end"><label class="field">Concepto<input data-k="concepto" value="${esc(g.concepto)}"></label><label class="field">Monto mensual ($)<input data-k="monto" inputmode="decimal" value="${esc(g.monto)}" placeholder="A definir"></label></div>`;
   const sRow = (x,i) => `<div class="fgrid" data-s="${i}"><label class="field">Socio<input data-k="nombre" value="${esc(x.nombre)}"></label><label class="field">% del retiro<input data-k="pct" inputmode="decimal" value="${esc(x.pct)}"></label></div>`;
   const body = `<div><h3>Reparto de la ganancia (%)</h3><div class="fgrid" style="margin-top:8px"><label class="field">Nueva máquina<input id="fc-m" inputmode="decimal" value="${esc(fc.pctMaquina)}"></label><label class="field">Reserva<input id="fc-r" inputmode="decimal" value="${esc(fc.pctReserva)}"></label><label class="field">Retiro socios<input id="fc-t" inputmode="decimal" value="${esc(fc.pctRetiro)}"></label></div><p class="muted small" style="margin:6px 0 0">Tienen que sumar 100.</p></div>
    <div><h3>Socios</h3><div id="fc-ss" style="display:flex;flex-direction:column;gap:10px;margin-top:8px">${socios.map(sRow).join("")}</div><p class="muted small" style="margin:6px 0 0">Cómo se divide el retiro entre los socios. Tiene que sumar 100.</p></div>
+   <div><h3>Gastos generales por mes</h3><p class="muted small" style="margin:4px 0 0">Gastos del negocio que no son de una sola máquina. Se reparten en partes iguales entre las máquinas.</p><div id="fc-gs" style="display:flex;flex-direction:column;gap:10px;margin-top:8px">${gastosG.map(gRow).join("")}</div><button class="btn" type="button" id="fc-addg" style="margin-top:10px">Agregar gasto</button></div>
    <div><h3>Meta</h3><div class="fgrid" style="margin-top:8px"><label class="field">Precio de la próxima máquina ($)<input id="fc-meta" inputmode="decimal" value="${esc(fc.metaMaquina)}" placeholder="A definir"></label></div></div>
    <div><h3>Inversión en cada máquina</h3>${ms.map(m=>{ const iv = (fc.inversiones||{})[m.id] || {}; return `<div class="card" style="margin:8px 0 0" data-inv="${esc(m.id)}"><strong>${esc(m.nombre)}</strong><div class="fgrid" style="margin-top:8px"><label class="field">Máquina ($)<input data-k="maquina" inputmode="decimal" value="${esc(iv.maquina)}"></label><label class="field">Instalación ($)<input data-k="instalacion" inputmode="decimal" value="${esc(iv.instalacion)}"></label><label class="field">Stock inicial ($)<input data-k="stockInicial" inputmode="decimal" value="${esc(iv.stockInicial)}"></label></div></div>`; }).join("")}
    <p class="muted small" style="margin:8px 0 0">El canon fijo y los otros gastos de cada lugar se cargan en Máquinas → ⋮ → Editar nombre y datos. La comisión del QR, en Ajustes.</p></div>`;
   openDrawer("Configurar finanzas", body, `<button class="btn" type="button" data-close>Cancelar</button><button class="btn pri" type="button" id="fc-ok">Guardar</button>`, (d, close) => {
+    $("#fc-addg", d).addEventListener("click", () => { gastosG.push({concepto:"", monto:null}); const w = document.createElement("div"); w.innerHTML = gRow(gastosG[gastosG.length-1], gastosG.length-1); $("#fc-gs", d).appendChild(w.firstElementChild); });
     $("#fc-ok", d).addEventListener("click", async () => {
       const pm = num($("#fc-m",d).value) || 0, pr = num($("#fc-r",d).value) || 0, pt = num($("#fc-t",d).value) || 0;
       if (Math.abs(pm+pr+pt-100) > 0.01){ toast("Los porcentajes del reparto tienen que sumar 100"); return; }
       const ss = [...d.querySelectorAll("[data-s]")].map((el,i) => ({id: socios[i].id, nombre: el.querySelector('[data-k="nombre"]').value.trim() || ("Socio " + (i+1)), pct: num(el.querySelector('[data-k="pct"]').value) || 0}));
       if (Math.abs(ss.reduce((t,x)=>t+x.pct,0)-100) > 0.01){ toast("El reparto entre socios tiene que sumar 100"); return; }
       const inversiones = {}; d.querySelectorAll("[data-inv]").forEach(el => { const o = {}; el.querySelectorAll("[data-k]").forEach(i => { o[i.dataset.k] = num(i.value); }); inversiones[el.dataset.inv] = o; });
-      if (await save("config/finanzas", {pctMaquina:pm, pctReserva:pr, pctRetiro:pt, socios:ss, metaMaquina: num($("#fc-meta",d).value), inversiones}, "Finanzas guardadas")){ close(); render(); }
+      const gastosGenerales = [...d.querySelectorAll("[data-gg]")].map(el => ({concepto: el.querySelector('[data-k="concepto"]').value.trim(), monto: num(el.querySelector('[data-k="monto"]').value)})).filter(g => g.concepto);
+      if (await save("config/finanzas", {pctMaquina:pm, pctReserva:pr, pctRetiro:pt, socios:ss, metaMaquina: num($("#fc-meta",d).value), inversiones, gastosGenerales}, "Finanzas guardadas")){ close(); render(); }
     });
   });
 }
@@ -868,7 +879,7 @@ const acciones = {
   "fin-config": () => openFinConfig(),
   "fin-mov": () => openMovimiento(null),
   "csv-fin": () => { const ym = mesDe(UI.fmes||0), r = finMes(ym), fc = fcfg(); const R = (x) => Math.round(x||0);
-    bajar("finanzas-" + ym + ".csv", [["Concepto","Monto"],["Ventas por QR",R(r.qr)],["Ventas en efectivo",R(r.ef)],...(r.mix?[["QR y efectivo sin separar",R(r.mix)]]:[]),["Total facturado",R(r.f)],["Costo de la mercadería (a precio de reposición)",-R(r.costo)],["Comisión QR",-R(r.com)],...r.lineasCanon.map(([n,v])=>["Canon " + n, -R(v)]),["Otros gastos fijos",-R(r.otros)],["Ganancia neta",R(r.neta)],[],["Nueva máquina (" + fc.pctMaquina + "%)",R(r.maq)],["Reserva (" + fc.pctReserva + "%)",R(r.res)],["Retiro socios (" + fc.pctRetiro + "%)",R(r.ret)],...r.socios.map(x=>["  " + x.nombre + " (" + x.pct + "%)", R(x.monto)]),[],["Movimientos"],...movsList().filter(m=>(m.fecha||"").startsWith(ym)).map(m=>[m.fecha + " · " + (SOBRES[m.sobre]||["—"])[0] + (m.desc?" · " + m.desc:""), -R(m.monto)])]); },
+    bajar("finanzas-" + ym + ".csv", [["Concepto","Monto"],["Ventas por QR",R(r.qr)],["Ventas en efectivo",R(r.ef)],...(r.mix?[["QR y efectivo sin separar",R(r.mix)]]:[]),["Total facturado",R(r.f)],["Costo de la mercadería (a precio de reposición)",-R(r.costo)],["Comisión QR",-R(r.com)],...r.lineasCanon.map(([n,v])=>["Canon " + n, -R(v)]),["Otros gastos fijos de las máquinas",-R(r.otros)],...r.lineasGen.map(([n,v])=>[n,-R(v)]),["Ganancia neta",R(r.neta)],[],["Nueva máquina (" + fc.pctMaquina + "%)",R(r.maq)],["Reserva (" + fc.pctReserva + "%)",R(r.res)],["Retiro socios (" + fc.pctRetiro + "%)",R(r.ret)],...r.socios.map(x=>["  " + x.nombre + " (" + x.pct + "%)", R(x.monto)]),[],["Movimientos"],...movsList().filter(m=>(m.fecha||"").startsWith(ym)).map(m=>[m.fecha + " · " + (SOBRES[m.sobre]||["—"])[0] + (m.desc?" · " + m.desc:""), -R(m.monto)])]); },
   "mas-hist": () => { UI.histN += 60; render(); },
   "copiar-compras": () => copiar("Lista de compras\n" + comprasPorProveedor(compras()).map(g => "\n" + (g.id === "_sin" ? "SIN PRECIO CARGADO" : provNombre(g.id).toUpperCase()) + "\n" + g.items.map(x => "- " + x.p.nombre + ": " + x.rec + (x.best ? " (" + fm(x.best.comp) + " c/u)" : "")).join("\n")).join("\n")),
   "csv-compras": () => bajar("lista-de-compras.csv", [["Producto","Depósito","Faltan para llenar","Vende por día","Comprar","Mejor proveedor"], ...compras().map(x=>[x.p.nombre, x.dep, x.falta, x.cons ? f1(x.cons) : "", x.rec, (opcionesCompra(x.p)[0] ? provNombre(opcionesCompra(x.p)[0].id) : "")])]),
