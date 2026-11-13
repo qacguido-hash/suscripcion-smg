@@ -17,7 +17,7 @@ ws.freeze_panes='B2'; ws.auto_filter.ref=ws.dimensions
 n=wb.create_sheet('Estados')
 n.append(['Estado','Qué significa','Filas'])
 from collections import Counter; c=Counter(o['stat'] for o in out)
-D={'Confirmado en web':'El correo del padrón aparece publicado en la web del colegio.',
+D={'Confirmado en web':'El correo del padrón aparece publicado en la web, Facebook o Instagram oficial del colegio (link en "Web consultada").',
 'Corregido con la web':'El correo del padrón no está en la web (o es personal); se usa el que publica la web para ese nivel.',
 'Válido (oficial DGCyE)':'Casilla oficial @abc.gob.ar del establecimiento.',
 'Corregido':'Error de tipeo del padrón corregido (abc.gov.ar → abc.gob.ar, abc.go → abc.gob.ar).',
@@ -29,7 +29,7 @@ D={'Confirmado en web':'El correo del padrón aparece publicado en la web del co
 'Inválido':'El dominio no existe: el correo rebota.'}
 for k in sorted(D,key=lambda k:ORD[k]): n.append([k,D[k],c.get(k,0)]); n.cell(n.max_row,1).fill=PatternFill('solid',fgColor=COL[k])
 n.append([]); n.append(['Total',f'{len(out)} filas (cada nivel de cada colegio por separado; fuente: Padrón Oficial de Establecimientos, solo gestión privada).',len(out)])
-n.append(['Método','Para cada dominio se consultó si tiene servidor de correo (registro MX) y se recorrió la web del colegio (inicio, contacto y páginas de niveles) buscando direcciones publicadas. Revisado el 13/11/2026.'])
+n.append(['Método','Para cada dominio se consultó si tiene servidor de correo (registro MX) y se recorrió la web del colegio (inicio, contacto y páginas de niveles) buscando direcciones publicadas; además se buscó cada dirección en la web y en las redes oficiales de cada colegio (sin contar directorios que copian el padrón). Revisado el 13/11/2026.'])
 for c_ in n[1]: c_.font=Font(bold=True)
 n.column_dimensions['A'].width=24; n.column_dimensions['B'].width=100
 for r in n.iter_rows():

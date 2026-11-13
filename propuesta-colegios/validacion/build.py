@@ -22,8 +22,10 @@ def lvl_pick(cands,niv):
     for e in cands:
         if re.match(r'(info|consultas|institucional|informes|infoquilmes|secretaria|administracion)@',e): return e
     return None
+FOUND=json.load(open('found.json'))
 def check(e):
     user,dom=e.split('@'); dom=dom.lower()
+    if e.lower() in FOUND: return 'Confirmado en web',e,'Publicado por el colegio en '+FOUND[e.lower()]
     if dom=='abc.go': return 'Corregido','dpp0851747@abc.gob.ar','Dirección truncada en el padrón ("abc.go"); se completa con abc.gob.ar.'
     if dom=='abc.gov.ar': return 'Corregido',user+'@abc.gob.ar','Dominio viejo abc.gov.ar; el oficial de la DGCyE es abc.gob.ar (es la casilla oficial del establecimiento).'
     if dom=='gmail.com.ar': return 'Corregido (probable)',user+'@gmail.com','gmail.com.ar no existe (no recibe correo); casi seguro es @gmail.com.'
@@ -54,11 +56,11 @@ for r in rows:
         w=web.get(d)
         if w and w[1]: webmails.update(w[1]); src=w[0]
     best=None; stat=None
-    OVR={('INSTITUTO SAN JORGE','Secundario'):'secretaria.college.quilmes@stgeorges.edu.ar',('COLEGIO SAN JORGE','Primario'):'prepschool@stgeorges.edu.ar'}
+    OVR={('COLEGIO FELIX BERNAL','Primario'):'cpfelixbernalep2@gmail.com',('ESCUELA LA PROVIDENCIA','Inicial, Primario'):'direccionprimario@institutolaprovidencia.com.ar',('INSTITUTO SAN JORGE','Secundario'):'secretaria.college.quilmes@stgeorges.edu.ar',('COLEGIO SAN JORGE','Primario'):'prepschool@stgeorges.edu.ar'}
     conf=[x for x in res if x[1]=='Confirmado en web']
     good=[x for x in res if x[1] in ('Válido (oficial DGCyE)','Corregido','Dominio activo','No figura en la web')]
     pick=lvl_pick(sorted(webmails),niv)
-    if (name,niv) in OVR: best=OVR[(name,niv)]; stat='Corregido con la web'
+    if (name,niv) in OVR: best=OVR[(name,niv)]; stat='Corregido con la web'; src={'COLEGIO FELIX BERNAL':'https://www.instagram.com/colegioprivadobernal_/reels/','ESCUELA LA PROVIDENCIA':'https://institutolaprovidencia.edu.ar/contact/'}.get(name,src)
     elif conf: best=conf[0][2]; stat='Confirmado en web'
     elif good:
         good.sort(key=lambda x:ORDER.index(x[1])); best=good[0][2]; stat=good[0][1]
@@ -68,6 +70,7 @@ for r in rows:
             c=[x for x in res if x[1]==st]
             if c: best=c[0][2]; stat=st; break
     if not stat: stat='Sin correo'
+    if conf and not src: src=FOUND.get(best.lower(),'')
     out.append(dict(name=name.title(),addr=addr,loc=loc,cp=cp,niv=niv,tel=tel,cue=cue,best=best,stat=stat,
         padron=mails,detalle=' | '.join(f'{e}: {s}' + (f' → {f}' if f and f!=e else '') for e,s,f,_ in res),
         notas=' '.join(dict.fromkeys(n for *_,n in res)),web=src,webmails='; '.join(sorted(webmails))))
