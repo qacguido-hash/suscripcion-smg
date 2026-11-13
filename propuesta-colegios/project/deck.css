@@ -1,0 +1,53 @@
+:root{
+  --bg:#F4F6F6; --bg2:#FBFCFC; --navy:#10273D; --ink:#4A5866; --teal:#17786A; --line:#E2E7EA; --card:#FFFFFF;
+  --dark:#10273D; --dark-ink:#C9D6E0; --dark-card:#1B3550; --mint:#7FD3C0;
+}
+body{font-family:'DM Sans', Arial, sans-serif; color:var(--navy)}
+section{background:var(--bg); padding:128px; display:flex; flex-direction:column; gap:40px; box-sizing:border-box}
+section.alt{background:var(--bg2)}
+section.dark{background:var(--dark)}
+.eyebrow{font-size:26px; font-weight:600; letter-spacing:3px; color:var(--teal); margin:0}
+section.dark .eyebrow{color:var(--mint)}
+.title{font-size:84px; font-weight:700; line-height:1.05; letter-spacing:-1px; color:var(--navy); margin:0}
+section.dark .title{color:#F4F6F6}
+.head{display:flex; flex-direction:column; gap:24px}
+.lead{font-size:34px; line-height:1.4; color:var(--ink); margin:0}
+section.dark .lead{color:var(--dark-ink)}
+.cards{display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:32px}
+.cards.two{grid-template-columns:repeat(2, minmax(0,1fr))}
+.card{background:var(--card); border:2px solid var(--line); border-radius:22px; padding:40px 44px; display:flex; flex-direction:column; gap:14px}
+.card h3{font-size:38px; font-weight:700; line-height:1.15; color:var(--navy); margin:0}
+.card p{font-size:28px; line-height:1.45; color:var(--ink); margin:0}
+section.dark .card{background:var(--dark-card); border-color:#29486A}
+section.dark .card h3{color:#F4F6F6}
+section.dark .card p{color:var(--dark-ink)}
+.note{font-size:28px; line-height:1.45; color:var(--ink); margin:0}
+.step{font-size:72px; font-weight:700; color:var(--teal); line-height:1; margin:0}
+.caption{font-size:24px; color:var(--ink); margin:0}
+
+/* portada */
+.cover{justify-content:center; gap:36px}
+.cover h1{font-size:150px; font-weight:700; line-height:1.0; letter-spacing:-2px; color:var(--navy); margin:0}
+.cover .sub{font-size:44px; line-height:1.3; color:var(--ink); margin:0; max-width:1500px}
+
+/* máquina + datos */
+.split{display:flex; gap:96px; align-items:center; flex:1}
+.split .pic{display:flex; flex-direction:column; gap:14px; align-items:center}
+.facts{display:flex; flex-direction:column; gap:30px; flex:1}
+.facts .f{font-size:44px; font-weight:700; color:var(--navy); margin:0}
+.facts .s{font-size:30px; color:var(--ink); margin:0}
+
+/* mix con vidriera */
+.mixrow{display:flex; gap:72px; align-items:flex-start}
+.mixcol{display:flex; flex-direction:column; gap:22px; flex:1}
+.mixcol .card{padding:30px 38px; gap:10px}
+.mixcol .card h3{font-size:34px}
+.mixcol .card p{font-size:27px}
+.vid{display:flex; flex-direction:column; gap:12px; align-items:center}
+.brands{font-size:28px; line-height:1.45; color:var(--navy); font-weight:600; margin:0}
+
+@keyframes rise{from{opacity:0; transform:translateY(16px)}to{opacity:1; transform:none}}
+.card{animation:rise 500ms ease-out both}
+.cards .card:nth-child(2), .mixcol .card:nth-child(2){animation-delay:120ms}
+.cards .card:nth-child(3), .mixcol .card:nth-child(3){animation-delay:240ms}
+.cards .card:nth-child(4), .mixcol .card:nth-child(4){animation-delay:360ms}
