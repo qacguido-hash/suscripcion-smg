@@ -134,7 +134,7 @@ tr.click{cursor:pointer} tr.click:hover td{background:var(--surface-2)}
 .mtab .meter{height:8px;background:var(--info-soft);border-radius:99px;overflow:hidden;margin-top:6px}
 .mtab .meter i{display:block;height:100%;background:var(--ok);border-radius:99px}
 .mtab .meter.w i{background:#E39A2B} .mtab .meter.b i{background:var(--bad)}
-.mtab .spark{width:100%;max-width:110px;height:34px;display:block}
+.mtab .spark{width:100%;max-width:140px;height:40px;display:block;overflow:visible}
 .mtab .tot{display:flex;flex-wrap:wrap;gap:10px 28px;padding:14px 20px;background:var(--surface-2);border-top:1px solid var(--line);font-size:14px}
 .mtab .tot b{font-family:var(--display);font-size:17px}
 @media (max-width:899px){.mtab .hd{display:none}.mtab .rw{grid-template-columns:1fr 1fr;gap:12px 16px}.mtab .rw>.nm{grid-column:1/-1;padding-right:40px}.mtab .mopt{position:absolute;top:14px;right:14px}.mtab .n{white-space:normal}.mtab .lbl{display:block;font-size:12px;color:var(--muted)}}
@@ -584,7 +584,9 @@ function vMaquinas(){
       let cant = 0, cap = 0, vacios = 0; for (const [, sl] of slotsDe(m)) if (sl.productoId && sl.capacidad){ cant += Math.min(sl.cantidad||0, sl.capacidad); cap += sl.capacidad; if (!(sl.cantidad > 0)) vacios++; }
       const pctS = cap ? Math.round(cant/cap*100) : null; const bajos = rep.filter(r => r.st === "b" || r.st === "w");
       const porDia = dias14.map(d => evs.filter(e => e.mid===m.id && e.fecha===d).reduce((t,e)=>t+e.f,0)); const mx = Math.max(...porDia);
-      const spark = mx > 0 ? `<svg class="spark" viewBox="0 0 130 34" role="img" aria-label="Facturación de los últimos 14 días"><polyline fill="none" stroke="var(--accent)" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" points="${porDia.map((v,i)=>`${(i*130/13).toFixed(1)},${(31 - v/mx*28).toFixed(1)}`).join(" ")}"/></svg>` : '<span class="sub">Sin ventas</span>';
+      const tot14 = porDia.reduce((t,v)=>t+v,0); const fk = (v) => v >= 1000000 ? "$ " + (v/1000000).toFixed(1).replace(".",",") + "M" : v >= 1000 ? "$ " + Math.round(v/1000) + "k" : fm(v);
+      const pts = porDia.map((v,i)=>[(i*128/13+1).toFixed(1), (36 - (mx ? v/mx : 0)*30).toFixed(1)]); const pl = pts.map(q=>q.join(",")).join(" ");
+      const spark = mx > 0 ? `<svg class="spark" viewBox="0 0 130 40" preserveAspectRatio="none" role="img" aria-label="Facturación de los últimos 14 días: ${fm(tot14)}"><polygon points="1,40 ${pl} 129,40" fill="var(--accent)" opacity=".12"/><polyline fill="none" stroke="var(--accent)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke" points="${pl}"/><circle cx="${pts[13][0]}" cy="${pts[13][1]}" r="3" fill="var(--accent)"/></svg><div class="sub" style="margin-top:2px;white-space:nowrap"><strong style="color:var(--fg)">${fk(tot14)}</strong> en 14 días</div>` : '<span class="sub">Sin ventas</span>';
       return {m, n, x, real, pctS, vacios, rep, bajos, spark}; });
     const T = filas.reduce((a,r)=>({f:a.f+r.x.f, u:a.u+r.x.u, real:a.real+r.real}), {f:0,u:0,real:0});
     return `<div class="head"><div><h1>Máquinas</h1><p class="muted">${ms.length} ${ms.length===1?"máquina":"máquinas"}</p></div>${S.ro?"":`<button class="btn pri" type="button" data-act="nueva-maq">Agregar máquina</button>`}</div>
