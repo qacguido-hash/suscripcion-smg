@@ -129,6 +129,25 @@ tr.click{cursor:pointer} tr.click:hover td{background:var(--surface-2)}
 .mcard{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:10px;cursor:pointer;text-align:left}
 .mcard:hover{border-color:var(--muted)}
 .mcard .n{font-family:var(--display);font-size:20px;font-weight:700}
+.vwrap{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:16px;align-items:start}
+.vscroll{overflow-x:auto;border-radius:16px}
+.vmach{background:var(--accent);border-radius:16px;padding:12px;display:grid;grid-template-columns:minmax(560px,1fr) 54px;gap:10px}
+.vglass{background:#1d2027;border-radius:10px;padding:8px;display:flex;flex-direction:column;gap:7px}
+.tray{display:grid;grid-template-columns:repeat(11,minmax(0,1fr));gap:5px;border-bottom:3px solid #3a3e48;padding-bottom:6px}
+.vsl{background:#2a2e37;border:0;border-radius:7px;padding:4px 3px 5px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;font:inherit;color:#fff;min-width:0}
+.vsl:hover{background:#353a45} .vsl:focus-visible{outline:2px solid #fff;outline-offset:1px}
+.vsl img,.vsl .ph{width:100%;height:44px;object-fit:contain}
+.vsl .ph{display:grid;place-items:center;color:#7b808a;font-size:10px}
+.vsl .no{font-size:10px;color:#aab0bb;font-weight:600}
+.vsl .q{font-size:10.5px;font-weight:600}
+.vsl .bar{width:90%;height:4px;background:#444a55;border-radius:99px;overflow:hidden;display:block}
+.vsl .bar i{display:block;height:100%;background:#3ea96a} .vsl .bar.w i{background:#E39A2B} .vsl .bar.b i{background:#e0454b}
+.vsl.e{box-shadow:inset 0 0 0 2px #e0454b}
+.vpanel{background:#2a2e37;border-radius:10px;display:flex;flex-direction:column;align-items:center;padding:12px 6px;gap:10px}
+.vpanel i{display:block} .vpanel .scr{width:36px;height:26px;background:#0e7c86;border-radius:4px}
+.vpanel .qr{width:36px;height:36px;background:repeating-conic-gradient(#fff 0 25%,#222 0 50%) 0 0/9px 9px;border-radius:3px}
+.vpanel .pay{width:26px;height:6px;background:#111;border-radius:3px}
+@media (max-width:1100px){.vwrap{grid-template-columns:1fr}}
 .slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:10px}
 .slot{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:8px;display:flex;flex-direction:column;gap:6px;cursor:pointer;text-align:left;min-height:150px}
 .slot:hover{border-color:var(--muted)}
@@ -572,18 +591,25 @@ function vMaquinas(){
   const x = resumen(delMes(evs, ym).filter(e=>e.mid===m.id)), xa = resumen(delMes(evs, mesDe(-1), new Date().getDate()).filter(e=>e.mid===m.id));
   const pron = []; const vistos = new Set(); for (const [, sl] of slotsDe(m)) if (sl.productoId && !vistos.has(sl.productoId)){ vistos.add(sl.productoId); const cant = stockMaq(sl.productoId, m.id), cons = consumo(sl.productoId, m.id); if (cons > 0) pron.push({p:S.productos[sl.productoId]||{}, cant, cons, ds: diasStock(cant, cons), slots: slotsDe(m).filter(([,s])=>s.productoId===sl.productoId).map(([k])=>k)}); }
   pron.sort((a,b)=>a.ds-b.ds);
-  const slots = []; for (let i=1;i<=n;i++){ const sl = (m.slots||{})[i] || {}; const p = sl.productoId ? S.productos[sl.productoId] : null; const st = slotState(sl); const cons = p ? consumo(sl.productoId, m.id) : null; const ds = p ? diasStock(stockMaq(sl.productoId, m.id), cons) : null;
-    slots.push(`<button type="button" class="slot" data-slot="${i}" aria-label="Slot ${i}${p?": "+esc(p.nombre):" vacío"}"><span class="no">Slot ${i}</span>${p?img(p,""):`<div class="ph" aria-hidden="true">vacío</div>`}<span class="nm">${p?esc(p.nombre):'<span class="muted">Sin asignar</span>'}</span>
-    ${p && sl.capacidad ? `<span class="small num">${sl.cantidad||0}/${sl.capacidad}${ds != null ? " · " + dur(ds) : ""}</span><div class="bar ${st||""}"><i style="width:${Math.min(100,Math.round((sl.cantidad||0)/sl.capacidad*100))}%"></i></div>` : ""}</button>`); }
+  let cantT = 0, capT = 0; for (const [, sl] of slotsDe(m)) if (sl.productoId && sl.capacidad){ cantT += Math.min(sl.cantidad||0, sl.capacidad); capT += sl.capacidad; }
+  const pctS = capT ? Math.round(cantT/capT*100) : null;
+  const cel = (i) => { const sl = (m.slots||{})[i] || {}; const p = sl.productoId ? S.productos[sl.productoId] : null; const st = slotState(sl); const vacio = p && sl.capacidad && !(sl.cantidad > 0);
+    return `<button type="button" class="vsl ${vacio?"e":""} ${p?"":"v"}" data-slot="${i}" aria-label="Slot ${i}${p?": "+esc(p.nombre)+(sl.capacidad?", "+(sl.cantidad||0)+" de "+sl.capacidad:""):" sin asignar"}" title="${p?esc(p.nombre):"Sin asignar"}"><span class="no">${i}</span>${p?img(p,""):`<span class="ph">vacío</span>`}
+    ${p && sl.capacidad ? `<span class="q num">${sl.cantidad||0}/${sl.capacidad}</span><span class="bar ${st||""}"><i style="width:${Math.min(100,Math.round((sl.cantidad||0)/sl.capacidad*100))}%"></i></span>` : p ? `<span class="q">—</span>` : ""}</button>`; };
+  let bandejas = ""; for (let i=1;i<=n;i+=11){ let f = ""; for (let j=i;j<Math.min(i+11,n+1);j++) f += cel(j); bandejas += `<div class="tray">${f}</div>`; }
+  const agotan = pron.length ? pron.slice(0,8).map(x=>`<div class="li">${img(x.p)}<div class="grow"><div class="t">${esc(x.p.nombre)}</div><div class="d">Slot ${x.slots.join(", ")} · quedan ${x.cant} · vende ${f1(x.cons)}/día</div></div><span class="pill ${x.ds<1?"p-bad":x.ds<3?"p-warn":"p-ok"}">${x.ds<1?"hoy":x.ds<2?"mañana":Math.floor(x.ds)+" días"}</span></div>`).join("")
+    : rep.length ? [...rep].sort((a,b)=>a.cant/a.cap-b.cant/b.cap).slice(0,8).map(r=>{ const pp = S.productos[r.pid]||{}; return `<div class="li">${img(pp)}<div class="grow"><div class="t">${esc(pp.nombre||"")}</div><div class="d">Slot ${r.n} · quedan ${r.cant} de ${r.cap}</div></div><span class="pill ${r.cant===0?"p-bad":r.st?"p-warn":"p-info"}">${r.cant===0?"vacío":"faltan "+r.falta}</span></div>`; }).join("")
+    : "";
   return `<button type="button" class="back" data-act="volver-maq">← Todas las máquinas</button>
-  <div class="head"><div><h1>${esc(m.nombre)}</h1><p class="muted">${esc(m.ubicacion||"")}</p></div><div class="row">${S.ro?"":`<button class="btn" type="button" data-act="editar-maq">Editar nombre y datos</button><button class="btn" type="button" data-act="contar">Contar y reponer</button><button class="btn pri" type="button" data-act="preparar">Preparar reposición</button>`}</div></div>
-  <section class="grid-k"><div class="card kpi"><div class="l">Ventas del mes</div><div class="v num">${fm(x.f)}${delta(x.f, xa.f)}</div><div class="s">${fint(x.u)} u. · ticket ${x.u ? fm(x.f/x.u) : "—"}</div></div>
-   <div class="card kpi"><div class="l">Rentabilidad real del mes</div><div class="v num">${fm(x.gan - gf)}</div><div class="s">Costo ${fm(x.cm)} · QR ${fm(x.com)} · gastos ${fm(gf)}</div></div>
-   <div class="card kpi"><div class="l">Para reponer</div><div class="v num">${rep.reduce((t,r)=>t+r.falta,0)} u.</div><div class="s">en ${rep.length} slots · ${n} slots en total</div></div></section>
-  <div class="card"><div class="row" style="justify-content:space-between;margin-bottom:6px"><h2>Pronóstico de stock</h2><span class="muted small">Según lo vendido en los últimos ${ventanaDias() || 0} días</span></div>
-   ${pron.length ? `<div class="list">${pron.slice(0,12).map(x=>`<div class="li">${img(x.p)}<div class="grow"><div class="t">${esc(x.p.nombre)} <span class="muted small">· slot ${x.slots.join(", ")}</span></div><div class="d">Vende ${f1(x.cons)} u./día · quedan ${x.cant}</div></div><span class="pill ${x.ds<2?"p-bad":x.ds<4?"p-warn":"p-ok"}">${dur(x.ds)}</span></div>`).join("")}</div>`
-     : `<p class="muted small" style="margin:0">Cuando la máquina tenga ventas registradas vas a ver cuántas unidades vende por día cada producto y para cuántos días le queda stock.</p>`}</div>
-  <div class="card"><div class="row" style="justify-content:space-between;margin-bottom:10px"><h2>Slots</h2><span class="muted small">Tocá un slot para cambiar el producto, la capacidad o la cantidad</span></div><div class="slots">${slots.join("")}</div></div>`;
+  <div class="head"><div><h1>${esc(m.nombre)}</h1><p class="muted">${esc(m.ubicacion||"")}${m.ubicacion?" · ":""}${n} slots</p></div><div class="row">${S.ro?"":`<button class="btn" type="button" data-act="editar-maq">Editar</button><button class="btn" type="button" data-act="contar">Contar y reponer</button><button class="btn pri" type="button" data-act="preparar">Preparar reposición</button>`}</div></div>
+  <section class="grid-k"><div class="card kpi"><div class="l">Ventas del mes</div><div class="v num">${fm(x.f)}</div><div class="s">${fint(x.u)} u.</div></div>
+   <div class="card kpi"><div class="l">Ganancia real del mes</div><div class="v num">${fm(x.gan - gf)}</div><div class="s">${x.f ? "margen " + pct((x.gan-gf)/x.f*100) : "Costo, QR y gastos fijos descontados"}</div></div>
+   <div class="card kpi"><div class="l">Ticket promedio</div><div class="v num">${x.u ? fm(x.f/x.u) : "—"}</div><div class="s">por unidad</div></div>
+   <div class="card kpi"><div class="l">Stock en máquina</div><div class="v num">${pctS == null ? "—" : pctS + "%"}</div><div class="s">${rep.length ? `faltan ${rep.reduce((t,r)=>t+r.falta,0)} u. en ${rep.length} slots` : pctS == null ? "Cargá la capacidad de cada slot" : "Completa"}</div></div></section>
+  <div class="vwrap"><div><div class="vscroll"><div class="vmach"><div class="vglass">${bandejas}</div><div class="vpanel" aria-hidden="true"><i class="scr"></i><i class="qr"></i><i class="pay"></i></div></div></div>
+   <p class="muted small" style="margin:8px 0 0">Tocá un producto para cambiarlo o corregir la capacidad y la cantidad. Borde rojo: slot vacío.</p></div>
+   <div class="card"><h2>${pron.length ? "Se agotan primero" : "Para reponer"}</h2>${agotan ? `<div class="list">${agotan}</div>` : `<p class="muted small" style="margin:0">${pctS == null ? "Cuando cargues la capacidad y la cantidad de cada slot vas a ver acá lo que hay que reponer." : "Todos los slots están completos."}</p>`}
+   ${!pron.length && agotan ? `<p class="muted small" style="margin:8px 0 0">Cuando haya ventas registradas vas a ver en cuántos días se agota cada producto.</p>` : ""}</div></div>`;
 }
 
 function vAjustes(){
