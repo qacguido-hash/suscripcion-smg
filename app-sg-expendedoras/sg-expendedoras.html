@@ -594,7 +594,7 @@ function vMaquinas(){
         ${r.bajos.length ? `<span class="pill p-warn" style="margin-top:6px">Reponer ${r.rep.reduce((t,x)=>t+x.falta,0)} u. en ${r.rep.length} slots</span>` : r.pctS == null ? `<span class="pill p-info" style="margin-top:6px">Cargá las capacidades de los slots</span>` : `<span class="pill p-ok" style="margin-top:6px">Todo en orden</span>`}</div></div>
       <div><span class="lbl">Ventas del mes</span><div class="v num">${fm(r.x.f)}</div><div class="sub">${fint(r.x.u)} u.</div></div>
       <div><span class="lbl">Ganancia real</span><div class="v num">${fm(r.real)}</div><div class="sub">${r.x.f ? "margen " + pct(r.real/r.x.f*100) : "con gastos fijos"}</div></div>
-      <div><span class="lbl">Ticket</span><div class="v num">${r.x.u ? fm(r.x.f/r.x.u) : "—"}</div></div>
+      <div><span class="lbl">Ticket</span><div class="v num">${r.x.u ? fm(r.x.f/r.x.u) : "—"}</div><div class="sub">por unidad</div></div>
       <div><span class="lbl">Stock en máquina</span>${r.pctS == null ? '<div class="sub">Sin capacidades cargadas</div>' : `<div class="sub">${r.pctS}% lleno · ${r.vacios} ${r.vacios===1?"vacío":"vacíos"}</div><div class="meter ${r.pctS<40?"b":r.pctS<70?"w":""}"><i style="width:${r.pctS}%"></i></div>`}</div>
       <div><span class="lbl">Últimos 14 días</span>${r.spark}</div>
       <div class="mopt">${S.ro?"":`<button class="kebab" type="button" data-kebab aria-haspopup="menu" aria-expanded="false" aria-label="Opciones de ${esc(r.m.nombre)}"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg></button>
