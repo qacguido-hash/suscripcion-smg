@@ -1,0 +1,987 @@
+{
+ "p01_agua_villavicencio": {
+  "nombre": "Agua Villavicencio sin gas 500 ml",
+  "golomax": {
+   "nombre": "Agua VILLAVICENCIO 12u. x500ml.",
+   "codigo": "2141100",
+   "divisor": 1
+  }
+ },
+ "p02_baggio_naranja": {
+  "nombre": "Baggio Pronto naranja 200 ml",
+  "masmelos": {
+   "titulo": "JUGO BAGGIO NJA 18 UNI X 200 CC",
+   "codigo": "Cod. 021152",
+   "unidades": 18
+  }
+ },
+ "p03_baggio_multifruta": {
+  "nombre": "Baggio Pronto multifruta 200 ml",
+  "masmelos": {
+   "titulo": "JUGO BAGGIO MULT 18 UNI X 200 CC",
+   "codigo": "Cod. 021151",
+   "unidades": 18
+  },
+  "golomax": {
+   "nombre": "Jugos BAGGIO Fresh Multifruta x200ml.",
+   "codigo": "2426265",
+   "divisor": 1
+  }
+ },
+ "p09_powerade": {
+  "nombre": "Powerade Mountain Blast 500 ml",
+  "masmelos": {
+   "titulo": "POWERADE M.BLAST 6 UNI X 500 CC",
+   "codigo": "Cod. 018241",
+   "unidades": 6
+  },
+  "golomax": {
+   "nombre": "POWERADE Mountain Blast 6u. x500ml.",
+   "codigo": "2422722",
+   "divisor": 1
+  }
+ },
+ "p100_yummy_moritas_150": {
+  "nombre": "Yummy Moritas 150 g",
+  "masmelos": {
+   "titulo": "GOMA YUMMY MORITAS X 150 G",
+   "codigo": "Cod. 019022",
+   "unidades": 1
+  },
+  "golomax": {
+   "nombre": "Gomitas YUMMY Moritas x150g.",
+   "codigo": "1326620",
+   "divisor": 1
+  },
+  "distrioks": {
+   "id": 11917,
+   "unidades": 1
+  }
+ },
+ "p101_yummy_dientes_150": {
+  "nombre": "Yummy Dientes 150 g",
+  "masmelos": {
+   "titulo": "GOMA. YUMMY DIENTES X 150 G",
+   "codigo": "Cod. 011048",
+   "unidades": 1
+  },
+  "golomax": {
+   "nombre": "Gomitas YUMMY Dientes x150g.",
+   "codigo": "1326626",
+   "divisor": 1
+  },
+  "distrioks": {
+   "id": 25495,
+   "unidades": 1
+  }
+ },
+ "p102_bombon_leche": {
+  "nombre": "Bombón Bon o Bon leche 15 g",
+  "masmelos": {
+   "titulo": "BOMB.BON O BON CLAS X 30 UNI",
+   "codigo": "Cod. 007052",
+   "unidades": 30
+  }
+ },
+ "p103_bombon_blanco": {
+  "nombre": "Bombón Bon o Bon blanco 15 g",
+  "masmelos": {
+   "titulo": "BOMB.BON O BON BCO X 30 UNI",
+   "codigo": "Cod. 007053",
+   "unidades": 30
+  }
+ },
+ "p104_bombon_chocolinas": {
+  "nombre": "Bombón Bon o Bon Chocolinas 15 g",
+  "masmelos": {
+   "titulo": "BOMB.BON O BON CHOCOLINAS X 18 UNI",
+   "codigo": "Cod. 007095",
+   "unidades": 18
+  }
+ },
+ "p107_aquarius_manzana": {
+  "nombre": "Aquarius manzana 600 ml",
+  "golomax": {
+   "nombre": "Agua Saborizada AQUARIUS Manzana 6u. x600ml.",
+   "codigo": "2143070",
+   "divisor": 1
+  }
+ },
+ "p10_monster": {
+  "nombre": "Monster Energy 473 ml",
+  "masmelos": {
+   "titulo": "MONSTER ENERGY 6 UNI X 473 ML",
+   "codigo": "Cod. 047005",
+   "unidades": 6
+  },
+  "golomax": {
+   "nombre": "Bebida Energizante MONSTER Green Lata 6u. x473ml.",
+   "codigo": "2368090",
+   "divisor": 1
+  }
+ },
+ "p16_mini_oreo": {
+  "nombre": "Mini Oreo 50 g",
+  "masmelos": {
+   "titulo": "GALLE.MINI OREO X 50 G",
+   "codigo": "Cod. 017851",
+   "unidades": 1
+  },
+  "golomax": {
+   "nombre": "Galletitas OREO Mini x50g.",
+   "codigo": "1284199",
+   "divisor": 1
+  },
+  "pop": {
+   "id": 490534,
+   "unidades": 54
+  }
+ },
+ "p17_mini_pepitos": {
+  "nombre": "Mini Pepitos 50 g",
+  "masmelos": {
+   "titulo": "GALLE.MINI PEPITOS X 50 G",
+   "codigo": "Cod. 017237",
+   "unidades": 1
+  },
+  "golomax": {
+   "nombre": "Galletitas PEPITOS Mini x50g.",
+   "codigo": "1284650",
+   "divisor": 1
+  },
+  "pop": {
+   "id": 495969,
+   "unidades": 54
+  }
+ },
+ "p18_club_social": {
+  "nombre": "Club Social original 24 g",
+  "masmelos": {
+   "titulo": "GALLE.CLUB SOCIAL ORIG X 6 UNI X 144 G",
+   "codigo": "Cod. 017741",
+   "unidades": 6
+  },
+  "golomax": {
+   "nombre": "Galletitas CLUB SOCIAL Original x6u.",
+   "codigo": "1304167",
+   "divisor": 6
+  },
+  "pop": {
+   "id": 8582,
+   "unidades": 6
+  }
+ },
+ "p19_rex": {
+  "nombre": "Rex original 75 g",
+  "masmelos": {
+   "titulo": "GALLE.REX ORIGINAL X 75 G (10174)",
+   "codigo": "Cod. 017431",
+   "unidades": 1
+  },
+  "golomax": {
+   "nombre": "Galletitas REX x75g.",
+   "codigo": "1302775",
+   "divisor": 1
+  },
+  "pop": {
+   "id": 401662,
+   "unidades": 1
+  }
+ },
+ "p20_pringles": {
+  "nombre": "Pringles original 37 g",
+  "masmelos": {
+   "titulo": "PAPAS PRINGLES ORIGINAL X 37G",
+   "codigo": "Cod. 032304",
+   "unidades": 1
+  },
+  "golomax": {
+   "nombre": "Papas PRINGLES Sabor Original x37g.",
+   "codigo": "1425500",
+   "divisor": 1
+  },
+  "distrioks": {
+   "id": 11813,
+   "unidades": 1
+  },
+  "pop": {
+   "id": 436424,
+   "unidades": 1
+  }
+ },
+ "p21_milka_ddl_negro": {
+  "nombre": "Alfajor Milka Super Dulce de Leche 70 g",
+  "masmelos": {
+   "titulo": "ALF.MILKA EXTRA DDL CHOCO X 70 G",
+   "codigo": "Cod. 002263",
+   "unidades": 1
+  },
+  "golomax": {
+   "nombre": "Alfajor MILKA SImple Leche con Super Dulce de Leche x70g.",
+   "codigo": "1107164",
+   "divisor": 1
+  }
+ },
+ "p22_milka_ddl_blanco": {
+  "nombre": "Alfajor Milka Super Dulce de Leche blanco 70 g",
+  "masmelos": {
+   "titulo": "ALF.MILKA EXTRA DDL BCO X 70 G",
+   "codigo": "Cod. 002265",
+   "unidades": 1
+  },
+  "golomax": {
+   "nombre": "Alfajor MILKA Simple Blanco con Super Dulce de Leche x70g.",
+   "codigo": "1107126",
+   "divisor": 1
+  }
+ },
+ "p23_rasta_negro": {
+  "nombre": "Alfajor Rasta negro 70 g",
+  "masmelos": {
+   "titulo": "ALF. RASTA CHOCO NEGRO X 70 G",
+   "codigo": "Cod. 042114",
+   "unidades": 1
+  },
+  "golomax": {
+   "nombre": "Alfajor RASTA Negro x70g.",
+   "codigo": "1106865",
+   "divisor": 1
+  },
+  "distrioks": {
+   "id": 38358,
+   "unidades": 18
+  },
+  "pop": {
+   "id": 468868,
+   "unidades": 1
+  }
+ },
+ "p24_rasta_blanco": {
+  "nombre": "Alfajor Rasta blanco",
+  "masmelos": {
+   "titulo": "ALF. RASTA CHOCO BLANCO X 70 G",
+   "codigo": "Cod. 042118",
+   "unidades": 1
+  },
+  "golomax": {
+   "nombre": "Alfajor RASTA Blanco x70g.",
+   "codigo": "1106824",
+   "divisor": 1
+  },
+  "distrioks": {
+   "id": 38361,
+   "unidades": 18
+  },
+  "pop": {
+   "id": 468861,
+   "unidades": 1
+  }
+ },
+ "p25_aguila_brownie": {
+  "nombre": "Alfajor Águila Minitorta Brownie 71 g",
+  "masmelos": {
+   "titulo": "ALF. AGUILA MINI TORTA BROWNIE X 71.5 G",
+   "codigo": "Cod. 002249",
+   "unidades": 1
+  },
+  "golomax": {
+   "nombre": "Alfajor AGUILA Mini Torta Brownie x74g.",
+   "codigo": "1101227",
+   "divisor": 1
+  },
+  "pop": {
+   "id": 491380,
+   "unidades": 21
+  }
+ },
+ "p26_cachafaz": {
+  "nombre": "Alfajor Cachafaz chocolate 60 g",
+  "masmelos": {
+   "titulo": "ALF.CACHAFAZ CHOCO FLOWPACK 12 UNI X 60 G (UXB 6)",
+   "codigo": "Cod. 002338",
+   "unidades": 12
+  },
+  "golomax": {
+   "nombre": "Alfajor CACHAFAZ Negro x60g.",
+   "codigo": "1107863",
+   "divisor": 1
+  }
+ },
+ "p27_alfajor_block": {
+  "nombre": "Alfajor Block 60 g",
+  "masmelos": {
+   "titulo": "ALF.COFLER BLOCK X 60 G",
+   "codigo": "Cod. 002377",
+   "unidades": 1
+  },
+  "golomax": {
+   "nombre": "Alfajor COFLER BLOCK x60g.",
+   "codigo": "1109800",
+   "divisor": 1
+  },
+  "pop": {
+   "id": 496046,
+   "unidades": 21
+  }
+ },
+ "p28_chocotorta": {
+  "nombre": "Alfajor Chocotorta 71,5 g",
+  "masmelos": {
+   "titulo": "ALF. CHOCOLINAS CHOCOTORTA TRIPLE X 71,5 G",
+   "codigo": "Cod. 002342",
+   "unidades": 1
+  },
+  "golomax": {
+   "nombre": "Alfajor CHOCOLINAS Chocotorta Triple x71,5g.",
+   "codigo": "1105466",
+   "divisor": 1
+  }
+ },
+ "p29_milka_mousse": {
+  "nombre": "Alfajor Milka Mousse triple 55 g",
+  "masmelos": {
+   "titulo": "ALF.MILKA TRIPLE MOUSSE X 55 G",
+   "codigo": "Cod. 002330",
+   "unidades": 1
+  },
+  "golomax": {
+   "nombre": "Alfajor MILKA Triple Mousse Leche x55g.",
+   "codigo": "1107163",
+   "divisor": 1
+  },
+  "pop": {
+   "id": 75544,
+   "unidades": 36
+  }
+ },
+ "p30_guaymallen": {
+  "nombre": "Alfajor Guaymallén chocolate 38 g",
+  "masmelos": {
+   "titulo": "ALF.GUAYMA CHOCO X 40 UNI",
+   "codigo": "Cod. 002048",
+   "unidades": 40
+  },
+  "distrioks": {
+   "id": 25937,
+   "unidades": 40
+  },
+  "pop": {
+   "id": 7175,
+   "unidades": 1
+  }
+ },
+ "p31_rocklets": {
+  "nombre": "Rocklets 40 g",
+  "masmelos": {
+   "titulo": "CONF.ROCKLETS 18 UNI X 40 G",
+   "codigo": "Cod. 038061",
+   "unidades": 18
+  },
+  "golomax": {
+   "nombre": "Confites ROCKLETS 18u. x40g.",
+   "codigo": "1261040",
+   "divisor": 1
+  },
+  "pop": {
+   "id": 86650,
+   "unidades": 1
+  }
+ },
+ "p32_sugus": {
+  "nombre": "Sugus confitados 50 g",
+  "masmelos": {
+   "titulo": "CARAM.SUGUS CONF X 50 G",
+   "codigo": "Cod. 009336",
+   "unidades": 1
+  },
+  "golomax": {
+   "nombre": "Caramelos SUGUS Confitados x50g.",
+   "codigo": "1164700",
+   "divisor": 1
+  },
+  "pop": {
+   "id": 7838,
+   "unidades": 1
+  }
+ },
+ "p33_hamlet": {
+  "nombre": "Hamlet bicolor 42 g",
+  "masmelos": {
+   "titulo": "CHOCO.HAMLET BICOLOR X 42 G (4910)",
+   "codigo": "Cod. 012729",
+   "unidades": 1
+  },
+  "golomax": {
+   "nombre": "Chocolate HAMLET Bicolor x45g.",
+   "codigo": "1211500",
+   "divisor": 1
+  },
+  "pop": {
+   "id": 491909,
+   "unidades": 21
+  }
+ },
+ "p34_kitkat": {
+  "nombre": "Kit Kat 41,5 g",
+  "masmelos": {
+   "titulo": "CHOCO.KIT KAT 4 FINGER X 41.5 G",
+   "codigo": "Cod. 012108",
+   "unidades": 1
+  },
+  "golomax": {
+   "nombre": "Oblea KIT KAT x41.5g.",
+   "codigo": "1361524",
+   "divisor": 1
+  },
+  "pop": {
+   "id": 6951,
+   "unidades": 1
+  }
+ },
+ "p35_kinder": {
+  "nombre": "Kinder Chocolate 50 g",
+  "masmelos": {
+   "titulo": "CHOCO.KINDER LECHE CACAO X 50 G",
+   "codigo": "Cod. 012143",
+   "unidades": 1
+  },
+  "golomax": {
+   "nombre": "Chocolate KINDER Barrita x50g.",
+   "codigo": "1217100",
+   "divisor": 1
+  },
+  "pop": {
+   "id": 9742,
+   "unidades": 1
+  }
+ },
+ "p36_conito": {
+  "nombre": "Conito Cachafaz 38 g",
+  "masmelos": {
+   "titulo": "CONITO CACHAFAZ 12 UNI X 38 G",
+   "codigo": "Cod. 016685",
+   "unidades": 12
+  },
+  "pop": {
+   "id": 120913,
+   "unidades": 12
+  }
+ },
+ "p37_beldent": {
+  "nombre": "Beldent Infinit menta 13,3 g",
+  "masmelos": {
+   "titulo": "CHICLE BELDENT INF 7 MTA X 15 UNI (NUEVO)",
+   "codigo": "Cod. 0011477",
+   "unidades": 15
+  },
+  "golomax": {
+   "nombre": "Chicles BELDENT INFINIT x7 Menta x15u.",
+   "codigo": "1207763",
+   "divisor": 1
+  },
+  "pop": {
+   "id": 489941,
+   "unidades": 15
+  }
+ },
+ "p38_tictac": {
+  "nombre": "Tic Tac naranja 16 g",
+  "masmelos": {
+   "titulo": "PAST.TIC TAC NJA X 12 UNI",
+   "codigo": "Cod. 024155",
+   "unidades": 12
+  },
+  "golomax": {
+   "nombre": "Pastillas TIC TAC Naranja x12u.",
+   "codigo": "1405362",
+   "divisor": 1
+  },
+  "pop": {
+   "id": 383650,
+   "unidades": 1
+  }
+ },
+ "p40_moritas": {
+  "nombre": "Mogul Moras 50 g",
+  "pop": {
+   "id": 492452,
+   "unidades": 10
+  }
+ },
+ "p41_cofler_air_mixto": {
+  "nombre": "Cofler Air mixto 55 g",
+  "masmelos": {
+   "titulo": "CHOCO COFLER AIR BCO/LECHE X 55 G",
+   "codigo": "Cod. 012072",
+   "unidades": 1
+  }
+ },
+ "p43_cofler_extra": {
+  "nombre": "Cofler Extra Chocotorta 46 g",
+  "masmelos": {
+   "titulo": "CHOCO COFLER EXTRA CHOCOTORTA X 46 G",
+   "codigo": "Cod. 012669",
+   "unidades": 1
+  },
+  "golomax": {
+   "nombre": "Chocolate COFLER Extra Chocotorta x46g.",
+   "codigo": "1219511",
+   "divisor": 1
+  }
+ },
+ "p45_block": {
+  "nombre": "Chocolate Block con maní 38 g",
+  "masmelos": {
+   "titulo": "CHOCO COFLER BLOCK 20 UNI X 38 G",
+   "codigo": "Cod. 012686",
+   "unidades": 20
+  }
+ },
+ "p46_cadbury_fruti": {
+  "nombre": "Cadbury Yoghurt Frutilla 29 g",
+  "masmelos": {
+   "titulo": "CHOCO.CADBURY YOG/FRUT 12 UNI X 29 G",
+   "codigo": "Cod. 012575",
+   "unidades": 12
+  },
+  "golomax": {
+   "nombre": "Chocolate CADBURY Yoghurt Frutilla x29g.",
+   "codigo": "1215538",
+   "divisor": 1
+  },
+  "pop": {
+   "id": 75564,
+   "unidades": 1
+  }
+ },
+ "p47_cereal_mix": {
+  "nombre": "Cereal Mix yoghurt frutilla 26 g",
+  "masmelos": {
+   "titulo": "CEREAL MIX FRUT/YOG X 26 G",
+   "codigo": "Cod. 010035",
+   "unidades": 1
+  },
+  "golomax": {
+   "nombre": "Cereal MIX Yoghurt Frutilla x28g.",
+   "codigo": "1181138",
+   "divisor": 1
+  }
+ },
+ "p48_integra_choco": {
+  "nombre": "Íntegra proteica maní y chocolate 45 g",
+  "pop": {
+   "id": 492204,
+   "unidades": 10
+  }
+ },
+ "p49_integra_arandanos": {
+  "nombre": "Íntegra proteica maní y arándanos 43 g",
+  "pop": {
+   "id": 492202,
+   "unidades": 10
+  }
+ },
+ "p51_lays": {
+  "nombre": "Lay's clásicas 85 g",
+  "masmelos": {
+   "titulo": "PAPAS LAYS CLASICAS X 85 G",
+   "codigo": "Cod. 032285",
+   "unidades": 1
+  },
+  "golomax": {
+   "nombre": "Papas LAYS Clásicas x85g.",
+   "codigo": "1421594",
+   "divisor": 1
+  }
+ },
+ "p53_doritos": {
+  "nombre": "Doritos queso 77 g",
+  "masmelos": {
+   "titulo": "DORITOS QUESO X 77 G",
+   "codigo": "Cod. 032203",
+   "unidades": 1
+  },
+  "golomax": {
+   "nombre": "DORITOS Sabor Queso x77g.",
+   "codigo": "1424988",
+   "divisor": 1
+  }
+ },
+ "p54_saladix": {
+  "nombre": "Saladix pizza 100 g",
+  "masmelos": {
+   "titulo": "GALLE.SALADIX PIZZA X 100 G",
+   "codigo": "Cod. 017289",
+   "unidades": 1
+  },
+  "golomax": {
+   "nombre": "SALADIX Sabor Pizza x100g.",
+   "codigo": "1301174",
+   "divisor": 1
+  },
+  "pop": {
+   "id": 496172,
+   "unidades": 24
+  }
+ },
+ "p55_surtidas": {
+  "nombre": "Terrabusi Variedad 390 g",
+  "masmelos": {
+   "titulo": "GALLE.VARIEDAD TERRABUSI X 390 G",
+   "codigo": "Cod. 017406",
+   "unidades": 1
+  },
+  "golomax": {
+   "nombre": "Galletitas TERRABUSI Variedad x390g.",
+   "codigo": "1285040",
+   "divisor": 1
+  },
+  "pop": {
+   "id": 462309,
+   "unidades": 1
+  }
+ },
+ "p56_baggio_manzana": {
+  "nombre": "Baggio Pronto manzana 200 ml",
+  "masmelos": {
+   "titulo": "JUGO BAGGIO MZA 18 UNI X 200 CC",
+   "codigo": "Cod. 021150",
+   "unidades": 18
+  },
+  "golomax": {
+   "nombre": "Jugos BAGGIO Fresh Manzana Deliciosa x200ml.",
+   "codigo": "2426293",
+   "divisor": 1
+  }
+ },
+ "p59_guaymallen_blanco": {
+  "nombre": "Alfajor Guaymallén blanco 38 g",
+  "masmelos": {
+   "titulo": "ALF.GUAYMA BCO X 40 UNI",
+   "codigo": "Cod. 002047",
+   "unidades": 40
+  },
+  "golomax": {
+   "nombre": "Alfajor GUAYMALLEN Blanco 40u. x38g.",
+   "codigo": "1103125",
+   "divisor": 1
+  },
+  "distrioks": {
+   "id": 25934,
+   "unidades": 40
+  },
+  "pop": {
+   "id": 7109,
+   "unidades": 1
+  }
+ },
+ "p61_don_satur_dulces": {
+  "nombre": "Bizcochos Don Satur dulces 200 g",
+  "masmelos": {
+   "titulo": "BIZC.DON SATUR DULCE X 200 G (0215)",
+   "codigo": "Cod. 005011",
+   "unidades": 1
+  },
+  "golomax": {
+   "nombre": "Bizcochos DON SATUR Dulce x200g.",
+   "codigo": "1121701",
+   "divisor": 1
+  }
+ },
+ "p62_don_satur_salados": {
+  "nombre": "Bizcochos Don Satur salados 200 g",
+  "masmelos": {
+   "titulo": "BIZC.DON SATUR SALADO X 200 G (0115)",
+   "codigo": "Cod. 005013",
+   "unidades": 1
+  },
+  "golomax": {
+   "nombre": "Bizcochos DON SATUR Salado x200g.",
+   "codigo": "1121703",
+   "divisor": 1
+  },
+  "pop": {
+   "id": 1472,
+   "unidades": 1
+  }
+ },
+ "p63_pepas_terepin": {
+  "nombre": "Pepas Terepín 200 g",
+  "masmelos": {
+   "titulo": "GALLE.TEREPIN PEPAS X 200 G",
+   "codigo": "Cod. 017493",
+   "unidades": 1
+  },
+  "golomax": {
+   "nombre": "Galletitas TEREPÍN Pepas x200g.",
+   "codigo": "1287620",
+   "divisor": 1
+  },
+  "distrioks": {
+   "id": 40976,
+   "unidades": 1
+  }
+ },
+ "p64_cerealitas": {
+  "nombre": "Cerealitas clásicas 212 g",
+  "masmelos": {
+   "titulo": "GALLE.CEREALITAS X 212 G",
+   "codigo": "Cod. 017025",
+   "unidades": 1
+  },
+  "golomax": {
+   "nombre": "Galletitas CEREALITAS x212g.",
+   "codigo": "1303200",
+   "divisor": 1
+  },
+  "pop": {
+   "id": 66833,
+   "unidades": 1
+  }
+ },
+ "p66_sonrisas": {
+  "nombre": "Sonrisas frambuesa 108 g",
+  "masmelos": {
+   "titulo": "GALLE.SONRISAS X 108 G",
+   "codigo": "Cod. 017306",
+   "unidades": 1
+  },
+  "golomax": {
+   "nombre": "Galletitas SONRISAS Frambuesa x108g.",
+   "codigo": "1282932",
+   "divisor": 1
+  },
+  "pop": {
+   "id": 7816,
+   "unidades": 1
+  }
+ },
+ "p67_madalenas_bimbo": {
+  "nombre": "Madalenas Bimbo chocolate rellenas de dulce de leche 234 g",
+  "masmelos": {
+   "titulo": "MADA. BIMBO CHOCO RELL DDL X 234 G",
+   "codigo": "Cod. 008140",
+   "unidades": 1
+  }
+ },
+ "p68_b3st_protein": {
+  "nombre": "Barra B3ST Protein frutos rojos 60 g",
+  "masmelos": {
+   "titulo": "BARRA BNB B3ST PROTEIN FTOS ROJOS X 60 G",
+   "codigo": "Cod. 020330",
+   "unidades": 1
+  },
+  "golomax": {
+   "nombre": "Barra BEST Protein Frutos Rojos x60g.",
+   "codigo": "1188458",
+   "divisor": 1
+  },
+  "distrioks": {
+   "id": 36512,
+   "unidades": 16
+  }
+ },
+ "p69_budin_bonafide": {
+  "nombre": "Budín Bonafide marmolado 180 g",
+  "masmelos": {
+   "titulo": "BUDIN BONAFIDE MARMOLADO X 180 G",
+   "codigo": "Cod. 008031",
+   "unidades": 1
+  }
+ },
+ "p70_palitos_nikitos": {
+  "nombre": "Palitos salados Nikitos 80 g",
+  "masmelos": {
+   "titulo": "PALITOS SALADOS NIKITOS X 80 G",
+   "codigo": "Cod. 032158",
+   "unidades": 1
+  }
+ },
+ "p71_agua_villamanaos": {
+  "nombre": "Agua Villamanaos sin gas 600 ml",
+  "masmelos": {
+   "titulo": "AGUA VILLAMANAOS S/G 12 UNI X 600 ML",
+   "codigo": "Cod. 001040",
+   "unidades": 12
+  },
+  "golomax": {
+   "nombre": "Agua VILLAMANAOS 12u. x600ml.",
+   "codigo": "2140306",
+   "divisor": 1
+  }
+ },
+ "p72_coca_600": {
+  "nombre": "Coca-Cola 600 ml",
+  "masmelos": {
+   "titulo": "GASE.COCA COLA 6 UNI X 600 CC",
+   "codigo": "Cod. 018160",
+   "unidades": 6
+  }
+ },
+ "p73_coca_zero_600": {
+  "nombre": "Coca-Cola Zero 600 ml",
+  "masmelos": {
+   "titulo": "GASE.COCA ZERO 6 UNI X 600CC",
+   "codigo": "Cod. 001033",
+   "unidades": 6
+  }
+ },
+ "p74_sprite_600": {
+  "nombre": "Sprite 600 ml",
+  "masmelos": {
+   "titulo": "GASE.SPRITE 6 UNI X 600CC",
+   "codigo": "Cod. 001011",
+   "unidades": 6
+  }
+ },
+ "p76_integra_ddl": {
+  "nombre": "Íntegra proteica dulce de leche 43 g",
+  "masmelos": {
+   "titulo": "BARRA PROTEICA INTEGRA DDL X 43 G",
+   "codigo": "Cod. 002322",
+   "unidades": 1
+  }
+ },
+ "p80_cofler_extra_cookies": {
+  "nombre": "Cofler Extra Cookies & Cream 46 g",
+  "masmelos": {
+   "titulo": "CHOCO COFLER EXTRA COOKIES & CREAM X 46 G",
+   "codigo": "Cod. 012083",
+   "unidades": 1
+  }
+ },
+ "p82_chochoco": {
+  "nombre": "Chocolatada Mr Choco 200 ml",
+  "masmelos": {
+   "titulo": "CHOCOLATADA CHOCHO-CO X 200CC",
+   "codigo": "Cod. 0212110",
+   "unidades": 1
+  }
+ },
+ "p85_aquarius_pomelo": {
+  "nombre": "Aquarius pomelo 600 ml",
+  "masmelos": {
+   "titulo": "AQUARIUS POMELO BCO 6 UNI X 600 CC",
+   "codigo": "Cod. 001023",
+   "unidades": 6
+  },
+  "golomax": {
+   "nombre": "Agua Saborizada AQUARIUS Pomelo 6u. x600ml.",
+   "codigo": "2143075",
+   "divisor": 1
+  }
+ },
+ "p86_fulbito_mani": {
+  "nombre": "Alfajor Fulbito maní 30 g",
+  "masmelos": {
+   "titulo": "ALF.FULBITO MANI 44 UNI X 30 G (01832)",
+   "codigo": "Cod. 002171",
+   "unidades": 44
+  },
+  "golomax": {
+   "nombre": "Alfajor FULBITO Negro Relleno con Maní 44u. x30g.",
+   "codigo": "1104962",
+   "divisor": 1
+  }
+ },
+ "p87_fulbito_choco": {
+  "nombre": "Alfajor Fulbito chocolate 30 g",
+  "masmelos": {
+   "titulo": "ALF.FULBITO CHOCO 44 UNI X 30 G",
+   "codigo": "Cod. 036014",
+   "unidades": 44
+  },
+  "golomax": {
+   "nombre": "Alfajor FULBITO Negro Relleno con Chocolate 44u. x30g.",
+   "codigo": "1104926",
+   "divisor": 1
+  }
+ },
+ "p88_fulbito_black": {
+  "nombre": "Alfajor Fulbito Black 30 g",
+  "masmelos": {
+   "titulo": "ALF.FULBITO BLACK 44 UNI X 30G (01834)",
+   "codigo": "Cod. 002893",
+   "unidades": 44
+  },
+  "golomax": {
+   "nombre": "Alfajor FULBITO Black 44u. x30g.",
+   "codigo": "1104964",
+   "divisor": 1
+  }
+ },
+ "p89_giga": {
+  "nombre": "Alfajor Giga chocolate 72 g",
+  "masmelos": {
+   "titulo": "ALF. GIGA CHOCO X 72 G",
+   "codigo": "Cod. 002218",
+   "unidades": 1
+  },
+  "golomax": {
+   "nombre": "Alfajor GIGA By Spreen Negro x72g.",
+   "codigo": "1108263",
+   "divisor": 1
+  },
+  "distrioks": {
+   "id": 42411,
+   "unidades": 18
+  }
+ },
+ "p90_hershey": {
+  "nombre": "Hershey's chocolate con leche 82 g",
+  "masmelos": {
+   "titulo": "CHOCO.HERSHEYS C/LECHE X 82 G",
+   "codigo": "Cod. 015026",
+   "unidades": 1
+  },
+  "distrioks": {
+   "id": 26599,
+   "unidades": 1
+  }
+ },
+ "p91_batatas_nikitos": {
+  "nombre": "Batatas fritas Nikitos 70 g",
+  "masmelos": {
+   "titulo": "BATATAS FRITAS NIKITOS X 70 G",
+   "codigo": "Cod. 032719",
+   "unidades": 1
+  }
+ },
+ "p92_panuelos_candela": {
+  "nombre": "Pañuelos descartables Candela",
+  "masmelos": {
+   "titulo": "PAÑUELOS CANDELA X 6 UNI (1161)",
+   "codigo": "Cod. 004681",
+   "unidades": 6
+  },
+  "golomax": {
+   "nombre": "Pañuelos CANDELA x6u.",
+   "codigo": "5421206",
+   "divisor": 1
+  }
+ },
+ "p93_yerba_mananita": {
+  "nombre": "Yerba Mañanita 250 g",
+  "masmelos": {
+   "titulo": "YERBA MAÑANITA 4 FLEX X 250 G",
+   "codigo": "Cod. 030720",
+   "unidades": 1
+  }
+ },
+ "p94_pep_120": {
+  "nombre": "Pep Rueditas pizza 120 g",
+  "masmelos": {
+   "titulo": "PEP RUEDITAS PIZZA X 120 G",
+   "codigo": "Cod. 037060",
+   "unidades": 1
+  }
+ },
+ "p96_pochoclos_nikitos": {
+  "nombre": "Pochoclos Nikitos premium 95 g",
+  "masmelos": {
+   "titulo": "POCHOCLOS NIKITOS PREMIUM ACARAM. X 95 G",
+   "codigo": "Cod. 032181",
+   "unidades": 1
+  }
+ }
+}
