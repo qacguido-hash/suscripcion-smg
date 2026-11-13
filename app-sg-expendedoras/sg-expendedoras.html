@@ -133,7 +133,9 @@ tr.click{cursor:pointer} tr.click:hover td{background:var(--surface-2)}
 .vscroll{overflow-x:auto;border-radius:16px}
 .vmach{background:var(--accent);border-radius:16px;padding:12px;display:grid;grid-template-columns:minmax(560px,1fr) 54px;gap:10px}
 .vglass{background:#1d2027;border-radius:10px;padding:8px;display:flex;flex-direction:column;gap:7px}
-.tray{display:grid;grid-template-columns:repeat(11,minmax(0,1fr));gap:5px;border-bottom:3px solid #3a3e48;padding-bottom:6px}
+.tray{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:5px;border-bottom:3px solid #3a3e48;padding-bottom:6px}
+.tray.big{grid-template-columns:repeat(5,minmax(0,1fr))}
+.tray.big .vsl img,.tray.big .vsl .ph{height:84px}
 .vsl{background:#2a2e37;border:0;border-radius:7px;padding:4px 3px 5px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;font:inherit;color:#fff;min-width:0}
 .vsl:hover{background:#353a45} .vsl:focus-visible{outline:2px solid #fff;outline-offset:1px}
 .vsl img,.vsl .ph{width:100%;height:44px;object-fit:contain}
@@ -596,7 +598,9 @@ function vMaquinas(){
   const cel = (i) => { const sl = (m.slots||{})[i] || {}; const p = sl.productoId ? S.productos[sl.productoId] : null; const st = slotState(sl); const vacio = p && sl.capacidad && !(sl.cantidad > 0);
     return `<button type="button" class="vsl ${vacio?"e":""} ${p?"":"v"}" data-slot="${i}" aria-label="Slot ${i}${p?": "+esc(p.nombre)+(sl.capacidad?", "+(sl.cantidad||0)+" de "+sl.capacidad:""):" sin asignar"}" title="${p?esc(p.nombre):"Sin asignar"}"><span class="no">${i}</span>${p?img(p,""):`<span class="ph">vacío</span>`}
     ${p && sl.capacidad ? `<span class="q num">${sl.cantidad||0}/${sl.capacidad}</span><span class="bar ${st||""}"><i style="width:${Math.min(100,Math.round((sl.cantidad||0)/sl.capacidad*100))}%"></i></span>` : p ? `<span class="q">—</span>` : ""}</button>`; };
-  let bandejas = ""; for (let i=1;i<=n;i+=11){ let f = ""; for (let j=i;j<Math.min(i+11,n+1);j++) f += cel(j); bandejas += `<div class="tray">${f}</div>`; }
+  // Disposición real: bandeja de arriba con 5 canales grandes y debajo bandejas de 10.
+  const filas = []; { let i = 1; if (n > 10 && (n - 5) % 10 === 0){ filas.push([1,5]); i = 6; } for (; i<=n; i+=10) filas.push([i, Math.min(i+9, n)]); }
+  let bandejas = ""; for (const [ini, fin] of filas){ let f = ""; for (let j=ini;j<=fin;j++) f += cel(j); bandejas += `<div class="tray ${fin-ini+1 <= 5 ? "big" : ""}">${f}</div>`; }
   const agotan = pron.length ? pron.slice(0,8).map(x=>`<div class="li">${img(x.p)}<div class="grow"><div class="t">${esc(x.p.nombre)}</div><div class="d">Slot ${x.slots.join(", ")} · quedan ${x.cant} · vende ${f1(x.cons)}/día</div></div><span class="pill ${x.ds<1?"p-bad":x.ds<3?"p-warn":"p-ok"}">${x.ds<1?"hoy":x.ds<2?"mañana":Math.floor(x.ds)+" días"}</span></div>`).join("")
     : rep.length ? [...rep].sort((a,b)=>a.cant/a.cap-b.cant/b.cap).slice(0,8).map(r=>{ const pp = S.productos[r.pid]||{}; return `<div class="li">${img(pp)}<div class="grow"><div class="t">${esc(pp.nombre||"")}</div><div class="d">Slot ${r.n} · quedan ${r.cant} de ${r.cap}</div></div><span class="pill ${r.cant===0?"p-bad":r.st?"p-warn":"p-info"}">${r.cant===0?"vacío":"faltan "+r.falta}</span></div>`; }).join("")
     : "";
