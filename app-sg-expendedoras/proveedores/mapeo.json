@@ -983,5 +983,17 @@
    "codigo": "Cod. 032181",
    "unidades": 1
   }
+ },
+ "p108_hershey_cookies_77": {
+  "nombre": "Hershey's Cookies & Cream 77 g",
+  "masmelos": {
+   "titulo": "CHOCO. HERSHEYS COOKIES & CREAM X 77 G",
+   "codigo": "Cod. 015025",
+   "unidades": 1
+  },
+  "distrioks": {
+   "id": 33369,
+   "unidades": 1
+  }
  }
 }

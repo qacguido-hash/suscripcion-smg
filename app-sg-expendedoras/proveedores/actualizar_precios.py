@@ -91,7 +91,9 @@ def precio_woo(prov, m):
     except Exception as e:
         return None, "error: " + str(e)[:80]
 
-FUENTES = {"masmelos": precio_masmelos, "golomax": precio_golomax,
+# Masmelos NO se actualiza solo: la web sin iniciar sesión muestra precios distintos (≈5% más caros)
+# a los que ve el cliente con su cuenta. Sus precios se cargan a mano. precio_masmelos queda para uso manual.
+FUENTES = {"golomax": precio_golomax,
            "distrioks": lambda m: precio_woo("distrioks", m), "pop": lambda m: precio_woo("pop", m)}
 
 def main(dump, out):

@@ -1,7 +1,8 @@
 # Actualización diaria de precios de proveedores
 
 App: https://claude.ai/artifact/LECc5G6xbvVBwaq7J8PNcR (colección `productos`).
-Proveedores: Masmelos, Golomax, Distribuidora OKs (`distrioks`), Distribuidora Pop (`pop`).
+Proveedores que se actualizan solos: Golomax, Distribuidora OKs (`distrioks`), Distribuidora Pop (`pop`).
+**Masmelos no**: su web sin cuenta muestra otros precios que los del cliente; se carga a mano.
 `mapeo.json` dice qué artículo de cada proveedor corresponde a cada producto de la app.
 
 ## Pasos
