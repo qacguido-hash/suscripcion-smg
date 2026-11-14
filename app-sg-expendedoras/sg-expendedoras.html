@@ -172,7 +172,7 @@ tr.click{cursor:pointer} tr.click:hover td{background:var(--surface-2)}
 .stl>.num{white-space:nowrap}
 .sq{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:8px;vertical-align:-1px}
 .fbar{height:10px;background:var(--info-soft);border-radius:99px;overflow:hidden;margin:8px 0 4px}.fbar i{display:block;height:100%;border-radius:99px}
-.pqs{margin-top:8px}.pq{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--line);cursor:pointer}.pq:first-child{border-top:0}.pq .grow{flex:1;min-width:0}.pq .r .pill{white-space:normal;text-align:right}.plan .plh{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}.plan .plh>div{min-width:0}.pq .t{font-weight:600;font-size:14.5px}.pq .d{font-size:12.5px;color:var(--muted)}.pq .r{display:flex;flex-direction:column;align-items:flex-end;gap:4px;text-align:right}.pq.ok .t{color:var(--muted)}.pq:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+[hidden]{display:none!important}.pqs{margin-top:8px}.pq{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--line);cursor:pointer}.pq:first-child{border-top:0}.pq .grow{flex:1;min-width:0}.pq .r .pill{white-space:normal;text-align:right}.plan .plh{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}.plan .plh>div{min-width:0}.pq .t{font-weight:600;font-size:14.5px}.pq .d{font-size:12.5px;color:var(--muted)}.pq .r{display:flex;flex-direction:column;align-items:flex-end;gap:4px;text-align:right}.pq.ok .t{color:var(--muted)}.pq:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .plan .aviso{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;background:var(--warn-soft);border-radius:10px;padding:8px 10px;margin:10px 0 0}
 .plan .dolar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-top:10px;padding-top:10px;border-top:1px dashed var(--line)}.plan .cubre{margin-top:12px;padding-top:10px;border-top:1px solid var(--line)}
 .mv{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--line);font-size:14px}.mv:first-child{border-top:0}
@@ -729,11 +729,12 @@ function planItems(p){
   return out.map(x => Object.assign(x, {pago: (p.pagos||{})[x.k] || null}));
 }
 function planTot(p){
-  const d = dolarHoy(), it = planItems(p); let usdPag = 0, usdPend = 0, arsPag = 0, fletePend = 0;
+  const d = dolarHoy(), it = planItems(p); let usdPag = 0, usdPend = 0, arsPag = 0, fletePend = 0, usdDir = 0;
   for (const x of it){ if (x.k === "flete"){ if (x.pago) arsPag += x.pago.ars||0; else fletePend += x.ars||0; continue; }
-    if (x.pago){ usdPag += x.usd; arsPag += x.pago.ars||0; } else usdPend += x.usd; }
+    if (x.pago){ usdPag += x.usd; if (x.pago.enDolares) usdDir += x.pago.usd || x.usd; else arsPag += x.pago.ars||0; } else usdPend += x.usd; }
   const arsPendEst = d && d.valor ? usdPend * d.valor + fletePend : null;
-  return {it, usdPag, usdPend, arsPag, fletePend, arsPendEst, costo: arsPendEst != null ? arsPag + arsPendEst : null};
+  const dirEst = d && d.valor ? usdDir * d.valor : null;
+  return {it, usdPag, usdPend, arsPag, usdDir, fletePend, arsPendEst, costo: arsPendEst != null ? arsPag + arsPendEst + (dirEst||0) : null};
 }
 // Ganancia neta promedio de una máquina por mes (últimos 3 meses cerrados con ventas)
 function gananciaPorMaquina(){
@@ -753,7 +754,7 @@ function planCard(p){
     const venc = x.vence ? days(x.vence) : null;
     const estado = x.pago ? `<span class="pill p-ok">${x.pago.fecha ? "Pagado " + fdate(x.pago.fecha) : "Pagado"}</span>`
       : x.vence ? `<span class="pill ${venc < 0 ? "p-bad" : venc <= 7 ? "p-warn" : "p-info"}">${venc < 0 ? "Vencida " + fdate(x.vence) : (p.entregaEstimada && x.k !== "anticipo" ? "Aprox. " : "Vence ") + fdate(x.vence)}</span>` : `<span class="pill p-info">${esc(x.cuando)}</span>`;
-    const det = x.pago ? (x.pago.ars == null ? '<span style="color:var(--warn)">Faltan los pesos y la fecha: tocá para cargarlos</span>' : esF ? ORIG[x.pago.sobre]||"" : fm(x.pago.ars) + " · dólar " + fm(x.pago.tc) + " · " + (ORIG[x.pago.sobre]||"")) : est;
+    const det = x.pago ? (x.pago.enDolares ? "Pagado en dólares · " + (ORIG[x.pago.sobre]||"") : x.pago.ars == null ? '<span style="color:var(--warn)">Faltan los pesos y la fecha: tocá para cargarlos</span>' : esF ? ORIG[x.pago.sobre]||"" : fm(x.pago.ars) + " · dólar " + fm(x.pago.tc) + " · " + (ORIG[x.pago.sobre]||"")) : est;
     return `<div class="pq ${x.pago ? "ok" : ""}" ${S.ro ? "" : `role="button" tabindex="0" data-pago="${esc(p.id)}|${x.k}"`}><div class="grow"><div class="t">${esc(x.label)}</div><div class="d">${det || (esF && x.ars == null ? "Falta cargar el monto" : "")}</div></div><div class="r"><strong class="num">${esF && x.ars == null && !x.pago ? "—" : monto}</strong>${estado}</div></div>`; };
   let cubre = "";
   if (proxima && proxima.k !== "anticipo" && g && d && d.valor){ const cuotaArs = proxima.usd * d.valor, ratio = g.monto / cuotaArs;
@@ -770,6 +771,7 @@ function planCard(p){
    <div class="stl tot" style="margin-top:6px"><span>Falta pagar</span><span class="num">${fusd(T.usdPend)}${T.fletePend ? " + " + fm(T.fletePend) : ""}</span></div>
    <div class="stl"><span>En pesos, al dólar de hoy</span><span class="num">${T.arsPendEst != null ? "≈ " + fm(T.arsPendEst) : "—"}</span></div>
    <div class="stl"><span>Pagado en pesos</span><span class="num">${fm(T.arsPag)}</span></div>
+   ${T.usdDir ? `<div class="stl"><span>Pagado directamente en dólares</span><span class="num">${fusd(T.usdDir)}</span></div>` : ""}
    <div class="dolar"><span class="small">Dólar BNA vendedor: <strong class="num">${d && d.valor ? fm(d.valor) : "sin cargar"}</strong>${d && d.fecha ? ` <span class="muted">· ${fdate(d.fecha)}</span>` : ""}</span>${S.ro ? "" : `<button class="btn sm" type="button" data-act="fin-dolar">${d && d.valor ? "Actualizar" : "Cargar"}</button>`}</div>
    ${cubre}
    ${p.maquinaId && S.maquinas[p.maquinaId] ? `<p class="muted small" style="margin:10px 0 0">El costo en pesos de esta compra cuenta como inversión de ${esc(S.maquinas[p.maquinaId].nombre)} para el ROI.</p>` : ""}
@@ -808,23 +810,30 @@ function openPago(pid, k){
   const p = planList().find(x => x.id === pid); if (!p) return; const x = planItems(p).find(i => i.k === k); if (!x) return;
   const pg = x.pago || {}, d = dolarHoy() || {}, esF = k === "flete";
   const body = `<p class="small" style="margin:0"><strong>${esc(p.nombre)} · ${esc(x.label)}</strong>${esF ? "" : " · " + fusd(x.usd)}</p>
+   ${esF ? "" : `<label class="field">Se pagó en<select id="pg-mon"><option value="ars" ${pg.enDolares ? "" : "selected"}>Pesos, al dólar BNA vendedor</option><option value="usd" ${pg.enDolares ? "selected" : ""}>Dólares</option></select></label>`}
    <div class="fgrid"><label class="field">Fecha del pago<input id="pg-f" type="date" value="${esc(pg.fecha || today())}"></label>
-   ${esF ? "" : `<label class="field">Dólar BNA vendedor<input id="pg-tc" inputmode="decimal" value="${esc(pg.tc || d.valor || "")}"></label><label class="field">Dólares<input id="pg-u" inputmode="decimal" value="${esc(String(pg.usd != null ? pg.usd : x.usd).replace(".", ","))}"></label>`}
-   <label class="field">Pesos pagados<input id="pg-a" inputmode="decimal" value="${esc(pg.ars != null ? Math.round(pg.ars) : esF ? (x.ars || "") : "")}"></label></div>
+   ${esF ? "" : `<label class="field" data-sol-ars>Dólar BNA vendedor<input id="pg-tc" inputmode="decimal" value="${esc(pg.tc || d.valor || "")}"></label><label class="field">Dólares<input id="pg-u" inputmode="decimal" value="${esc(String(pg.usd != null ? pg.usd : x.usd).replace(".", ","))}"></label>`}
+   <label class="field" data-sol-ars>Pesos pagados<input id="pg-a" inputmode="decimal" value="${esc(pg.ars != null ? Math.round(pg.ars) : esF ? (x.ars || "") : "")}"></label></div>
    <label class="field">De dónde sale la plata<select id="pg-s">${Object.entries(ORIG).map(([v,l]) => `<option value="${v}" ${(pg.sobre || (k === "anticipo" || k === "sena" ? "aporte" : "maquina")) === v ? "selected" : ""}>${l}</option>`).join("")}</select></label>
    <p class="muted small" style="margin:0">Si sale de un sobre, se registra como movimiento y baja su saldo. El aporte de los socios es plata que ponen de afuera y no toca los sobres.</p>`;
   openDrawer(x.pago ? "Editar pago" : "Registrar pago", body, `${x.pago ? `<button class="btn ghost danger" type="button" id="pg-del">Borrar pago</button>` : ""}<button class="btn" type="button" data-close>Cancelar</button><button class="btn pri" type="button" id="pg-ok">Guardar</button>`, (dr, close) => {
     const calc = () => { if (esF) return; const tc = num($("#pg-tc", dr).value), u = num($("#pg-u", dr).value); if (tc && u) $("#pg-a", dr).value = Math.round(tc * u); };
+    const enUsd = () => !esF && $("#pg-mon", dr).value === "usd";
+    const mon = () => { dr.querySelectorAll("[data-sol-ars]").forEach(el => el.hidden = enUsd()); }; if (!esF){ $("#pg-mon", dr).addEventListener("change", mon); mon(); }
     if (!esF){ $("#pg-tc", dr).addEventListener("input", calc); $("#pg-u", dr).addEventListener("input", calc); if (!x.pago) calc(); }
     const dl = $("#pg-del", dr); if (dl) dl.addEventListener("click", async () => {
       const pagos = Object.assign({}, p.pagos); delete pagos[k]; if (pg.movId) await del("movimientos/" + pg.movId);
       if (await guardarPlan(Object.assign({}, p, {pagos}), "Pago borrado")){ close(); render(); } });
     $("#pg-ok", dr).addEventListener("click", async () => {
-      const ars = num($("#pg-a", dr).value); if (!ars || ars <= 0){ toast("Escribí cuántos pesos pagaste"); return; }
+      const usdM = enUsd(), uv = esF ? null : num($("#pg-u", dr).value);
+      if (usdM && (!uv || uv <= 0)){ toast("Escribí cuántos dólares pagaste"); return; }
+      const dh = dolarHoy(); let ars = usdM ? null : num($("#pg-a", dr).value); if (!usdM && (!ars || ars <= 0)){ toast("Escribí cuántos pesos pagaste"); return; }
       const sobre = $("#pg-s", dr).value, fecha = $("#pg-f", dr).value || today();
-      const reg = {fecha, ars, sobre, tc: esF ? null : num($("#pg-tc", dr).value), usd: esF ? null : num($("#pg-u", dr).value), movId: pg.movId || null};
+      if (usdM && sobre !== "aporte" && !(dh && dh.valor)){ toast("Cargá el dólar del día para descontarlo del sobre"); return; }
+      const reg = {fecha, ars, sobre, enDolares: usdM, tc: esF || usdM ? null : num($("#pg-tc", dr).value), usd: uv, movId: pg.movId || null};
+      const montoMov = usdM ? Math.round(uv * dh.valor) : ars;
       if (sobre === "aporte"){ if (reg.movId){ await del("movimientos/" + reg.movId); reg.movId = null; } }
-      else { reg.movId = reg.movId || uid(); if (!await save("movimientos/" + reg.movId, {fecha, sobre, monto: ars, desc: p.nombre + " · " + x.label + (esF ? "" : " (" + fusd(reg.usd) + ")"), socio: null, plan: p.id, item: k})) return; }
+      else { reg.movId = reg.movId || uid(); if (!await save("movimientos/" + reg.movId, {fecha, sobre, monto: montoMov, desc: p.nombre + " · " + x.label + (esF ? "" : " (" + fusd(reg.usd) + ")"), socio: null, plan: p.id, item: k})) return; }
       if (await guardarPlan(Object.assign({}, p, {pagos: Object.assign({}, p.pagos, {[k]: reg})}), "Pago guardado")){ close(); render(); } });
   });
 }
