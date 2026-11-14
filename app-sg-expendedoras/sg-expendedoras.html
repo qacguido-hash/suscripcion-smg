@@ -172,6 +172,9 @@ tr.click{cursor:pointer} tr.click:hover td{background:var(--surface-2)}
 .stl>.num{white-space:nowrap}
 .sq{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:8px;vertical-align:-1px}
 .fbar{height:10px;background:var(--info-soft);border-radius:99px;overflow:hidden;margin:8px 0 4px}.fbar i{display:block;height:100%;border-radius:99px}
+.pqs{margin-top:8px}.pq{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--line);cursor:pointer}.pq:first-child{border-top:0}.pq .grow{flex:1;min-width:0}.pq .r .pill{white-space:normal;text-align:right}.plan .plh{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}.plan .plh>div{min-width:0}.pq .t{font-weight:600;font-size:14.5px}.pq .d{font-size:12.5px;color:var(--muted)}.pq .r{display:flex;flex-direction:column;align-items:flex-end;gap:4px;text-align:right}.pq.ok .t{color:var(--muted)}.pq:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.plan .aviso{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;background:var(--warn-soft);border-radius:10px;padding:8px 10px;margin:10px 0 0}
+.plan .dolar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-top:10px;padding-top:10px;border-top:1px dashed var(--line)}.plan .cubre{margin-top:12px;padding-top:10px;border-top:1px solid var(--line)}
 .mv{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--line);font-size:14px}.mv:first-child{border-top:0}
 .mv .ic{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;font-size:14px;font-weight:700;color:#fff;flex:0 0 30px}
 .mnav{display:flex;align-items:center;gap:8px}
@@ -700,12 +703,128 @@ function finAcum(){
   return {filas, asign, saldo, ritmoMaq, juntado: saldo.maquina};
 }
 function roiMaq(m){
-  const inv = (fcfg().inversiones||{})[m.id] || {}; const total = (inv.maquina||0) + (inv.instalacion||0) + (inv.stockInicial||0);
+  const inv = (fcfg().inversiones||{})[m.id] || {}; const pl = planList().find(p => p.maquinaId === m.id); const cm = inv.maquina || (pl ? planTot(pl).costo || planTot(pl).arsPag : 0); const total = (cm||0) + (inv.instalacion||0) + (inv.stockInicial||0);
   const meses = mesesTrabajados().map(ym => finMes(ym, m.id)).filter(x => x.n > 0);
   const acum = meses.reduce((t,x)=>t+x.neta,0), prom = meses.length ? acum/meses.length : 0;
   const roi = total ? acum/total*100 : null, faltan = total && prom > 0 ? Math.max(0, Math.ceil((total-acum)/prom)) : null;
   return {total, acum, roi, mensual: roi != null && meses.length ? roi/meses.length : null, faltan, meses: meses.length};
 }
+// ---------- compra de máquina en dólares ----------
+const fusd = (n) => (n == null || !isFinite(n)) ? "—" : "USD " + n.toLocaleString("es-AR",{minimumFractionDigits:2, maximumFractionDigits:2});
+const dolarHoy = () => ((S.fin||{}).dolar) || null;
+const planList = () => Object.entries((S.fin||{}).planes||{}).map(([id,p]) => Object.assign({id}, p));
+const addMonths = (s, n) => { const d = new Date(s + "T00:00:00"); const dia = d.getDate(); d.setDate(1); d.setMonth(d.getMonth() + n); d.setDate(Math.min(dia, new Date(d.getFullYear(), d.getMonth()+1, 0).getDate())); return iso(d); };
+const ORIG = { maquina:"Sobre Nueva máquina", reserva:"Sobre Reserva", aporte:"Aporte de los socios" };
+function planItems(p){
+  const tot = p.totalUSD || 0, ap = Math.round(tot * (p.anticipoPct||0)) / 100, n = Math.max(0, p.cuotas||0);
+  const saldo = Math.round((tot - ap) * 100) / 100, cu = n ? Math.floor(saldo / n * 100) / 100 : 0;
+  const out = [];
+  if (ap > 0) out.push({k:"anticipo", label:"Anticipo " + f1(p.anticipoPct) + "%", usd: ap, vence: p.fechaAnticipo || null, cuando: "Al confirmar la compra"});
+  for (let i = 1; i <= n; i++){ const usd = i === n ? Math.round((saldo - cu*(n-1))*100)/100 : cu;
+    const v = p.entrega ? addMonths(addDays(p.entrega, p.diasPrimera||30), i-1) : null;
+    out.push({k:"c"+i, label:"Cuota " + i + " de " + n, usd, vence: v, cuando: i === 1 ? (p.diasPrimera||30) + " días después de recibir la máquina" : "Un mes después de la cuota " + (i-1)}); }
+  if (p.flete != null || (p.pagos||{}).flete) out.push({k:"flete", label:"Flete", ars: p.flete, vence: p.entrega || null, cuando: "Se paga en pesos"});
+  return out.map(x => Object.assign(x, {pago: (p.pagos||{})[x.k] || null}));
+}
+function planTot(p){
+  const d = dolarHoy(), it = planItems(p); let usdPag = 0, usdPend = 0, arsPag = 0, fletePend = 0;
+  for (const x of it){ if (x.k === "flete"){ if (x.pago) arsPag += x.pago.ars||0; else fletePend += x.ars||0; continue; }
+    if (x.pago){ usdPag += x.usd; arsPag += x.pago.ars||0; } else usdPend += x.usd; }
+  const arsPendEst = d && d.valor ? usdPend * d.valor + fletePend : null;
+  return {it, usdPag, usdPend, arsPag, fletePend, arsPendEst, costo: arsPendEst != null ? arsPag + arsPendEst : null};
+}
+// Ganancia neta promedio de una máquina por mes (últimos 3 meses cerrados con ventas)
+function gananciaPorMaquina(){
+  const act = mesDe(0), filas = mesesTrabajados().map(ym => finMes(ym)).filter(x => x.n > 0);
+  const base = filas.filter(x => x.ym !== act).slice(0,3), uso = base.length ? base : filas.slice(0,1);
+  if (!uso.length) return null; const n = Math.max(1, maqList().length);
+  return {monto: uso.reduce((t,x)=>t+x.neta,0) / uso.length / n, meses: uso.length, parcial: !base.length};
+}
+async function guardarFin(cambios, msg){ return save("config/finanzas", Object.assign({}, S.fin || {}, cambios), msg); }
+async function guardarPlan(p, msg){ const c = strip(p); return guardarFin({planes: Object.assign({}, (S.fin||{}).planes || {}, {[p.id]: c})}, msg); }
+function planCard(p){
+  const T = planTot(p), d = dolarHoy(), g = gananciaPorMaquina(), hoy = today();
+  const cuotas = T.it.filter(x => /^c\d/.test(x.k)), proxima = T.it.find(x => !x.pago && x.k !== "flete");
+  const pctPag = p.totalUSD ? T.usdPag / p.totalUSD * 100 : 0;
+  const fila = (x) => { const esF = x.k === "flete"; const monto = esF ? fm(x.pago ? x.pago.ars : x.ars) : fusd(x.usd);
+    const est = !esF && !x.pago && d && d.valor ? "≈ " + fm(x.usd * d.valor) : "";
+    const venc = x.vence ? days(x.vence) : null;
+    const estado = x.pago ? `<span class="pill p-ok">Pagado ${fdate(x.pago.fecha)}</span>`
+      : x.vence ? `<span class="pill ${venc < 0 ? "p-bad" : venc <= 7 ? "p-warn" : "p-info"}">${venc < 0 ? "Vencida " + fdate(x.vence) : "Vence " + fdate(x.vence)}</span>` : `<span class="pill p-info">${esc(x.cuando)}</span>`;
+    const det = x.pago ? (esF ? ORIG[x.pago.sobre]||"" : fm(x.pago.ars) + " · dólar " + fm(x.pago.tc) + " · " + (ORIG[x.pago.sobre]||"")) : est;
+    return `<div class="pq ${x.pago ? "ok" : ""}" ${S.ro ? "" : `role="button" tabindex="0" data-pago="${esc(p.id)}|${x.k}"`}><div class="grow"><div class="t">${esc(x.label)}</div><div class="d">${det || (esF && x.ars == null ? "Falta cargar el monto" : "")}</div></div><div class="r"><strong class="num">${esF && x.ars == null && !x.pago ? "—" : monto}</strong>${estado}</div></div>`; };
+  let cubre = "";
+  if (proxima && proxima.k !== "anticipo" && g && d && d.valor){ const cuotaArs = proxima.usd * d.valor, ratio = g.monto / cuotaArs;
+    cubre = `<div class="cubre"><div class="small muted">¿Alcanza la ganancia de la máquina para la cuota?</div><div class="fbar"><i style="width:${Math.min(100, Math.max(0, ratio*100)).toFixed(1)}%;background:${ratio >= 1 ? "var(--ok)" : "var(--warn)"}"></i></div>
+      <p class="small" style="margin:0">${g.monto <= 0 ? "Por ahora las máquinas no dejan ganancia para pagar cuotas." : ratio >= 1 ? `Sí: una máquina deja ≈ ${fm(g.monto)} por mes y la cuota es ≈ ${fm(cuotaArs)}. Sobran ≈ ${fm(g.monto - cuotaArs)}.` : `Cubre el ${Math.round(ratio*100)}% de la cuota: una máquina deja ≈ ${fm(g.monto)} por mes y la cuota es ≈ ${fm(cuotaArs)}. Faltan ≈ ${fm(cuotaArs - g.monto)} por cuota.`}</p>
+      <p class="muted small" style="margin:4px 0 0">Ganancia neta promedio por máquina ${g.parcial ? "del mes en curso" : "de los últimos " + g.meses + (g.meses === 1 ? " mes" : " meses")}, sin repartir en sobres.</p></div>`; }
+  else if (proxima && proxima.k !== "anticipo" && !g) cubre = `<p class="muted small" style="margin:10px 0 0">Cuando haya ventas vas a ver si la ganancia de una máquina alcanza para cada cuota.</p>`;
+  return `<div class="card plan"><div class="plh" style="margin-bottom:4px"><div><h2 style="margin:0">${esc(p.nombre || "Compra de máquina")}</h2><div class="small muted">${fusd(p.totalUSD)} · ${p.anticipoPct ? f1(p.anticipoPct) + "% de anticipo y " : ""}${p.cuotas} cuotas sin interés</div></div>${S.ro ? "" : `<button class="btn sm" type="button" data-plan-edit="${esc(p.id)}">Editar</button>`}</div>
+   <div class="row" style="justify-content:space-between;align-items:baseline;margin-top:10px"><strong class="num" style="font:700 20px var(--display)">${fusd(T.usdPag)}</strong><span class="muted small">pagado de ${fusd(p.totalUSD)}</span></div>
+   <div class="fbar"><i style="width:${Math.min(100,pctPag).toFixed(1)}%;background:var(--ok)"></i></div>
+   ${!p.entrega && cuotas.length ? `<div class="aviso"><span class="small">Las fechas de las cuotas se calculan desde el día que reciben la máquina.</span>${S.ro ? "" : `<button class="btn sm" type="button" data-plan-edit="${esc(p.id)}">Cargar fecha de entrega</button>`}</div>` : ""}
+   <div class="pqs">${T.it.map(fila).join("")}</div>
+   <div class="stl tot" style="margin-top:6px"><span>Falta pagar</span><span class="num">${fusd(T.usdPend)}${T.fletePend ? " + " + fm(T.fletePend) : ""}</span></div>
+   <div class="stl"><span>En pesos, al dólar de hoy</span><span class="num">${T.arsPendEst != null ? "≈ " + fm(T.arsPendEst) : "—"}</span></div>
+   <div class="stl"><span>Pagado en pesos</span><span class="num">${fm(T.arsPag)}</span></div>
+   <div class="dolar"><span class="small">Dólar BNA vendedor: <strong class="num">${d && d.valor ? fm(d.valor) : "sin cargar"}</strong>${d && d.fecha ? ` <span class="muted">· ${fdate(d.fecha)}</span>` : ""}</span>${S.ro ? "" : `<button class="btn sm" type="button" data-act="fin-dolar">${d && d.valor ? "Actualizar" : "Cargar"}</button>`}</div>
+   ${cubre}
+   ${p.maquinaId && S.maquinas[p.maquinaId] ? `<p class="muted small" style="margin:10px 0 0">El costo en pesos de esta compra cuenta como inversión de ${esc(S.maquinas[p.maquinaId].nombre)} para el ROI.</p>` : ""}
+  </div>`;
+}
+function openDolar(){
+  const d = dolarHoy() || {};
+  const body = `<div class="fgrid"><label class="field">Dólar BNA vendedor ($ por dólar)<input id="dl-v" inputmode="decimal" value="${esc(d.valor)}" placeholder="Ej.: 1475"></label><label class="field">Fecha<input id="dl-f" type="date" value="${esc(today())}"></label></div>
+   <p class="muted small" style="margin:0">Se usa para calcular cuántos pesos faltan. Cada pago guarda el dólar del día en que lo hiciste. El valor está en bna.com.ar → Cotización billetes, columna Venta.</p>`;
+  openDrawer("Dólar del día", body, `<button class="btn" type="button" data-close>Cancelar</button><button class="btn pri" type="button" id="dl-ok">Guardar</button>`, (dr, close) => {
+    setTimeout(() => { const i = $("#dl-v", dr); if (i) i.focus(); }, 30);
+    $("#dl-ok", dr).addEventListener("click", async () => { const v = num($("#dl-v", dr).value); if (!v || v <= 0){ toast("Escribí el valor del dólar"); return; }
+      if (await guardarFin({dolar: {valor: v, fecha: $("#dl-f", dr).value || today()}}, "Dólar guardado")){ close(); render(); } });
+  });
+}
+function openPlan(id){
+  const p = id ? Object.assign({}, planList().find(x => x.id === id)) : {id: uid(), nombre: "Máquina nueva", totalUSD: null, anticipoPct: 50, cuotas: 4, diasPrimera: 30, entrega: null, maquinaId: null, flete: null, pagos: {}};
+  const body = `<label class="field">Nombre<input id="pl-n" value="${esc(p.nombre)}" placeholder="Ej.: Máquina del colegio"></label>
+   <div class="fgrid"><label class="field">Precio total (USD)<input id="pl-t" inputmode="decimal" value="${esc(p.totalUSD != null ? String(p.totalUSD).replace(".", ",") : "")}" placeholder="Ej.: 7182,5"></label><label class="field">Anticipo (%)<input id="pl-a" inputmode="decimal" value="${esc(p.anticipoPct)}"></label><label class="field">Cuotas sin interés<input id="pl-c" inputmode="numeric" value="${esc(p.cuotas)}"></label></div>
+   <div class="fgrid"><label class="field">Primera cuota a los (días de recibida)<input id="pl-d" inputmode="numeric" value="${esc(p.diasPrimera)}"></label><label class="field">Fecha en que la reciben<input id="pl-e" type="date" value="${esc(p.entrega || "")}"></label></div>
+   <div class="fgrid"><label class="field">Flete ($, se paga en pesos)<input id="pl-f" inputmode="decimal" value="${esc(p.flete)}" placeholder="A definir"></label><label class="field">Máquina <select id="pl-m"><option value="">Todavía no está cargada</option>${maqList().map(m => `<option value="${esc(m.id)}" ${p.maquinaId === m.id ? "selected" : ""}>${esc(m.nombre)}</option>`).join("")}</select></label></div>
+   <p class="muted small" style="margin:0">Las cuotas son en dólares y se pueden pagar en pesos al dólar BNA vendedor del día. Cuando la máquina esté cargada en Máquinas, elegila acá: el costo en pesos de la compra cuenta como su inversión para el ROI.</p>`;
+  openDrawer(id ? "Editar compra" : "Compra de máquina", body, `${id ? `<button class="btn ghost danger" type="button" id="pl-del">Borrar</button>` : ""}<button class="btn" type="button" data-close>Cancelar</button><button class="btn pri" type="button" id="pl-ok">Guardar</button>`, (dr, close) => {
+    const dl = $("#pl-del", dr); if (dl) dl.addEventListener("click", async () => {
+      if (dl.dataset.ok !== "1"){ dl.dataset.ok = "1"; dl.textContent = "Tocá de nuevo para borrar"; return; }
+      const planes = Object.assign({}, (S.fin||{}).planes); delete planes[id]; if (await guardarFin({planes}, "Compra borrada")){ close(); render(); } });
+    $("#pl-ok", dr).addEventListener("click", async () => {
+      const t = num($("#pl-t", dr).value), a = num($("#pl-a", dr).value), c = Math.round(num($("#pl-c", dr).value) || 0);
+      if (!t || t <= 0){ toast("Escribí el precio en dólares"); return; } if (a == null || a < 0 || a > 100){ toast("El anticipo va de 0 a 100%"); return; }
+      Object.assign(p, {nombre: $("#pl-n", dr).value.trim() || "Máquina nueva", totalUSD: t, anticipoPct: a, cuotas: c, diasPrimera: Math.round(num($("#pl-d", dr).value) || 30), entrega: $("#pl-e", dr).value || null, flete: num($("#pl-f", dr).value), maquinaId: $("#pl-m", dr).value || null});
+      if (await guardarPlan(p, "Compra guardada")){ close(); render(); } });
+  });
+}
+function openPago(pid, k){
+  const p = planList().find(x => x.id === pid); if (!p) return; const x = planItems(p).find(i => i.k === k); if (!x) return;
+  const pg = x.pago || {}, d = dolarHoy() || {}, esF = k === "flete";
+  const body = `<p class="small" style="margin:0"><strong>${esc(p.nombre)} · ${esc(x.label)}</strong>${esF ? "" : " · " + fusd(x.usd)}</p>
+   <div class="fgrid"><label class="field">Fecha del pago<input id="pg-f" type="date" value="${esc(pg.fecha || today())}"></label>
+   ${esF ? "" : `<label class="field">Dólar BNA vendedor<input id="pg-tc" inputmode="decimal" value="${esc(pg.tc || d.valor || "")}"></label><label class="field">Dólares<input id="pg-u" inputmode="decimal" value="${esc(String(pg.usd != null ? pg.usd : x.usd).replace(".", ","))}"></label>`}
+   <label class="field">Pesos pagados<input id="pg-a" inputmode="decimal" value="${esc(pg.ars != null ? Math.round(pg.ars) : esF ? (x.ars || "") : "")}"></label></div>
+   <label class="field">De dónde sale la plata<select id="pg-s">${Object.entries(ORIG).map(([v,l]) => `<option value="${v}" ${(pg.sobre || (k === "anticipo" ? "aporte" : "maquina")) === v ? "selected" : ""}>${l}</option>`).join("")}</select></label>
+   <p class="muted small" style="margin:0">Si sale de un sobre, se registra como movimiento y baja su saldo. El aporte de los socios es plata que ponen de afuera y no toca los sobres.</p>`;
+  openDrawer(x.pago ? "Editar pago" : "Registrar pago", body, `${x.pago ? `<button class="btn ghost danger" type="button" id="pg-del">Borrar pago</button>` : ""}<button class="btn" type="button" data-close>Cancelar</button><button class="btn pri" type="button" id="pg-ok">Guardar</button>`, (dr, close) => {
+    const calc = () => { if (esF) return; const tc = num($("#pg-tc", dr).value), u = num($("#pg-u", dr).value); if (tc && u) $("#pg-a", dr).value = Math.round(tc * u); };
+    if (!esF){ $("#pg-tc", dr).addEventListener("input", calc); $("#pg-u", dr).addEventListener("input", calc); if (!x.pago) calc(); }
+    const dl = $("#pg-del", dr); if (dl) dl.addEventListener("click", async () => {
+      const pagos = Object.assign({}, p.pagos); delete pagos[k]; if (pg.movId) await del("movimientos/" + pg.movId);
+      if (await guardarPlan(Object.assign({}, p, {pagos}), "Pago borrado")){ close(); render(); } });
+    $("#pg-ok", dr).addEventListener("click", async () => {
+      const ars = num($("#pg-a", dr).value); if (!ars || ars <= 0){ toast("Escribí cuántos pesos pagaste"); return; }
+      const sobre = $("#pg-s", dr).value, fecha = $("#pg-f", dr).value || today();
+      const reg = {fecha, ars, sobre, tc: esF ? null : num($("#pg-tc", dr).value), usd: esF ? null : num($("#pg-u", dr).value), movId: pg.movId || null};
+      if (sobre === "aporte"){ if (reg.movId){ await del("movimientos/" + reg.movId); reg.movId = null; } }
+      else { reg.movId = reg.movId || uid(); if (!await save("movimientos/" + reg.movId, {fecha, sobre, monto: ars, desc: p.nombre + " · " + x.label + (esF ? "" : " (" + fusd(reg.usd) + ")"), socio: null, plan: p.id, item: k})) return; }
+      if (await guardarPlan(Object.assign({}, p, {pagos: Object.assign({}, p.pagos, {[k]: reg})}), "Pago guardado")){ close(); render(); } });
+  });
+}
+
 const mesFuturo = (n) => { const d = new Date(); d.setDate(1); d.setMonth(d.getMonth()+n); const t = d.toLocaleDateString("es-AR",{month:"long", year:"numeric"}); return t.replace(" de ", " "); };
 function vFinanzas(){
   if (UI.fmes == null) UI.fmes = 0;
@@ -744,6 +863,8 @@ function vFinanzas(){
    : `<p class="muted small" style="margin:0">${r.n ? "Este mes no hubo ganancia para repartir." : "Todavía no hay ventas en " + nombreMes(ym) + ". Cuando se registren, acá vas a ver cómo se reparte la ganancia."}</p>`}
   </div>
   <div class="col">
+   ${planList().map(planCard).join("")}
+   ${!planList().length && !S.ro ? `<div class="card"><h2>Compra de máquina</h2><p class="muted small" style="margin:0 0 10px">Cargá una compra en dólares con anticipo y cuotas para seguir los pagos y ver si la ganancia alcanza para cada cuota.</p><button class="btn" type="button" data-act="plan-new">Cargar compra</button></div>` : ""}
    <div class="card"><h2>Meta y recupero</h2>
     <div class="small muted">Nueva máquina</div>
     ${meta ? `<div class="row" style="justify-content:space-between;align-items:baseline"><strong class="num" style="font:700 20px var(--display)">${fm(Math.max(0,A.juntado))}</strong><span class="muted small">de ${fm(meta)}${mesesMeta != null ? " · " + (mesesMeta === 0 ? "¡meta alcanzada!" : mesFuturo(mesesMeta)) : ""}</span></div><div class="fbar"><i style="width:${Math.min(100,Math.max(0,A.juntado)/meta*100).toFixed(1)}%;background:${SOBRES.maquina[1]}"></i></div>
@@ -774,7 +895,7 @@ function openFinConfig(){
    <div><h3>Socios</h3><div id="fc-ss" style="display:flex;flex-direction:column;gap:10px;margin-top:8px">${socios.map(sRow).join("")}</div><p class="muted small" style="margin:6px 0 0">Cómo se divide el retiro entre los socios. Tiene que sumar 100.</p></div>
    <div><h3>Gastos generales por mes</h3><p class="muted small" style="margin:4px 0 0">Gastos del negocio que no son de una sola máquina. Se reparten en partes iguales entre las máquinas.</p><div id="fc-gs" style="display:flex;flex-direction:column;gap:10px;margin-top:8px">${gastosG.map(gRow).join("")}</div><button class="btn" type="button" id="fc-addg" style="margin-top:10px">Agregar gasto</button></div>
    <div><h3>Meta</h3><div class="fgrid" style="margin-top:8px"><label class="field">Precio de la próxima máquina ($)<input id="fc-meta" inputmode="decimal" value="${esc(fc.metaMaquina)}" placeholder="A definir"></label></div></div>
-   <div><h3>Inversión en cada máquina</h3>${ms.map(m=>{ const iv = (fc.inversiones||{})[m.id] || {}; return `<div class="card" style="margin:8px 0 0" data-inv="${esc(m.id)}"><strong>${esc(m.nombre)}</strong><div class="fgrid" style="margin-top:8px"><label class="field">Máquina ($)<input data-k="maquina" inputmode="decimal" value="${esc(iv.maquina)}"></label><label class="field">Instalación ($)<input data-k="instalacion" inputmode="decimal" value="${esc(iv.instalacion)}"></label><label class="field">Stock inicial ($)<input data-k="stockInicial" inputmode="decimal" value="${esc(iv.stockInicial)}"></label></div></div>`; }).join("")}
+   <div><h3>Inversión en cada máquina</h3>${ms.map(m=>{ const iv = (fc.inversiones||{})[m.id] || {}; return `<div class="card" style="margin:8px 0 0" data-inv="${esc(m.id)}"><strong>${esc(m.nombre)}</strong><div class="fgrid" style="margin-top:8px"><label class="field">Máquina ($)<input data-k="maquina" inputmode="decimal" value="${esc(iv.maquina)}" ${planList().some(p=>p.maquinaId===m.id)?'placeholder="Sale de la compra en dólares"':""}></label><label class="field">Instalación ($)<input data-k="instalacion" inputmode="decimal" value="${esc(iv.instalacion)}"></label><label class="field">Stock inicial ($)<input data-k="stockInicial" inputmode="decimal" value="${esc(iv.stockInicial)}"></label></div></div>`; }).join("")}
    <p class="muted small" style="margin:8px 0 0">El canon fijo y los otros gastos de cada lugar se cargan en Máquinas → ⋮ → Editar nombre y datos. La comisión del QR, en Ajustes.</p></div>`;
   openDrawer("Configurar finanzas", body, `<button class="btn" type="button" data-close>Cancelar</button><button class="btn pri" type="button" id="fc-ok">Guardar</button>`, (d, close) => {
     $("#fc-addg", d).addEventListener("click", () => { gastosG.push({concepto:"", monto:null}); const w = document.createElement("div"); w.innerHTML = gRow(gastosG[gastosG.length-1], gastosG.length-1); $("#fc-gs", d).appendChild(w.firstElementChild); });
@@ -785,11 +906,12 @@ function openFinConfig(){
       if (Math.abs(ss.reduce((t,x)=>t+x.pct,0)-100) > 0.01){ toast("El reparto entre socios tiene que sumar 100"); return; }
       const inversiones = {}; d.querySelectorAll("[data-inv]").forEach(el => { const o = {}; el.querySelectorAll("[data-k]").forEach(i => { o[i.dataset.k] = num(i.value); }); inversiones[el.dataset.inv] = o; });
       const gastosGenerales = [...d.querySelectorAll("[data-gg]")].map(el => ({concepto: el.querySelector('[data-k="concepto"]').value.trim(), monto: num(el.querySelector('[data-k="monto"]').value)})).filter(g => g.concepto);
-      if (await save("config/finanzas", {pctMaquina:pm, pctReserva:pr, pctRetiro:pt, socios:ss, metaMaquina: num($("#fc-meta",d).value), inversiones, gastosGenerales}, "Finanzas guardadas")){ close(); render(); }
+      if (await guardarFin({pctMaquina:pm, pctReserva:pr, pctRetiro:pt, socios:ss, metaMaquina: num($("#fc-meta",d).value), inversiones, gastosGenerales}, "Finanzas guardadas")){ close(); render(); }
     });
   });
 }
 function openMovimiento(id){
+  if (id && S.movimientos[id] && S.movimientos[id].plan){ const mv = S.movimientos[id]; return openPago(mv.plan, mv.item); }
   const fc = fcfg(); const m = id ? Object.assign({id}, S.movimientos[id]) : {fecha: today(), sobre:"reposicion", monto:null, desc:"", socio:null};
   const ejemplos = {reposicion:"Ej.: Compra Masmelos", gastos:"Ej.: Canon de noviembre", maquina:"Ej.: Seña de la máquina nueva", reserva:"Ej.: Reparación del monedero", retiro:"Ej.: Retiro de noviembre"};
   const body = `<div class="fgrid"><label class="field">Sale del sobre<select id="mv-s">${Object.entries(SOBRES).map(([k,[l]])=>`<option value="${k}" ${m.sobre===k?"selected":""}>${l}</option>`).join("")}</select></label>
@@ -833,6 +955,8 @@ function bindSearch(id, key){ const el = $(id); if (!el) return; el.addEventList
 function bindView(){
   const v0 = $("#view");
   v0.querySelectorAll("[data-fmes]").forEach(b => b.addEventListener("click", () => { UI.fmes = +b.dataset.fmes; render(); }));
+  v0.querySelectorAll("[data-pago]").forEach(b => { const go = () => { const [a,k] = b.dataset.pago.split("|"); openPago(a,k); }; b.addEventListener("click", go); b.addEventListener("keydown", e => { if (e.key === "Enter") go(); }); });
+  v0.querySelectorAll("[data-plan-edit]").forEach(b => b.addEventListener("click", () => openPlan(b.dataset.planEdit)));
   v0.querySelectorAll("[data-mov]").forEach(b => { b.addEventListener("click", () => openMovimiento(b.dataset.mov)); b.addEventListener("keydown", e => { if (e.key === "Enter") openMovimiento(b.dataset.mov); }); });
   const v = $("#view");
   bindSearch("#f-q","q"); bindSearch("#f-pq","pq");
@@ -878,6 +1002,8 @@ const acciones = {
   "preparar": () => openPreparar(UI.maq),
   "fin-config": () => openFinConfig(),
   "fin-mov": () => openMovimiento(null),
+  "fin-dolar": () => openDolar(),
+  "plan-new": () => openPlan(null),
   "csv-fin": () => { const ym = mesDe(UI.fmes||0), r = finMes(ym), fc = fcfg(); const R = (x) => Math.round(x||0);
     bajar("finanzas-" + ym + ".csv", [["Concepto","Monto"],["Ventas por QR",R(r.qr)],["Ventas en efectivo",R(r.ef)],...(r.mix?[["QR y efectivo sin separar",R(r.mix)]]:[]),["Total facturado",R(r.f)],["Costo de la mercadería (a precio de reposición)",-R(r.costo)],["Comisión QR",-R(r.com)],...r.lineasCanon.map(([n,v])=>["Canon " + n, -R(v)]),["Otros gastos fijos de las máquinas",-R(r.otros)],...r.lineasGen.map(([n,v])=>[n,-R(v)]),["Ganancia neta",R(r.neta)],[],["Nueva máquina (" + fc.pctMaquina + "%)",R(r.maq)],["Reserva (" + fc.pctReserva + "%)",R(r.res)],["Retiro socios (" + fc.pctRetiro + "%)",R(r.ret)],...r.socios.map(x=>["  " + x.nombre + " (" + x.pct + "%)", R(x.monto)]),[],["Movimientos"],...movsList().filter(m=>(m.fecha||"").startsWith(ym)).map(m=>[m.fecha + " · " + (SOBRES[m.sobre]||["—"])[0] + (m.desc?" · " + m.desc:""), -R(m.monto)])]); },
   "mas-hist": () => { UI.histN += 60; render(); },
