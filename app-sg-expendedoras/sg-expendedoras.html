@@ -719,7 +719,9 @@ function planItems(p){
   const tot = p.totalUSD || 0, ap = Math.round(tot * (p.anticipoPct||0)) / 100, n = Math.max(0, p.cuotas||0);
   const saldo = Math.round((tot - ap) * 100) / 100, cu = n ? Math.floor(saldo / n * 100) / 100 : 0;
   const out = [];
-  if (ap > 0) out.push({k:"anticipo", label:"Anticipo " + f1(p.anticipoPct) + "%", usd: ap, vence: p.fechaAnticipo || null, cuando: "Al confirmar la compra"});
+  const sena = Math.min(ap, p.senaUSD || 0);
+  if (sena > 0) out.push({k:"sena", label:"Seña", usd: sena, vence: null, cuando: "Al reservar la máquina"});
+  if (ap - sena > 0.004) out.push({k:"anticipo", label: sena > 0 ? "Resto del anticipo " + f1(p.anticipoPct) + "%" : "Anticipo " + f1(p.anticipoPct) + "%", usd: Math.round((ap - sena)*100)/100, vence: p.fechaAnticipo || null, cuando: "Al confirmar la compra"});
   for (let i = 1; i <= n; i++){ const usd = i === n ? Math.round((saldo - cu*(n-1))*100)/100 : cu;
     const v = p.entrega ? addMonths(addDays(p.entrega, p.diasPrimera||30), i-1) : null;
     out.push({k:"c"+i, label:"Cuota " + i + " de " + n, usd, vence: v, cuando: i === 1 ? (p.diasPrimera||30) + " días después de recibir la máquina" : "Un mes después de la cuota " + (i-1)}); }
@@ -749,9 +751,9 @@ function planCard(p){
   const fila = (x) => { const esF = x.k === "flete"; const monto = esF ? fm(x.pago ? x.pago.ars : x.ars) : fusd(x.usd);
     const est = !esF && !x.pago && d && d.valor ? "≈ " + fm(x.usd * d.valor) : "";
     const venc = x.vence ? days(x.vence) : null;
-    const estado = x.pago ? `<span class="pill p-ok">Pagado ${fdate(x.pago.fecha)}</span>`
-      : x.vence ? `<span class="pill ${venc < 0 ? "p-bad" : venc <= 7 ? "p-warn" : "p-info"}">${venc < 0 ? "Vencida " + fdate(x.vence) : "Vence " + fdate(x.vence)}</span>` : `<span class="pill p-info">${esc(x.cuando)}</span>`;
-    const det = x.pago ? (esF ? ORIG[x.pago.sobre]||"" : fm(x.pago.ars) + " · dólar " + fm(x.pago.tc) + " · " + (ORIG[x.pago.sobre]||"")) : est;
+    const estado = x.pago ? `<span class="pill p-ok">${x.pago.fecha ? "Pagado " + fdate(x.pago.fecha) : "Pagado"}</span>`
+      : x.vence ? `<span class="pill ${venc < 0 ? "p-bad" : venc <= 7 ? "p-warn" : "p-info"}">${venc < 0 ? "Vencida " + fdate(x.vence) : (p.entregaEstimada && x.k !== "anticipo" ? "Aprox. " : "Vence ") + fdate(x.vence)}</span>` : `<span class="pill p-info">${esc(x.cuando)}</span>`;
+    const det = x.pago ? (x.pago.ars == null ? '<span style="color:var(--warn)">Faltan los pesos y la fecha: tocá para cargarlos</span>' : esF ? ORIG[x.pago.sobre]||"" : fm(x.pago.ars) + " · dólar " + fm(x.pago.tc) + " · " + (ORIG[x.pago.sobre]||"")) : est;
     return `<div class="pq ${x.pago ? "ok" : ""}" ${S.ro ? "" : `role="button" tabindex="0" data-pago="${esc(p.id)}|${x.k}"`}><div class="grow"><div class="t">${esc(x.label)}</div><div class="d">${det || (esF && x.ars == null ? "Falta cargar el monto" : "")}</div></div><div class="r"><strong class="num">${esF && x.ars == null && !x.pago ? "—" : monto}</strong>${estado}</div></div>`; };
   let cubre = "";
   if (proxima && proxima.k !== "anticipo" && g && d && d.valor){ const cuotaArs = proxima.usd * d.valor, ratio = g.monto / cuotaArs;
@@ -762,6 +764,7 @@ function planCard(p){
   return `<div class="card plan"><div class="plh" style="margin-bottom:4px"><div><h2 style="margin:0">${esc(p.nombre || "Compra de máquina")}</h2><div class="small muted">${fusd(p.totalUSD)} · ${p.anticipoPct ? f1(p.anticipoPct) + "% de anticipo y " : ""}${p.cuotas} cuotas sin interés</div></div>${S.ro ? "" : `<button class="btn sm" type="button" data-plan-edit="${esc(p.id)}">Editar</button>`}</div>
    <div class="row" style="justify-content:space-between;align-items:baseline;margin-top:10px"><strong class="num" style="font:700 20px var(--display)">${fusd(T.usdPag)}</strong><span class="muted small">pagado de ${fusd(p.totalUSD)}</span></div>
    <div class="fbar"><i style="width:${Math.min(100,pctPag).toFixed(1)}%;background:var(--ok)"></i></div>
+   ${p.entrega && p.entregaEstimada ? `<div class="aviso"><span class="small">Llegada prevista: ${fdate(p.entrega)}. Las fechas de las cuotas son aproximadas hasta que la reciban.</span>${S.ro ? "" : `<button class="btn sm" type="button" data-plan-edit="${esc(p.id)}">Confirmar llegada</button>`}</div>` : ""}
    ${!p.entrega && cuotas.length ? `<div class="aviso"><span class="small">Las fechas de las cuotas se calculan desde el día que reciben la máquina.</span>${S.ro ? "" : `<button class="btn sm" type="button" data-plan-edit="${esc(p.id)}">Cargar fecha de entrega</button>`}</div>` : ""}
    <div class="pqs">${T.it.map(fila).join("")}</div>
    <div class="stl tot" style="margin-top:6px"><span>Falta pagar</span><span class="num">${fusd(T.usdPend)}${T.fletePend ? " + " + fm(T.fletePend) : ""}</span></div>
@@ -786,7 +789,8 @@ function openPlan(id){
   const p = id ? Object.assign({}, planList().find(x => x.id === id)) : {id: uid(), nombre: "Máquina nueva", totalUSD: null, anticipoPct: 50, cuotas: 4, diasPrimera: 30, entrega: null, maquinaId: null, flete: null, pagos: {}};
   const body = `<label class="field">Nombre<input id="pl-n" value="${esc(p.nombre)}" placeholder="Ej.: Máquina del colegio"></label>
    <div class="fgrid"><label class="field">Precio total (USD)<input id="pl-t" inputmode="decimal" value="${esc(p.totalUSD != null ? String(p.totalUSD).replace(".", ",") : "")}" placeholder="Ej.: 7182,5"></label><label class="field">Anticipo (%)<input id="pl-a" inputmode="decimal" value="${esc(p.anticipoPct)}"></label><label class="field">Cuotas sin interés<input id="pl-c" inputmode="numeric" value="${esc(p.cuotas)}"></label></div>
-   <div class="fgrid"><label class="field">Primera cuota a los (días de recibida)<input id="pl-d" inputmode="numeric" value="${esc(p.diasPrimera)}"></label><label class="field">Fecha en que la reciben<input id="pl-e" type="date" value="${esc(p.entrega || "")}"></label></div>
+   <div class="fgrid"><label class="field">Seña dentro del anticipo (USD)<input id="pl-s" inputmode="decimal" value="${esc(p.senaUSD != null ? String(p.senaUSD).replace(".", ",") : "")}" placeholder="Opcional"></label><label class="field">Resto del anticipo se paga el<input id="pl-fa" type="date" value="${esc(p.fechaAnticipo || "")}"></label></div>
+   <div class="fgrid"><label class="field">Primera cuota a los (días de recibida)<input id="pl-d" inputmode="numeric" value="${esc(p.diasPrimera)}"></label><label class="field">Fecha en que la reciben<input id="pl-e" type="date" value="${esc(p.entrega || "")}"></label><label class="field" style="flex-direction:row;align-items:center;gap:8px;align-self:end;min-height:44px"><input id="pl-ee" type="checkbox" ${p.entregaEstimada ? "checked" : ""} style="width:18px;height:18px;min-height:0">Es una fecha estimada</label></div>
    <div class="fgrid"><label class="field">Flete ($, se paga en pesos)<input id="pl-f" inputmode="decimal" value="${esc(p.flete)}" placeholder="A definir"></label><label class="field">Máquina <select id="pl-m"><option value="">Todavía no está cargada</option>${maqList().map(m => `<option value="${esc(m.id)}" ${p.maquinaId === m.id ? "selected" : ""}>${esc(m.nombre)}</option>`).join("")}</select></label></div>
    <p class="muted small" style="margin:0">Las cuotas son en dólares y se pueden pagar en pesos al dólar BNA vendedor del día. Cuando la máquina esté cargada en Máquinas, elegila acá: el costo en pesos de la compra cuenta como su inversión para el ROI.</p>`;
   openDrawer(id ? "Editar compra" : "Compra de máquina", body, `${id ? `<button class="btn ghost danger" type="button" id="pl-del">Borrar</button>` : ""}<button class="btn" type="button" data-close>Cancelar</button><button class="btn pri" type="button" id="pl-ok">Guardar</button>`, (dr, close) => {
@@ -796,7 +800,7 @@ function openPlan(id){
     $("#pl-ok", dr).addEventListener("click", async () => {
       const t = num($("#pl-t", dr).value), a = num($("#pl-a", dr).value), c = Math.round(num($("#pl-c", dr).value) || 0);
       if (!t || t <= 0){ toast("Escribí el precio en dólares"); return; } if (a == null || a < 0 || a > 100){ toast("El anticipo va de 0 a 100%"); return; }
-      Object.assign(p, {nombre: $("#pl-n", dr).value.trim() || "Máquina nueva", totalUSD: t, anticipoPct: a, cuotas: c, diasPrimera: Math.round(num($("#pl-d", dr).value) || 30), entrega: $("#pl-e", dr).value || null, flete: num($("#pl-f", dr).value), maquinaId: $("#pl-m", dr).value || null});
+      Object.assign(p, {nombre: $("#pl-n", dr).value.trim() || "Máquina nueva", totalUSD: t, anticipoPct: a, cuotas: c, diasPrimera: Math.round(num($("#pl-d", dr).value) || 30), entrega: $("#pl-e", dr).value || null, entregaEstimada: !!$("#pl-e", dr).value && $("#pl-ee", dr).checked, senaUSD: num($("#pl-s", dr).value), fechaAnticipo: $("#pl-fa", dr).value || null, flete: num($("#pl-f", dr).value), maquinaId: $("#pl-m", dr).value || null});
       if (await guardarPlan(p, "Compra guardada")){ close(); render(); } });
   });
 }
@@ -807,7 +811,7 @@ function openPago(pid, k){
    <div class="fgrid"><label class="field">Fecha del pago<input id="pg-f" type="date" value="${esc(pg.fecha || today())}"></label>
    ${esF ? "" : `<label class="field">Dólar BNA vendedor<input id="pg-tc" inputmode="decimal" value="${esc(pg.tc || d.valor || "")}"></label><label class="field">Dólares<input id="pg-u" inputmode="decimal" value="${esc(String(pg.usd != null ? pg.usd : x.usd).replace(".", ","))}"></label>`}
    <label class="field">Pesos pagados<input id="pg-a" inputmode="decimal" value="${esc(pg.ars != null ? Math.round(pg.ars) : esF ? (x.ars || "") : "")}"></label></div>
-   <label class="field">De dónde sale la plata<select id="pg-s">${Object.entries(ORIG).map(([v,l]) => `<option value="${v}" ${(pg.sobre || (k === "anticipo" ? "aporte" : "maquina")) === v ? "selected" : ""}>${l}</option>`).join("")}</select></label>
+   <label class="field">De dónde sale la plata<select id="pg-s">${Object.entries(ORIG).map(([v,l]) => `<option value="${v}" ${(pg.sobre || (k === "anticipo" || k === "sena" ? "aporte" : "maquina")) === v ? "selected" : ""}>${l}</option>`).join("")}</select></label>
    <p class="muted small" style="margin:0">Si sale de un sobre, se registra como movimiento y baja su saldo. El aporte de los socios es plata que ponen de afuera y no toca los sobres.</p>`;
   openDrawer(x.pago ? "Editar pago" : "Registrar pago", body, `${x.pago ? `<button class="btn ghost danger" type="button" id="pg-del">Borrar pago</button>` : ""}<button class="btn" type="button" data-close>Cancelar</button><button class="btn pri" type="button" id="pg-ok">Guardar</button>`, (dr, close) => {
     const calc = () => { if (esF) return; const tc = num($("#pg-tc", dr).value), u = num($("#pg-u", dr).value); if (tc && u) $("#pg-a", dr).value = Math.round(tc * u); };
