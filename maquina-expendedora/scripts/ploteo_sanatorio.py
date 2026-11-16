@@ -84,32 +84,28 @@ def ploteo(v):
 
     # Cómo comprar (fondo negro, letras claras, borde de línea)
     sx0, sx1, sy0 = P + 60, R - 60, by1 + 90
-    sy1 = B - 150
-    d.rounded_rectangle((sx0, sy0, sx1, sy1), 30, fill=caja, outline=l2, width=3)
-    d.text((sx0 + 40, sy0 + 44), "CÓMO COMPRAR", font=fnt("black", 52), fill=BLANCO)
-    d.line((sx0 + 40, sy0 + 128, sx0 + 220, sy0 + 128), fill=ROJO, width=8)
     # cada paso: líneas del título (en blanco) + líneas de aclaración (en gris)
     pasos = [(["Elegí tu producto"], ["¿Más de uno? Al carrito."]),
              (["Tocá «Comprar", "ahora»"], []),
              (["Seleccioná QR", "o Efectivo"], []),
              (["Pagá"], []),
              (["Retirá abajo"], [])]
-    alto = lambda t, s: max(100, 60 * len(t) + 46 * len(s))
-    libre = (sy1 - 50) - (sy0 + 175) - sum(alto(t, s) for t, s in pasos)
-    gap = libre / (len(pasos) - 1)
-    y = sy0 + 175
+    alto = lambda t, s: max(76, 46 * len(t) + 38 * len(s))
+    gap = 16
+    sy1 = sy0 + 130 + sum(alto(t, s) for t, s in pasos) + gap * (len(pasos) - 1) + 34
+    d.rounded_rectangle((sx0, sy0, sx1, sy1), 26, fill=caja, outline=l2, width=3)
+    d.text((sx0 + 36, sy0 + 30), "CÓMO COMPRAR", font=fnt("black", 46), fill=BLANCO)
+    d.line((sx0 + 36, sy0 + 100, sx0 + 196, sy0 + 100), fill=ROJO, width=7)
+    y = sy0 + 130
     for i, (tit, sub) in enumerate(pasos):
         h = alto(tit, sub)
-        d.ellipse((sx0 + 36, y, sx0 + 136, y + 100), fill=ROJO)
-        centro(d, (sx0 + 86, y + 51), str(i + 1), fnt("black", 56), BLANCO)
-        ty = y + (20 if len(tit) == 1 and not sub else 0)
+        d.ellipse((sx0 + 34, y, sx0 + 106, y + 72), fill=ROJO)
+        centro(d, (sx0 + 70, y + 37), str(i + 1), fnt("black", 42), BLANCO)
+        ty = y + (14 if len(tit) == 1 and not sub else 0)
         for j, ln in enumerate(tit):
-            d.text((sx0 + 155, ty + j * 60), ln, font=fnt("xb", 42), fill=BLANCO)
+            d.text((sx0 + 128, ty + j * 46), ln, font=fnt("xb", 38), fill=BLANCO)
         for j, ln in enumerate(sub):
-            d.text((sx0 + 155, ty + len(tit) * 60 + 8 + j * 46), ln, font=fnt("m", 30), fill=GRIS_T)
-        if i < len(pasos) - 1:                # línea punteada que une los pasos
-            for yy in range(int(y + 114), int(y + h + gap - 12), 20):
-                d.ellipse((sx0 + 81, yy, sx0 + 91, yy + 10), fill=l2)
+            d.text((sx0 + 128, ty + len(tit) * 46 + 4 + j * 38), ln, font=fnt("m", 28), fill=GRIS_T)
         y += h + gap
 
     # Puerta de retiro
