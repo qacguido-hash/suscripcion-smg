@@ -35,11 +35,16 @@ def lineas_diagonales(d, x0, y0, n, largo, sep, ancho, colores, sube=True):
 
 
 def ploteo(v):
-    C.PAL = v["pal"]; C.DIBUJAR_PUSH = False; C.TEXTO_PAGO = "Comprar ahora"
-    # En la máquina real el billetero está casi pegado al borde derecho del panel
-    _, by0_, _, by1_ = C.BILL
-    bw = C.BILL[2] - C.BILL[0]
-    C.BILL = (C.MX0 + C.MW - 70 - bw, by0_, C.MX0 + C.MW - 70, by1_)
+    C.PAL = v["pal"]; C.DIBUJAR_PUSH = False; C.PANTALLA_SOLO_PRODUCTOS = True; C.DIBUJAR_LECTOR = False
+    # Pantalla más arriba y centrada en el panel derecho; el billetero, debajo y casi pegado al borde
+    R0 = C.MX0 + C.MW
+    sw, sh = C.SCREEN0[2] - C.SCREEN0[0], C.SCREEN0[3] - C.SCREEN0[1]
+    scx = (C.PANEL_X + R0) / 2
+    st = C.MY0 + 270
+    C.SCREEN = (int(scx - sw / 2), st, int(scx + sw / 2), st + sh)
+    bw, bh = C.BILL0[2] - C.BILL0[0], C.BILL0[3] - C.BILL0[1]
+    bt = st + sh + 26 + 90
+    C.BILL = (R0 - 70 - bw, bt, R0 - 70, bt + bh)
     img = C.componer({1, 2, 3, 4, 5, 6}, "tmp", "distribucion.json", guardar=False).convert("RGB")
     d = ImageDraw.Draw(img)
     caja, l2 = v["caja"], v["linea2"]
@@ -78,33 +83,33 @@ def ploteo(v):
         d.text((lx0 + 4 + col * 160, by0 + 192 + fila * 44), b, font=fnt("b", 29), fill=GRIS_T)
 
     # Cómo comprar (fondo negro, letras claras, borde de línea)
-    sx0, sx1, sy0 = P + 70, R - 70, by1 + 260
+    sx0, sx1, sy0 = P + 60, R - 60, by1 + 90
     sy1 = B - 150
     d.rounded_rectangle((sx0, sy0, sx1, sy1), 30, fill=caja, outline=l2, width=3)
-    d.text((sx0 + 40, sy0 + 40), "CÓMO COMPRAR", font=fnt("black", 50), fill=BLANCO)
-    d.line((sx0 + 40, sy0 + 115, sx0 + 200, sy0 + 115), fill=ROJO, width=7)
+    d.text((sx0 + 40, sy0 + 44), "CÓMO COMPRAR", font=fnt("black", 52), fill=BLANCO)
+    d.line((sx0 + 40, sy0 + 128, sx0 + 220, sy0 + 128), fill=ROJO, width=8)
     # cada paso: líneas del título (en blanco) + líneas de aclaración (en gris)
     pasos = [(["Elegí tu producto"], ["¿Más de uno? Al carrito."]),
              (["Tocá «Comprar", "ahora»"], []),
              (["Seleccioná QR", "o Efectivo"], []),
              (["Pagá"], []),
              (["Retirá abajo"], [])]
-    alto = lambda t, s: max(80, 50 * len(t) + 40 * len(s))
-    libre = (sy1 - 40) - (sy0 + 150) - sum(alto(t, s) for t, s in pasos)
+    alto = lambda t, s: max(100, 60 * len(t) + 46 * len(s))
+    libre = (sy1 - 50) - (sy0 + 175) - sum(alto(t, s) for t, s in pasos)
     gap = libre / (len(pasos) - 1)
-    y = sy0 + 150
+    y = sy0 + 175
     for i, (tit, sub) in enumerate(pasos):
         h = alto(tit, sub)
-        d.ellipse((sx0 + 40, y, sx0 + 120, y + 80), fill=ROJO)
-        centro(d, (sx0 + 80, y + 41), str(i + 1), fnt("black", 46), BLANCO)
-        ty = y + (14 if len(tit) == 1 and not sub else 0)
+        d.ellipse((sx0 + 36, y, sx0 + 136, y + 100), fill=ROJO)
+        centro(d, (sx0 + 86, y + 51), str(i + 1), fnt("black", 56), BLANCO)
+        ty = y + (20 if len(tit) == 1 and not sub else 0)
         for j, ln in enumerate(tit):
-            d.text((sx0 + 145, ty + j * 50), ln, font=fnt("xb", 40), fill=BLANCO)
+            d.text((sx0 + 155, ty + j * 60), ln, font=fnt("xb", 42), fill=BLANCO)
         for j, ln in enumerate(sub):
-            d.text((sx0 + 145, ty + len(tit) * 50 + 6 + j * 40), ln, font=fnt("m", 30), fill=GRIS_T)
+            d.text((sx0 + 155, ty + len(tit) * 60 + 8 + j * 46), ln, font=fnt("m", 30), fill=GRIS_T)
         if i < len(pasos) - 1:                # línea punteada que une los pasos
-            for yy in range(int(y + 92), int(y + h + gap - 10), 18):
-                d.ellipse((sx0 + 76, yy, sx0 + 84, yy + 8), fill=l2)
+            for yy in range(int(y + 114), int(y + h + gap - 12), 20):
+                d.ellipse((sx0 + 81, yy, sx0 + 91, yy + 10), fill=l2)
         y += h + gap
 
     # Puerta de retiro

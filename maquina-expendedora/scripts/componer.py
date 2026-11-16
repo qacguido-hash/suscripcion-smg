@@ -26,6 +26,7 @@ GLASS = (mx(0.085), my(0.075), mx(0.655), my(0.715))   # vidriera (x0,y0,x1,y1)
 PANEL_X = mx(0.705)                                      # costura con el panel derecho
 SCREEN = (mx(0.738), my(0.17), mx(0.925), my(0.43))
 BILL = (mx(0.795), my(0.47), mx(0.885), my(0.575))
+SCREEN0, BILL0 = SCREEN, BILL   # posiciones de fábrica
 PUSH = (mx(0.165), my(0.785), mx(0.545), my(0.86))
 
 RED = (196, 22, 32)
@@ -36,6 +37,8 @@ PAL = {"body": RED, "dark": RED_DARK, "light": RED_LIGHT, "bevel": (214, 40, 46)
        "zocalo": (120, 10, 18), "zocalo_l": (160, 20, 28), "push": (170, 16, 26), "panel": None}
 DIBUJAR_PUSH = True
 TEXTO_PAGO = "Pagá con QR, tarjeta o efectivo"
+PANTALLA_SOLO_PRODUCTOS = False   # sin título ni botón: solo la grilla de productos
+DIBUJAR_LECTOR = True             # lector de tarjeta sin contacto debajo del billetero
 
 
 def font(path, size):
@@ -134,10 +137,13 @@ def pantalla(img, thumbs):
     w, h = x1 - x0, y1 - y0
     scr = vgrad(w, h, (238, 242, 247), (224, 230, 238))
     sd = ImageDraw.Draw(scr)
-    sd.rectangle((0, 0, w, int(h * 0.11)), fill=RED)
-    sd.text((w / 2, h * 0.055), "Elegí tu producto", font=font(FONT_B, int(h * 0.05)), fill="white", anchor="mm")
     cols, rows = 3, 4
-    gx0, gy0, gw, gh = int(w * 0.06), int(h * 0.15), int(w * 0.88), int(h * 0.70)
+    if PANTALLA_SOLO_PRODUCTOS:
+        gx0, gy0, gw, gh = int(w * 0.05), int(h * 0.04), int(w * 0.90), int(h * 0.92)
+    else:
+        sd.rectangle((0, 0, w, int(h * 0.11)), fill=RED)
+        sd.text((w / 2, h * 0.055), "Elegí tu producto", font=font(FONT_B, int(h * 0.05)), fill="white", anchor="mm")
+        gx0, gy0, gw, gh = int(w * 0.06), int(h * 0.15), int(w * 0.88), int(h * 0.70)
     cw, ch = gw / cols, gh / rows
     for i, t in enumerate(thumbs[: cols * rows]):
         c, r = i % cols, i // cols
@@ -146,8 +152,9 @@ def pantalla(img, thumbs):
         sd.rounded_rectangle((bx, by, bx + bw, by + bh), 12, fill="white", outline=(210, 214, 222), width=2)
         tt = t.copy(); tt.thumbnail((int(bw * 0.8), int(bh * 0.8)), Image.LANCZOS)
         scr.paste(tt, (bx + (bw - tt.width) // 2, by + (bh - tt.height) // 2), tt)
-    sd.rounded_rectangle((int(w * 0.12), int(h * 0.885), int(w * 0.88), int(h * 0.955)), 24, fill=(30, 140, 70))
-    sd.text((w / 2, h * 0.92), TEXTO_PAGO, font=font(FONT_M, int(h * 0.023)), fill="white", anchor="mm")
+    if not PANTALLA_SOLO_PRODUCTOS:
+        sd.rounded_rectangle((int(w * 0.12), int(h * 0.885), int(w * 0.88), int(h * 0.955)), 24, fill=(30, 140, 70))
+    if not PANTALLA_SOLO_PRODUCTOS: sd.text((w / 2, h * 0.92), TEXTO_PAGO, font=font(FONT_M, int(h * 0.023)), fill="white", anchor="mm")
     img.paste(scr, (x0, y0), rounded_mask((w, h), 8))
     # reflejo del vidrio de la pantalla
     refl = Image.new("L", (w, h), 0)
@@ -170,6 +177,8 @@ def billetero(img):
     for i, col in enumerate([(40, 200, 90), (230, 60, 50)]):
         d.ellipse((x0 + 24 + i * 28, y1 - 46, x0 + 40 + i * 28, y1 - 30), fill=col)
     # lector de tarjeta / QR debajo
+    if not DIBUJAR_LECTOR:
+        return
     cx0, cy0 = x0 - 10, y1 + 60
     d.rounded_rectangle((cx0, cy0, x1 + 10, cy0 + 150), 12, fill=(28, 28, 32))
     d.rounded_rectangle((cx0 + 14, cy0 + 14, x1 - 4, cy0 + 136), 8, fill=(48, 48, 54))
