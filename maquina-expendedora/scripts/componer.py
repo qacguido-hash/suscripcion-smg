@@ -31,6 +31,10 @@ PUSH = (mx(0.165), my(0.785), mx(0.545), my(0.86))
 RED = (196, 22, 32)
 RED_DARK = (140, 12, 20)
 RED_LIGHT = (226, 52, 58)
+# Paleta del gabinete (se puede cambiar desde otro script, p. ej. ploteo.py)
+PAL = {"body": RED, "dark": RED_DARK, "light": RED_LIGHT, "bevel": (214, 40, 46),
+       "zocalo": (120, 10, 18), "zocalo_l": (160, 20, 28), "push": (170, 16, 26), "panel": None}
+DIBUJAR_PUSH = True
 
 
 def font(path, size):
@@ -79,7 +83,7 @@ def gabinete(img, floor_y):
         d.rectangle((x - 30, MY0 + MH + 8, x + 30, MY0 + MH + 18), fill=(70, 70, 75))
     # cuerpo con sombreado lateral
     body = hgrad(MW, MH, (0, 0, 0), (0, 0, 0))
-    base = Image.new("RGB", (MW, MH), RED)
+    base = Image.new("RGB", (MW, MH), PAL["body"])
     t = np.linspace(0, 1, MW)
     shade = 1 - 0.18 * np.exp(-((t - 0.0) / 0.025) ** 2) - 0.25 * np.exp(-((t - 1.0) / 0.03) ** 2) + 0.05 * np.exp(-((t - 0.35) / 0.25) ** 2)
     arr = np.asarray(base).astype(float) * shade[None, :, None]
@@ -87,17 +91,23 @@ def gabinete(img, floor_y):
     arr *= (1 - 0.10 * tv)[:, None, None]
     body = Image.fromarray(np.clip(arr, 0, 255).astype(np.uint8))
     img.paste(body, (MX0, MY0), rounded_mask((MW, MH), 18))
+    if PAL.get("panel"):   # panel derecho de otro color (versión bicolor)
+        pw = MX0 + MW - PANEL_X
+        parr = np.asarray(Image.new("RGB", (pw, MH), PAL["panel"])).astype(float) * shade[None, -pw:, None] * (1 - 0.10 * tv)[:, None, None]
+        pimg = Image.fromarray(np.clip(parr, 0, 255).astype(np.uint8))
+        pm = Image.new("L", (pw, MH), 0); ImageDraw.Draw(pm).rounded_rectangle((-30, 0, pw - 1, MH - 1), 18, fill=255)
+        img.paste(pimg, (PANEL_X, MY0), pm)
     # borde superior y zócalo
-    d.rounded_rectangle((MX0, MY0, MX0 + MW, MY0 + 22), 12, fill=RED_LIGHT)
-    d.rectangle((MX0 + 8, MY0 + MH - 70, MX0 + MW - 8, MY0 + MH - 8), fill=(120, 10, 18))
-    d.rectangle((MX0 + 8, MY0 + MH - 70, MX0 + MW - 8, MY0 + MH - 64), fill=(160, 20, 28))
+    d.rounded_rectangle((MX0, MY0, MX0 + MW, MY0 + 22), 12, fill=PAL["light"])
+    d.rectangle((MX0 + 8, MY0 + MH - 70, MX0 + MW - 8, MY0 + MH - 8), fill=PAL["zocalo"])
+    d.rectangle((MX0 + 8, MY0 + MH - 70, MX0 + MW - 8, MY0 + MH - 64), fill=PAL["zocalo_l"])
     # costura puerta / panel
-    d.rectangle((PANEL_X - 5, MY0 + 22, PANEL_X + 5, MY0 + MH - 70), fill=RED_DARK)
-    d.line((PANEL_X + 6, MY0 + 22, PANEL_X + 6, MY0 + MH - 70), fill=RED_LIGHT, width=2)
+    d.rectangle((PANEL_X - 5, MY0 + 22, PANEL_X + 5, MY0 + MH - 70), fill=PAL["dark"])
+    d.line((PANEL_X + 6, MY0 + 22, PANEL_X + 6, MY0 + MH - 70), fill=PAL["light"], width=2)
     # marco de la vidriera (bisel)
     gx0, gy0, gx1, gy1 = GLASS
-    d.rounded_rectangle((gx0 - 34, gy0 - 34, gx1 + 34, gy1 + 34), 22, fill=RED_DARK)
-    d.rounded_rectangle((gx0 - 28, gy0 - 28, gx1 + 28, gy1 + 28), 18, fill=(214, 40, 46))
+    d.rounded_rectangle((gx0 - 34, gy0 - 34, gx1 + 34, gy1 + 34), 22, fill=PAL["dark"])
+    d.rounded_rectangle((gx0 - 28, gy0 - 28, gx1 + 28, gy1 + 28), 18, fill=PAL["bevel"])
     d.rounded_rectangle((gx0 - 14, gy0 - 14, gx1 + 14, gy1 + 14), 10, fill=(25, 25, 28))
     # cerradura
     lx, ly = mx(0.675), my(0.475)
@@ -106,8 +116,10 @@ def gabinete(img, floor_y):
     d.ellipse((lx - 11, ly - 11, lx + 11, ly + 11), fill=(90, 90, 95))
     d.rectangle((lx - 3, ly - 9, lx + 3, ly + 9), fill=(40, 40, 45))
     # puerta de retiro PUSH
+    if not DIBUJAR_PUSH:
+        return
     px0, py0, px1, py1 = PUSH
-    d.rounded_rectangle((px0 - 10, py0 - 10, px1 + 10, py1 + 10), 10, fill=(170, 16, 26))
+    d.rounded_rectangle((px0 - 10, py0 - 10, px1 + 10, py1 + 10), 10, fill=PAL["push"])
     d.rounded_rectangle((px0, py0, px1, py1), 6, outline=(255, 255, 255), width=7)
     f = font(FONT_B, int((py1 - py0) * 0.55))
     d.text(((px0 + px1) / 2, (py0 + py1) / 2 + 4), "PUSH", font=f, fill=(255, 255, 255), anchor="mm")
@@ -220,7 +232,7 @@ def sombreado_base(im):
     return Image.fromarray(np.clip(arr, 0, 255).astype(np.uint8))
 
 
-def componer(estantes_a_llenar, sufijo, distribucion="distribucion.json"):
+def componer(estantes_a_llenar, sufijo, distribucion="distribucion.json", guardar=True):
     cfg = json.load(open(f"{BASE}/scripts/{distribucion}"))
     img, floor_y = fondo()
     gabinete(img, floor_y)
@@ -314,6 +326,8 @@ def componer(estantes_a_llenar, sufijo, distribucion="distribucion.json"):
         thumbs = [Image.open(f"{BASE}/productos/{c['slug']}.png").convert("RGBA") for c in cfg["estantes"][0]["canales"]]
     pantalla(img, thumbs)
     billetero(img)
+    if not guardar:
+        return img
 
     os.makedirs(f"{BASE}/salida", exist_ok=True)
     out = f"{BASE}/salida/maquina_{sufijo}.png"
@@ -322,6 +336,7 @@ def componer(estantes_a_llenar, sufijo, distribucion="distribucion.json"):
     lite.save(f"{BASE}/salida/maquina_{sufijo}_liviana.jpg", quality=85, optimize=True, progressive=True)
     json.dump({"px_por_cm": round(pxcm, 2), "productos": reporte}, open(f"{BASE}/salida/escalas_{sufijo}.json", "w"), indent=1, ensure_ascii=False)
     print(out, f"{pxcm:.2f} px/cm")
+    return img
 
 
 if __name__ == "__main__":
