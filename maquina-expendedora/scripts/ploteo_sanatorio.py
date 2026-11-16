@@ -35,7 +35,11 @@ def lineas_diagonales(d, x0, y0, n, largo, sep, ancho, colores, sube=True):
 
 
 def ploteo(v):
-    C.PAL = v["pal"]; C.DIBUJAR_PUSH = False; C.TEXTO_PAGO = "Pagá con QR"
+    C.PAL = v["pal"]; C.DIBUJAR_PUSH = False; C.TEXTO_PAGO = "Comprar ahora"
+    # En la máquina real el billetero está casi pegado al borde derecho del panel
+    _, by0_, _, by1_ = C.BILL
+    bw = C.BILL[2] - C.BILL[0]
+    C.BILL = (C.MX0 + C.MW - 70 - bw, by0_, C.MX0 + C.MW - 70, by1_)
     img = C.componer({1, 2, 3, 4, 5, 6}, "tmp", "distribucion.json", guardar=False).convert("RGB")
     d = ImageDraw.Draw(img)
     caja, l2 = v["caja"], v["linea2"]
@@ -60,18 +64,18 @@ def ploteo(v):
     d.polygon([(cx - 26, ey1 - 2), (cx + 26, ey1 - 2), (cx, ey1 + 28)], fill=ROJO)
     centro(d, (cx, (ey0 + ey1) / 2), "Elegí en la pantalla", fnt("xb", 42), BLANCO)
 
-    # Billetero: por si se habilita el efectivo (el medio de pago principal es QR)
+    # Billetero: por si se habilita el efectivo. Todo a su izquierda, en una sola columna.
     bx0, by0, bx1, by1 = C.BILL
-    lx = P + 48
-    d.text((lx, by0 + 6), "BILLETES", font=fnt("xb", 26), fill=BLANCO)
-    for i, b in enumerate(["$500", "$1.000", "$2.000", "$10.000", "$20.000"]):
-        d.text((lx, by0 + 52 + i * 48), b, font=fnt("b", 29), fill=GRIS_T)
-    rx0, rx1 = bx1 + 36, R - 46
-    d.rounded_rectangle((rx0, by0, rx1, by0 + 250), 18, outline=ROJO, width=4)
-    centro(d, ((rx0 + rx1) / 2, by0 + 62), "NO DA", fnt("black", 36), BLANCO)
-    centro(d, ((rx0 + rx1) / 2, by0 + 108), "VUELTO", fnt("black", 36), BLANCO)
-    centro(d, ((rx0 + rx1) / 2, by0 + 168), "Pagá el", fnt("sb", 26), GRIS_T)
-    centro(d, ((rx0 + rx1) / 2, by0 + 204), "monto justo", fnt("sb", 26), GRIS_T)
+    lx0, lx1 = P + 62, bx0 - 34
+    lc = (lx0 + lx1) / 2
+    d.rounded_rectangle((lx0, by0, lx1, by0 + 118), 18, outline=ROJO, width=4)
+    centro(d, (lc, by0 + 42), "NO DA VUELTO", fnt("black", 34), BLANCO)
+    centro(d, (lc, by0 + 86), "Pagá el monto justo", fnt("sb", 26), GRIS_T)
+    d.text((lx0 + 4, by0 + 150), "BILLETES ACEPTADOS", font=fnt("xb", 24), fill=BLANCO)
+    billetes = ["$500", "$1.000", "$2.000", "$10.000", "$20.000"]
+    for i, b in enumerate(billetes):
+        col, fila = divmod(i, 3)
+        d.text((lx0 + 4 + col * 160, by0 + 192 + fila * 44), b, font=fnt("b", 29), fill=GRIS_T)
 
     # Cómo comprar (fondo negro, letras claras, borde de línea)
     sx0, sx1, sy0 = P + 70, R - 70, by1 + 260
@@ -79,19 +83,29 @@ def ploteo(v):
     d.rounded_rectangle((sx0, sy0, sx1, sy1), 30, fill=caja, outline=l2, width=3)
     d.text((sx0 + 40, sy0 + 40), "CÓMO COMPRAR", font=fnt("black", 50), fill=BLANCO)
     d.line((sx0 + 40, sy0 + 115, sx0 + 200, sy0 + 115), fill=ROJO, width=7)
-    pasos = [("Elegí tu producto", "¿Más de uno? Al carrito."), ("Tocá «Pagar»", None),
-             ("Pagá con QR", None), ("Retirá abajo", None)]
-    y = sy0 + 165
-    for i, (t, sub) in enumerate(pasos):
+    # cada paso: líneas del título (en blanco) + líneas de aclaración (en gris)
+    pasos = [(["Elegí tu producto"], ["¿Más de uno? Al carrito."]),
+             (["Tocá «Comprar", "ahora»"], []),
+             (["Seleccioná QR", "o Efectivo"], []),
+             (["Pagá"], []),
+             (["Retirá abajo"], [])]
+    alto = lambda t, s: max(80, 50 * len(t) + 40 * len(s))
+    libre = (sy1 - 40) - (sy0 + 150) - sum(alto(t, s) for t, s in pasos)
+    gap = libre / (len(pasos) - 1)
+    y = sy0 + 150
+    for i, (tit, sub) in enumerate(pasos):
+        h = alto(tit, sub)
         d.ellipse((sx0 + 40, y, sx0 + 120, y + 80), fill=ROJO)
         centro(d, (sx0 + 80, y + 41), str(i + 1), fnt("black", 46), BLANCO)
-        d.text((sx0 + 150, y + 14), t, font=fnt("xb", 42), fill=BLANCO)
-        if sub:
-            d.text((sx0 + 150, y + 72), sub, font=fnt("m", 32), fill=GRIS_T)
+        ty = y + (14 if len(tit) == 1 and not sub else 0)
+        for j, ln in enumerate(tit):
+            d.text((sx0 + 145, ty + j * 50), ln, font=fnt("xb", 40), fill=BLANCO)
+        for j, ln in enumerate(sub):
+            d.text((sx0 + 145, ty + len(tit) * 50 + 6 + j * 40), ln, font=fnt("m", 30), fill=GRIS_T)
         if i < len(pasos) - 1:                # línea punteada que une los pasos
-            for yy in range(int(y + 92), int(y + (195 if sub else 165)), 18):
+            for yy in range(int(y + 92), int(y + h + gap - 10), 18):
                 d.ellipse((sx0 + 76, yy, sx0 + 84, yy + 8), fill=l2)
-        y += 205 if sub else 175
+        y += h + gap
 
     # Puerta de retiro
     qx0, qy0, qx1, qy1 = C.PUSH
@@ -99,7 +113,6 @@ def ploteo(v):
     d.rounded_rectangle((qx0, qy0, qx1, qy1), 10, outline=BLANCO, width=8)
     centro(d, ((qx0 + qx1) / 2, qy0 + (qy1 - qy0) * 0.40), "RETIRÁ TU PRODUCTO", fnt("black", 64), BLANCO)
     centro(d, ((qx0 + qx1) / 2, qy0 + (qy1 - qy0) * 0.76), "Empujá la tapa", fnt("sb", 46), GRIS_T)
-    centro(d, ((qx0 + qx1) / 2, qy0 - 70), "Tu compra cae acá abajo", fnt("b", 44), BLANCO)
 
     # Soporte: WhatsApp y número de máquina
     wy0, wy1 = qy1 + 80, B - 150
