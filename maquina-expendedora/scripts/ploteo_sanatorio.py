@@ -91,7 +91,7 @@ def ploteo(v):
              (["Pagá"], []),
              (["Retirá abajo"], [])]
     alto = lambda t, s: max(76, 46 * len(t) + 38 * len(s))
-    gap = 16
+    gap = 54
     sy1 = sy0 + 130 + sum(alto(t, s) for t, s in pasos) + gap * (len(pasos) - 1) + 34
     d.rounded_rectangle((sx0, sy0, sx1, sy1), 26, fill=caja, outline=l2, width=3)
     d.text((sx0 + 36, sy0 + 30), "CÓMO COMPRAR", font=fnt("black", 46), fill=BLANCO)
@@ -106,6 +106,12 @@ def ploteo(v):
             d.text((sx0 + 128, ty + j * 46), ln, font=fnt("xb", 38), fill=BLANCO)
         for j, ln in enumerate(sub):
             d.text((sx0 + 128, ty + len(tit) * 46 + 4 + j * 38), ln, font=fnt("m", 28), fill=GRIS_T)
+        if i < len(pasos) - 1:                # 4 puntitos blancos debajo de cada número
+            y0d, y1d = y + 72, y + h + gap
+            ym = (y0d + y1d) / 2
+            for k in range(4):                # separación fija, centrados entre círculo y círculo
+                yy = ym + (k - 1.5) * 17
+                d.ellipse((sx0 + 66, yy - 4, sx0 + 74, yy + 4), fill=BLANCO)
         y += h + gap
 
     # Puerta de retiro
