@@ -191,6 +191,10 @@ tr.click{cursor:pointer} tr.click:hover td{background:var(--surface-2)}
 .seg{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--surface)}
 .seg button{border:0;background:transparent;padding:0 14px;min-height:42px;font-weight:600;font-size:14px;cursor:pointer;color:var(--muted)}
 .seg button.on{background:var(--fg);color:var(--bg)}
+.invbar{height:8px;border-radius:99px;background:var(--line-2);overflow:hidden;display:flex;margin-top:10px}
+.invbar span{display:block;height:100%}
+.invleg{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:12px;color:var(--muted);margin-top:6px}
+.invleg i{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:5px}
 .notice{padding:12px 14px;border-radius:10px;background:var(--info-soft);font-size:14px}
 .back{display:inline-flex;align-items:center;gap:6px;font-weight:600;font-size:14px;color:var(--muted);background:none;border:0;padding:8px 0;cursor:pointer;min-height:44px}
 
@@ -289,7 +293,7 @@ const S = { productos:{}, stock:{}, relev:{}, competidores:{}, proveedores:{}, m
 let db = null, assets = null, downloads = null;
 const DEF_CONFIG = { comisionQR: 0, diasPrecioViejo: 45, diasVence: 7, diasCobertura: 7, diasReposicion: 3 };
 const cfg = () => Object.assign({}, DEF_CONFIG, S.config);
-const UI = { q:"", cat:"", stockTab:"deposito", maq:null, precioFiltro:"todos", pq:"", orden:"nombre", vmes:0, histN:40 };
+const UI = { q:"", cat:"", stockTab:"deposito", maq:null, precioFiltro:"todos", pq:"", orden:"nombre", vmes:0, histN:40, per:"mes", rDesde:null, rHasta:null };
 
 // ---------- costos y márgenes ----------
 const provNombre = (id) => id === SIN ? "Sin proveedor" : ((S.proveedores[id]||{}).nombre || "Proveedor borrado");
@@ -437,12 +441,35 @@ const li = (rows, empty) => rows.length ? `<div class="list">${rows.join("")}</d
 const alertasHTML = (al) => al.length ? `<div>${al.map(a=>`<div class="alert"><span class="dot ${a.nivel}" aria-hidden="true"></span>${img(a.p)}<div class="grow" style="flex:1;min-width:0"><div class="t" style="font-weight:600;font-size:14px">${esc(a.t)}</div><div class="small muted">${esc(a.d)}</div></div></div>`).join("")}</div>` : `<p class="muted small" style="margin:0">Sin alertas por ahora. Las de consumo aparecen cuando haya ventas registradas.</p>`;
 
 // ---------- vistas ----------
+// Período elegido en Inicio: desde/hasta (fechas ISO) y cómo se nombra
+function periodoInicio(){
+  const hoy = today(), ym = mesDe(0);
+  if (UI.per === "hoy") return {desde:hoy, hasta:hoy, suf:"de hoy"};
+  if (UI.per === "semana"){ const d = new Date(); const lun = addDays(hoy, -((d.getDay()+6)%7)); return {desde:lun, hasta:hoy, suf:"de esta semana"}; }
+  if (UI.per === "anio") return {desde:hoy.slice(0,4)+"-01-01", hasta:hoy, suf:"de " + hoy.slice(0,4)};
+  if (UI.per === "rango"){ let a = UI.rDesde || ym+"-01", b = UI.rHasta || hoy; if (a > b) [a,b] = [b,a]; return {desde:a, hasta:b, suf:"del " + fdate(a).slice(0,5) + " al " + fdate(b).slice(0,5)}; }
+  return {desde:ym+"-01", hasta:hoy, suf:"de " + nombreMes(ym), mes:true};
+}
+// Inventario actual: unidades en depósito y máquinas, valorizadas a costo y a precio de venta
+function inventario(){
+  let dep = 0, maq = 0, vc = 0, vv = 0, gan = 0;
+  for (const p of prodList()){ const d = stockDep(p.id), m = stockMaq(p.id), u = d + m; if (!u) continue;
+    dep += d; maq += m; const c = costoActual(p), pv = p.precioVenta;
+    if (c != null) vc += u * c; if (pv != null) vv += u * pv; if (c != null && pv != null) gan += u * (pv - c); }
+  return {dep, maq, tot: dep + maq, vc, vv, gan};
+}
 function vInicio(){
-  const c = cfg(), evs = eventos(), ym = mesDe(0), dia = new Date().getDate();
-  const r = resumen(delMes(evs, ym)), ra = resumen(delMes(evs, mesDe(-1), dia));
-  const maqs = maqList(); const gf = maqs.reduce((t,m)=>t+gastosFijos(m),0);
+  const c = cfg(), todos = eventos(), ym = mesDe(0), per = periodoInicio();
+  const evs = todos.filter(e => e.fecha >= per.desde && e.fecha <= per.hasta);
+  const r = resumen(evs);
+  const maqs = maqList(); const gfMes = maqs.reduce((t,m)=>t+gastosFijos(m),0);
+  const nDias = Math.round((new Date(per.hasta+"T00:00:00") - new Date(per.desde+"T00:00:00"))/86400000) + 1;
+  const gf = per.mes ? gfMes : gfMes * nDias / 30;
+  const inv = inventario();
+  const segP = `<div class="seg" role="group" aria-label="Período">${[["hoy","Hoy"],["semana","Semana"],["mes","Mes"],["anio","Año"],["rango","Rango"]].map(([k,l])=>`<button type="button" class="${UI.per===k?"on":""}" data-per="${k}" aria-pressed="${UI.per===k}">${l}</button>`).join("")}</div>`;
+  const rangoUI = UI.per === "rango" ? `<div class="row"><label class="field" style="flex-direction:row;align-items:center;gap:8px">Desde <input class="inp" type="date" id="r-desde" value="${per.desde}" max="${today()}" style="width:auto"></label><label class="field" style="flex-direction:row;align-items:center;gap:8px">Hasta <input class="inp" type="date" id="r-hasta" value="${per.hasta}" max="${today()}" style="width:auto"></label></div>` : "";
   const ps = prodList(); const ms = ps.map(p => margen(p.precioVenta, costoActual(p)).m).filter(x=>x!=null); const mprom = ms.length ? ms.reduce((a,b)=>a+b,0)/ms.length : null;
-  const porProd = {}; for (const e of delMes(evs, ym)){ const x = porProd[e.pid] || {u:0,f:0}; x.u += e.u; x.f += e.f; porProd[e.pid] = x; }
+  const porProd = {}; for (const e of evs){ const x = porProd[e.pid] || {u:0,f:0}; x.u += e.u; x.f += e.f; porProd[e.pid] = x; }
   const enMaq = new Set(); for (const m of maqs) for (const [,sl] of slotsDe(m)) if (sl.productoId) enMaq.add(sl.productoId);
   const top = Object.entries(porProd).map(([pid,x])=>({p:S.productos[pid]||{}, u:x.u, f:x.f})).sort((a,b)=>b.u-a.u).slice(0,5);
   const menos = [...enMaq].map(pid => ({p:S.productos[pid]||{}, u:(porProd[pid]||{}).u||0})).sort((a,b)=>a.u-b.u).slice(0,5);
@@ -453,18 +480,28 @@ function vInicio(){
   return `
   <div class="head"><div><h1>Inicio</h1><p class="muted">${new Date().toLocaleDateString("es-AR",{weekday:"long",day:"numeric",month:"long"})}</p></div>
    <div class="row"><a class="btn pri" href="#maquinas">Reponer</a><a class="btn" href="#stock" data-go-stock="compras">Lista de compras</a></div></div>
+  <div class="row">${segP}${rangoUI}</div>
   ${sinCostos ? `<div class="notice">Para empezar: cargá en <a href="#productos">Productos</a> el costo de cada proveedor y tu precio de venta, y en <a href="#precios">Precios</a> lo que cobra la competencia.</div>` : ""}
-  <section class="grid-k" aria-label="Resumen del mes">
-    <div class="card kpi"><div class="l">Facturación de ${nombreMes(ym)}</div><div class="v num">${fm(r.f)}</div></div>
+  <section class="grid-k" aria-label="Resumen del período">
+    <div class="card kpi"><div class="l">Facturación ${per.suf}</div><div class="v num">${fm(r.f)}</div></div>
     <div class="card kpi"><div class="l">Ventas</div><div class="v num">${fint(r.u)} u.</div></div>
     <div class="card kpi"><div class="l">Ticket promedio</div><div class="v num">${r.u ? fm(r.f / r.u) : "—"}</div></div>
-    <div class="card kpi"><div class="l">Ganancia real del mes</div><div class="v num">${r.n || gf ? fm(r.gan - gf) : "—"}</div></div>
+    <div class="card kpi"><div class="l">Ganancia real ${per.mes ? "del mes" : per.suf}</div><div class="v num">${r.n || gf ? fm(r.gan - gf) : "—"}</div></div>
     <div class="card kpi"><div class="l">Margen promedio</div><div class="v num">${pct(mprom)}</div></div>
   </section>
+  <div><p class="sec-t">Inventario hoy</p>
+  <section class="grid-k" aria-label="Inventario hoy">
+    <div class="card kpi"><div class="l">Stock total</div><div class="v num">${fint(inv.tot)} u.</div>
+      ${inv.tot ? `<div class="invbar" aria-hidden="true"><span style="width:${inv.dep/inv.tot*100}%;background:var(--fg)"></span><span style="width:${inv.maq/inv.tot*100}%;background:var(--accent)"></span></div>` : ""}
+      <div class="invleg"><span><i style="background:var(--fg)"></i>Depósito ${fint(inv.dep)}</span><span><i style="background:var(--accent)"></i>Máquinas ${fint(inv.maq)}</span></div></div>
+    <div class="card kpi"><div class="l">Valor a costo</div><div class="v num">${fm(inv.vc)}</div></div>
+    <div class="card kpi"><div class="l">Valor a precio de venta</div><div class="v num">${fm(inv.vv)}</div></div>
+    <div class="card kpi"><div class="l">Ganancia en góndola</div><div class="v num" style="color:var(--ok)">${fm(inv.gan)}</div></div>
+  </section></div>
   <div class="card"><div class="row" style="justify-content:space-between;margin-bottom:6px"><h2>Alertas</h2><span class="pill ${al.length?"p-warn":"p-ok"}">${al.length}</span></div>${alertasHTML(al.slice(0,6))}</div>
   <section class="grid-2" aria-label="Detalle">
-    <div class="card"><h2>Más vendidos del mes</h2>${li(top.map(x=>`<div class="li">${img(x.p)}<div class="grow"><div class="t">${esc(x.p.nombre)}</div><div class="d">${fint(x.u)} u.</div></div><span class="num" style="font-weight:600">${fm(x.f)}</span></div>`), "Todavía no hay ventas registradas este mes.")}</div>
-    <div class="card"><h2>Menos vendidos del mes</h2>${li(r.n ? menos.map(x=>`<div class="li">${img(x.p)}<div class="grow"><div class="t">${esc(x.p.nombre)}</div><div class="d">${x.u ? fint(x.u) + " u." : "Sin ventas"}</div></div></div>`) : [], "Aparecen cuando haya ventas registradas.")}</div>
+    <div class="card"><h2>Más vendidos ${per.mes ? "del mes" : per.suf}</h2>${li(top.map(x=>`<div class="li">${img(x.p)}<div class="grow"><div class="t">${esc(x.p.nombre)}</div><div class="d">${fint(x.u)} u.</div></div><span class="num" style="font-weight:600">${fm(x.f)}</span></div>`), "Todavía no hay ventas registradas en este período.")}</div>
+    <div class="card"><h2>Menos vendidos ${per.mes ? "del mes" : per.suf}</h2>${li(r.n ? menos.map(x=>`<div class="li">${img(x.p)}<div class="grow"><div class="t">${esc(x.p.nombre)}</div><div class="d">${x.u ? fint(x.u) + " u." : "Sin ventas"}</div></div></div>`) : [], "Aparecen cuando haya ventas registradas.")}</div>
     <div class="card"><div class="row" style="justify-content:space-between;margin-bottom:6px"><h2>Pronóstico: se agotan pronto</h2><span class="pill ${agot.length?"p-bad":"p-ok"}">${agot.length}</span></div>
       ${li(agot.slice(0,5).map(x=>`<div class="li">${img(x.p)}<div class="grow"><div class="t">${esc(x.p.nombre)}</div><div class="d">${esc(x.m.nombre)} · vende ${f1(x.cons)} u./día · quedan ${x.cant}</div></div><span class="pill ${x.ds<2?"p-bad":"p-warn"}">${dur(x.ds)}</span></div>`), hayDatos() ? "Nada se agota en los próximos 3 días." : "El pronóstico aparece cuando la máquina tenga ventas registradas.")}</div>
     <div class="card"><div class="row" style="justify-content:space-between;margin-bottom:6px"><h2>Vencen pronto</h2><span class="pill ${venc.length?"p-warn":"p-ok"}">${venc.length}</span></div>
@@ -977,6 +1014,10 @@ function bindView(){
   const ord = $("#f-orden"); if (ord) ord.addEventListener("change", e => { UI.orden = e.target.value; render(); });
   v.querySelectorAll("[data-prod]").forEach(b => b.addEventListener("click", () => openProducto(b.dataset.prod)));
   v.querySelectorAll("[data-precio]").forEach(b => { b.addEventListener("click", () => openPrecio(b.dataset.precio)); b.addEventListener("keydown", e => { if (e.key==="Enter") openPrecio(b.dataset.precio); }); });
+  v.querySelectorAll("[data-per]").forEach(b => b.addEventListener("click", () => { UI.per = b.dataset.per; render(); }));
+  const rD = $("#r-desde"), rH = $("#r-hasta");
+  if (rD) rD.addEventListener("change", e => { UI.rDesde = e.target.value || null; render(); });
+  if (rH) rH.addEventListener("change", e => { UI.rHasta = e.target.value || null; render(); });
   v.querySelectorAll("[data-pf]").forEach(b => b.addEventListener("click", () => { UI.precioFiltro = b.dataset.pf; render(); }));
   v.querySelectorAll("[data-st]").forEach(b => b.addEventListener("click", () => { UI.stockTab = b.dataset.st; render(); }));
   v.querySelectorAll("[data-vmes]").forEach(b => b.addEventListener("click", () => { UI.vmes = b.dataset.vmes === "hist" ? "hist" : +b.dataset.vmes; UI.histN = 40; render(); }));
