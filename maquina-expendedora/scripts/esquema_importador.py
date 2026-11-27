@@ -16,7 +16,7 @@ def fnt(w, s): return ImageFont.truetype(F + {"black": "Inter-Black.otf", "xb": 
 S = 7
 ROJO, BLANCO, GRIS_T = (214, 30, 40), (255, 255, 255), (185, 187, 194)
 BODY, CAJA, L2, DARK = (66, 68, 74), (24, 25, 28), (150, 152, 160), (34, 35, 39)
-WHATSAPP, MAQ_N = "11 2160-0427", "001"
+WHATSAPP, MAQ_N = "11 2160-0427", os.environ.get("MAQ_N", "001")
 
 # --- geometría del esquema (px de la franja) ---
 FRENTE = (403, 70, 755, 568); ZOC = (403, 568, 755, 576)
@@ -161,7 +161,7 @@ def main():
     # rótulos
     for (x0, _, x1, _), t in ((LAT_IZQ, "LATERAL IZQUIERDO"), (FRENTE, "FRENTE"), (LAT_DER, "LATERAL DERECHO")):
         centro(d, (s((x0 + x1) / 2)[0], s(40)[0]), t, fnt("xb", 70), (235, 235, 238))
-    out = os.path.join(BASE, "salida", "esquema_importador")
+    out = os.path.join(BASE, "salida", "esquema_importador" + ("" if MAQ_N == "001" else "_maq" + MAQ_N))
     img.save(out + ".png", optimize=True)
     img.resize((W // 3, H // 3), Image.LANCZOS).save(out + "_liviana.jpg", quality=88)
     img.crop((fx0 - 200, 0, fx1 + 200, H)).save(out + "_frente.png", optimize=True)
